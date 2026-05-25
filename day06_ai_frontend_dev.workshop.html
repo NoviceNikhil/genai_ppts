@@ -1,0 +1,1241 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 6: AI-Assisted Frontend Development — Workshop</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+
+:root,[data-theme="dark"]{
+  --bg:#0e0e10;--bg-deep:#080809;--surface:#18181b;--surface-2:#212124;
+  --border:rgba(255,255,255,.07);--border-hover:rgba(139,92,246,.3);
+  --text:#f4f4f5;--text-2:#a1a1aa;--text-3:#52525b;
+  --accent:#8b5cf6;--accent-2:#a78bfa;--accent-3:#c4b5fd;
+  --tag-bg:rgba(139,92,246,.12);--tag-border:rgba(139,92,246,.22);--tag-text:#a78bfa;
+  --card-bg:rgba(255,255,255,.03);--card-bg-h:rgba(255,255,255,.055);
+  --grid-line:rgba(255,255,255,.016);--accent-line:rgba(139,92,246,.55);
+  --nav-bg:rgba(18,18,20,.92);--shadow:0 0 0 1px rgba(255,255,255,.07);
+  --noise-op:.025;--glow:rgba(139,92,246,.13);--glow-strong:rgba(139,92,246,.22);
+  --stat-grad:linear-gradient(135deg,#f4f4f5 30%,#8b5cf6);
+  --bar-track:rgba(255,255,255,.06);--bar-fill:linear-gradient(90deg,#7c3aed,#a78bfa);
+  --code-bg:#121214;--spring:cubic-bezier(0.16,1.1,0.3,1);
+}
+[data-theme="light"]{
+  --bg:#fafafa;--bg-deep:#f3f3f6;--surface:#fff;--surface-2:#f5f5f7;
+  --border:rgba(0,0,0,.08);--border-hover:rgba(109,40,217,.35);
+  --text:#111113;--text-2:#6b6b74;--text-3:#b0b0b8;
+  --accent:#7c3aed;--accent-2:#6d28d9;--accent-3:#5b21b6;
+  --tag-bg:rgba(124,58,237,.08);--tag-border:rgba(124,58,237,.18);--tag-text:#6d28d9;
+  --card-bg:rgba(0,0,0,.025);--card-bg-h:rgba(0,0,0,.04);
+  --grid-line:rgba(0,0,0,.04);--accent-line:rgba(124,58,237,.45);
+  --nav-bg:rgba(250,250,250,.94);--shadow:0 1px 3px rgba(0,0,0,.08),0 0 0 1px rgba(0,0,0,.06);
+  --noise-op:.015;--glow:rgba(124,58,237,.07);--glow-strong:rgba(124,58,237,.13);
+  --stat-grad:linear-gradient(135deg,#111113 30%,#7c3aed);
+  --bar-track:rgba(0,0,0,.07);--bar-fill:linear-gradient(90deg,#6d28d9,#8b5cf6);
+  --code-bg:#f5f5f7;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);font-family:Inter,-apple-system,BlinkMacSystemFont,sans-serif;color:var(--text);-webkit-font-smoothing:antialiased;transition:background .3s,color .3s}
+a{color:var(--accent-2);text-decoration:none}
+a:hover{text-decoration:underline}
+code,pre{font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace}
+.section-label{display:inline-flex;margin-bottom:.7rem;color:var(--accent);font-size:.78rem;font-weight:800;letter-spacing:.13em;text-transform:uppercase}
+.slide-heading{font-size:clamp(2.4rem,4vw,4.8rem);font-weight:850;letter-spacing:-.025em;line-height:1.08;margin:0 0 1.5rem;color:var(--text)}
+.subtitle{font-size:clamp(1.1rem,1.5vw,1.45rem);line-height:1.65;color:var(--text-2);max-width:780px}
+.linear-list{list-style:none;padding:0;margin:1rem 0;display:flex;flex-direction:column;gap:4px}
+.linear-list li{display:flex;gap:14px;align-items:flex-start;padding:12px 16px;border-radius:8px;font-size:.98rem;color:var(--text-2);line-height:1.6;transition:background .2s,color .2s}
+.linear-list li:hover{background:var(--card-bg-h);color:var(--text)}
+.linear-list li::before{content:"";flex-shrink:0;width:6px;height:6px;border-radius:50%;background:var(--accent);margin-top:9px;transition:background .3s}
+p{color:var(--text-2);font-size:1.05rem;line-height:1.75;margin:0 0 1.1rem}
+blockquote{border-left:3px solid var(--accent);background:var(--card-bg);padding:18px 22px;margin:1.2rem 0;color:var(--text-2);box-shadow:var(--shadow)}
+.code-container{margin:1.25rem 0;border:1px solid var(--border);border-radius:12px;background:var(--code-bg);overflow:hidden;box-shadow:var(--shadow)}
+.code-header{background:var(--bg-deep);padding:12px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.code-title{font-family:"JetBrains Mono",monospace;font-size:.74rem;color:var(--text-2);display:flex;align-items:center;gap:8px}
+.code-title::before{content:"";display:block;width:8px;height:8px;border-radius:50%;background:var(--accent)}
+.copy-btn{background:transparent;border:none;color:var(--text-3);cursor:pointer;font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;padding:4px 8px;border-radius:4px;transition:color .2s,background-color .2s;font-family:inherit}
+.copy-btn:hover{color:var(--text-2);background:var(--card-bg-h)}
+.code-container pre{padding:20px 24px;overflow-x:auto;margin:0}
+.code-container code{font-family:"JetBrains Mono","Fira Code",ui-monospace,monospace;font-size:.85rem;line-height:1.6;color:var(--text-2)}
+pre{padding:18px 20px;overflow:auto;color:var(--text);font-size:.88rem;line-height:1.65}
+.table-wrap{overflow:auto;margin:1.2rem 0;border:1px solid var(--border);border-radius:8px;box-shadow:var(--shadow)}
+table{width:100%;border-collapse:collapse;background:var(--card-bg)}
+th,td{padding:13px 14px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top;color:var(--text-2);line-height:1.5}
+th{color:var(--text);font-size:.82rem;text-transform:uppercase;letter-spacing:.08em;background:var(--surface)}
+.card{background:var(--card-bg);border:1px solid var(--border);border-radius:12px;padding:28px;position:relative;transition:background .25s,border-color .25s,transform .25s,box-shadow .25s;box-shadow:var(--shadow)}
+.card:hover{background:var(--card-bg-h);border-color:var(--border-hover);transform:translateY(-4px)}
+.card-icon{font-size:24px;margin-bottom:18px;display:inline-block;color:var(--accent)}
+.card h3{font-size:1.15rem;font-weight:700;margin-bottom:12px;color:var(--text)}
+.card p{font-size:.94rem;color:var(--text-2);line-height:1.6}
+.card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;margin-top:32px}
+.comp-container{border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--surface);margin:1.2rem 0}
+.comp-header{padding:16px 24px;font-weight:700;border-bottom:1px solid var(--border)}
+.comp-left-h{background:rgba(139,92,246,.06);color:var(--accent-2)}
+.comp-right-h{background:rgba(255,255,255,.02);color:var(--text-2)}
+.comp-body{padding:24px;font-size:.94rem;line-height:1.6;color:var(--text-2)}
+.two-col-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin:16px 0}
+@media(max-width:768px){.two-col-grid{grid-template-columns:1fr}}
+.timeline{position:relative;padding-left:32px;margin:32px 0}
+.timeline::before{content:"";position:absolute;left:8px;top:8px;bottom:8px;width:2px;background:linear-gradient(to bottom,var(--accent),rgba(139,92,246,.1))}
+.timeline-item{position:relative;padding-bottom:32px}
+.timeline-item:last-child{padding-bottom:0}
+.timeline-item::before{content:"";position:absolute;left:-29px;top:6px;width:10px;height:10px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px var(--tag-bg);transition:background .3s,transform .2s}
+.timeline-item:hover::before{transform:scale(1.3)}
+.timeline-date{font-family:"JetBrains Mono",monospace;font-size:.72rem;font-weight:600;text-transform:uppercase;color:var(--accent-2);margin-bottom:4px;letter-spacing:.05em}
+.timeline-title{font-size:1.05rem;font-weight:700;margin-bottom:8px;color:var(--text)}
+.timeline-desc{font-size:.94rem;color:var(--text-2);line-height:1.6}
+.workflow-container{display:flex;align-items:stretch;gap:16px;margin:32px 0;flex-wrap:wrap}
+.workflow-step{background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:20px 24px;flex:1;min-width:200px;transition:background .2s,border-color .2s,transform .2s;display:flex;flex-direction:column;justify-content:center}
+.workflow-step:hover{background:var(--card-bg-h);border-color:var(--border-hover);transform:translateY(-2px)}
+.workflow-num{font-family:"JetBrains Mono",monospace;font-size:.68rem;font-weight:700;color:var(--accent);margin-bottom:6px}
+.workflow-title{font-size:.96rem;font-weight:700;color:var(--text);margin-bottom:4px}
+.workflow-desc{font-size:.84rem;color:var(--text-2);line-height:1.5}
+.workflow-arrow{color:var(--accent);font-size:1.4rem;display:flex;align-items:center;justify-content:center;user-select:none}
+@media(max-width:768px){.workflow-arrow{transform:rotate(90deg);padding:8px 0}.workflow-container{flex-direction:column}}
+.tab-container{margin:28px 0}
+.tab-headers{display:flex;gap:8px;border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:20px;flex-wrap:wrap}
+.tab-header{background:transparent;border:none;color:var(--text-3);padding:8px 16px;cursor:pointer;font-size:.88rem;font-weight:600;border-radius:6px;transition:background-color .2s,color .2s;font-family:inherit}
+.tab-header:hover{color:var(--text-2);background:var(--card-bg-h)}
+.tab-header.active{color:var(--accent-2);background:var(--tag-bg)}
+.tab-panel{display:none}.tab-panel.active{display:block}
+.stat-num{background:var(--stat-grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hbar-track{background:var(--bar-track);border-radius:4px;height:8px;overflow:hidden}
+.hbar-fill{height:100%;border-radius:4px;background:var(--bar-fill);width:0%;transition:width .975s cubic-bezier(.16,1,.3,1)}
+@keyframes cursor-blink{0%,100%{opacity:1}50%{opacity:0}}
+.tw-cursor{display:inline;color:var(--accent);animation:cursor-blink .65s step-end infinite;margin-left:2px;font-weight:300;line-height:1}
+.reveal{opacity:0;transform:translateY(18px)}
+.reveal-left{opacity:0;transform:translateX(-28px)}
+.reveal-right{opacity:0;transform:translateX(28px)}
+.reveal-scale{opacity:0;transform:scale(.92) translateY(10px)}
+.reveal-blur{opacity:0;transform:translateY(14px);filter:blur(6px)}
+.reveal-pop{opacity:0;transform:scale(.72)}
+.reveal.visible,.reveal-left.visible,.reveal-right.visible,.reveal-scale.visible,.reveal-blur.visible,.reveal-pop.visible{opacity:1;transform:translate(0) scale(1);filter:blur(0);transition:opacity .65s var(--spring),transform .65s var(--spring),filter .5s ease}
+.visible-delay-1{transition-delay:.08s!important}
+.visible-delay-2{transition-delay:.16s!important}
+.visible-delay-3{transition-delay:.24s!important}
+.visible-delay-4{transition-delay:.32s!important}
+
+
+html{scroll-behavior:smooth}
+body{min-height:100vh;overflow-x:hidden}
+.grid-overlay{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(var(--grid-line) 1px,transparent 1px),linear-gradient(90deg,var(--grid-line) 1px,transparent 1px);background-size:56px 56px}
+.noise-layer{position:fixed;inset:0;z-index:1;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");background-size:256px;opacity:var(--noise-op);mix-blend-mode:overlay}
+#spotlight{position:fixed;inset:0;z-index:2;pointer-events:none}
+.top-header{position:fixed;top:0;left:0;right:0;height:64px;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 32px;background:var(--nav-bg);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);transition:background .3s,border-color .3s}
+.header-left{display:flex;align-items:center;gap:14px}
+.header-actions{display:flex;align-items:center;gap:10px}
+.brand{display:flex;align-items:center;gap:12px;font-size:1.05rem;font-weight:850;letter-spacing:-.02em}
+.brand-mark{color:var(--accent)}
+.theme-toggle{width:38px;height:38px;background:var(--surface);border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.05rem;box-shadow:var(--shadow);transition:background .3s,border-color .3s,transform .15s;color:var(--text);font-family:inherit}
+.theme-toggle:hover{transform:scale(1.06);background:var(--card-bg-h)}
+.sidebar-toggle{width:38px;height:38px;background:var(--surface);border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.15rem;box-shadow:var(--shadow);transition:background .3s,border-color .3s,transform .15s;color:var(--text);font-family:inherit}
+.sidebar-toggle:hover{transform:scale(1.06);background:var(--card-bg-h)}
+.sidebar{position:fixed;top:64px;left:0;bottom:0;width:280px;z-index:90;padding:24px 16px;background:var(--bg-deep);border-right:1px solid var(--border);overflow:auto;transition:transform .34s cubic-bezier(.16,1,.3,1),background .3s,border-color .3s}
+.sidebar.collapsed{transform:translateX(-100%)}
+.sidebar::-webkit-scrollbar{width:4px}
+.sidebar::-webkit-scrollbar-thumb{background:var(--border-hover);border-radius:99px}
+.sidebar-label{font-size:.65rem;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:var(--text-3);margin-bottom:12px;padding-left:12px}
+.nav-item{display:flex;gap:10px;align-items:flex-start;padding:10px 14px;border-radius:8px;color:var(--text-2);font-size:.84rem;font-weight:500;text-decoration:none;border-left:2px solid transparent;transition:background .2s,color .2s,border-left-color .2s;margin-bottom:2px}
+.nav-item:hover{background:var(--card-bg-h);color:var(--text)}
+.nav-item span{font-family:"JetBrains Mono",monospace;font-size:.68rem;color:var(--text-3);width:18px;flex-shrink:0;margin-top:2px}
+.nav-item.active{background:var(--tag-bg);color:var(--text);font-weight:600;border-left-color:var(--accent)}
+.nav-item.active span{color:var(--accent)}
+.workshop-main{position:relative;z-index:3;margin-left:280px;padding:104px clamp(28px,5vw,80px) 80px;max-width:1180px;transition:margin-left .34s cubic-bezier(.16,1,.3,1)}
+.sidebar.collapsed~.main-content .workshop-main,.sidebar-collapsed .workshop-main{margin-left:0}
+body.sidebar-collapsed .sidebar{transform:translateX(-100%)}
+body.sidebar-collapsed .workshop-main{margin-left:0}
+.hero-section{min-height:52vh;display:flex;flex-direction:column;justify-content:center;border-bottom:1px solid var(--border);margin-bottom:56px;scroll-margin-top:92px}
+.hero-title{font-size:clamp(3.3rem,7vw,7rem);font-weight:900;letter-spacing:-.045em;line-height:1.03;margin:0 0 1.4rem}
+.content-section{scroll-margin-top:92px;margin:0 0 64px;padding-bottom:28px;border-bottom:1px solid var(--border)}
+.content-section .content-section{margin:44px 0 0 0;padding:28px 0 0 24px;border-bottom:0;border-left:1px solid var(--border)}
+.section-body{max-width:860px}
+.reveal-left{opacity:0;transform:translateY(16px);transition:opacity .55s cubic-bezier(.16,1,.3,1),transform .55s cubic-bezier(.16,1,.3,1)}
+.reveal-left.visible{opacity:1;transform:translateY(0)}
+.activity-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:32px;box-shadow:var(--shadow);margin:16px 0 32px}
+.activity-title{font-size:1.1rem;font-weight:700;margin-bottom:20px;display:flex;align-items:center;gap:10px;color:var(--text)}
+.activity-title::before{content:"\2699\FE0F";font-size:1.2rem}
+.checklist{display:flex;flex-direction:column;gap:12px;margin-top:16px}
+.checklist-row{display:flex;align-items:flex-start;gap:14px;padding:12px 16px;border-radius:8px;border:1px solid var(--border);background:var(--card-bg);cursor:pointer;transition:background .2s,border-color .2s}
+.checklist-row:hover{background:var(--card-bg-h);border-color:var(--border-hover)}
+.checklist-checkbox{flex-shrink:0;width:20px;height:20px;border:2px solid var(--accent);border-radius:5px;margin-top:2px;display:flex;align-items:center;justify-content:center;transition:background .2s,border-color .2s;position:relative}
+.checklist-checkbox::after{content:"\2713";font-size:12px;font-weight:700;color:#fff;opacity:0;transform:scale(.6);transition:opacity .15s,transform .15s var(--spring)}
+.checklist-text{font-size:.96rem;color:var(--text-2);line-height:1.55;transition:color .2s}
+.checklist-row.checked{border-color:rgba(139,92,246,.2);background:rgba(139,92,246,.03)}
+.checklist-row.checked .checklist-checkbox{background:var(--accent);border-color:var(--accent)}
+.checklist-row.checked .checklist-checkbox::after{opacity:1;transform:scale(1)}
+.checklist-row.checked .checklist-text{color:var(--text-3);text-decoration:line-through}
+.accent-bar{height:1px;background:linear-gradient(90deg,transparent,var(--accent-line),transparent);margin:64px 0;border:none}
+@media(max-width:900px){.sidebar{display:none}.workshop-main{margin-left:0;padding:92px 20px 64px}.top-header{padding:0 18px}.hero-section{min-height:44vh}.hero-title{font-size:3.2rem}.slide-heading{font-size:2.35rem}.content-section .content-section{padding-left:16px}}
+
+    </style>
+</head>
+<body>
+    <div id="spotlight"></div>
+    <div class="grid-overlay"></div>
+    <div class="noise-layer"></div>
+
+    <header class="top-header">
+        <div class="header-left">
+            <button class="sidebar-toggle" id="sidebarBtn" aria-label="Toggle navigation" title="Toggle sidebar">&#9776;</button>
+            <div class="brand">
+                <span class="brand-accent">◇</span>
+                <span>Training Guide</span>
+            </div>
+        </div>
+        <div class="header-actions">
+            <button class="theme-toggle" id="themeBtn" aria-label="Toggle theme">&#9680;</button>
+        </div>
+    </header>
+
+    <aside class="sidebar" id="workshopSidebar" aria-label="Workshop navigation">
+        <div class="sidebar-label">Contents</div>
+        <ul class="nav-list">
+            <li><a class="nav-item" href="#day-6-ai-assisted-frontend-development"><span>01</span>Day 6: AI-Assisted Frontend Development</a></li><li><a class="nav-item" href="#day-6-ai-assisted-frontend-development-week-2-genai-applied-to-pe-development-track-1-pe-productivity"><span>02</span>Week 2 — GenAI Applied to PE Development | Track 1: PE Productivity</a></li><li><a class="nav-item" href="#day-6-ai-assisted-frontend-development-learning-objectives"><span>03</span>Learning Objectives</a></li><li><a class="nav-item" href="#day-6-ai-assisted-frontend-development-1-the-ai-assisted-frontend-engineering-mindset"><span>04</span>1. The AI-Assisted Frontend Engineering Mindset</a></li><li><a class="nav-item" href="#day-6-ai-assisted-frontend-development-2-react-component-generation-from-natural-language"><span>05</span>2. React Component Generation from Natural Language</a></li><li><a class="nav-item" href="#day-6-ai-assisted-frontend-development-3-typescript-type-generation-from-api-schemas"><span>06</span>3. TypeScript Type Generation from API Schemas</a></li><li><a class="nav-item" href="#day-6-ai-assisted-frontend-development-4-tailwind-css-with-ai-tools"><span>07</span>4. Tailwind CSS with AI Tools</a></li><li><a class="nav-item" href="#day-6-ai-assisted-frontend-development-5-ai-assisted-accessibility"><span>08</span>5. AI-Assisted Accessibility</a></li><li><a class="nav-item" href="#day-6-ai-assisted-frontend-development-6-state-management-and-custom-hooks-via-ai"><span>09</span>6. State Management and Custom Hooks via AI</a></li><li><a class="nav-item" href="#day-6-ai-assisted-frontend-development-7-reviewing-and-understanding-ai-generated-frontend-code"><span>10</span>7. Reviewing and Understanding AI-Generated Frontend Code</a></li><li><a class="nav-item" href="#day-6-ai-assisted-frontend-development-8-latest-trends-emerging-patterns-may-2026"><span>11</span>8. Latest Trends &amp; Emerging Patterns (May 2026)</a></li><li><a class="nav-item" href="#day-6-ai-assisted-frontend-development-hands-on-lab-build-a-dashboard-page-in-under-45-minutes"><span>12</span>Hands-On Lab: Build a Dashboard Page in Under 45 Minutes</a></li><li><a class="nav-item" href="#day-6-ai-assisted-frontend-development-key-takeaways"><span>13</span>Key Takeaways</a></li><li><a class="nav-item" href="#day-6-ai-assisted-frontend-development-self-assessment-checklist"><span>14</span>Self-Assessment Checklist</a></li><li><a class="nav-item" href="#day-6-ai-assisted-frontend-development-references-further-reading"><span>15</span>References &amp; Further Reading</a></li>
+        </ul>
+    </aside>
+
+    <main class="main-content">
+        <section class="hero-section" id="top" style="min-height:40vh;display:flex;flex-direction:column;justify-content:center;margin-bottom:64px;padding-bottom:48px;border-bottom:1px solid var(--border)">
+            <div class="tag">Training Guide</div>
+            <h1 class="slide-heading" style="font-size:clamp(2.8rem,5vw,5rem)">Day 6: AI-Assisted Frontend Development</h1>
+            
+        </section>
+        <section id="day-6-ai-assisted-frontend-development" class="content-section visible">
+    <span class="section-label">1 &middot; Day 6: AI-Assisted Frontend Development</span>
+    <h2 class="slide-heading">Day 6: AI-Assisted Frontend Development</h2>
+    <div class="section-body"></div>
+    <section id="day-6-ai-assisted-frontend-development-week-2-genai-applied-to-pe-development-track-1-pe-productivity" class="content-section reveal-left">
+    <span class="section-label">1.1 &middot; Week 2 — GenAI Applied to PE Development | Track 1: PE Productivity</span>
+    <h2 class="slide-heading">Week 2 — GenAI Applied to PE Development | Track 1: PE Productivity</h2>
+    <div class="section-body"><blockquote><strong>Duration:</strong> Full day (6-7 hours including lab) <strong>Prerequisites:</strong> Week 1 complete (LLM basics, prompt engineering, API fundamentals) <strong>Tools you&#39;ll need installed:</strong></blockquote>
+<ul class="linear-list"><li>Claude Code — <code>npm install -g @anthropic-ai/claude-code</code> (requires Node 18+, Anthropic API key or Max subscription)</li><li>Cursor IDE — Download from https://cursor.com/ (free tier available)</li><li>GitHub Copilot — VS Code extension, requires GitHub Copilot subscription (free for students)</li><li>Node.js 20+ and npm — for running Vite, Vitest, and React tooling</li><li>A Vite + React + TypeScript project — <code>npm create vite@latest dashboard-lab -- --template react-ts</code></li><li>Tailwind CSS v4 — <code>npm install tailwindcss @tailwindcss/vite</code> (added to Vite config)</li><li>Vitest + React Testing Library — <code>npm install -D vitest @testing-library/react @testing-library/jest-dom jsdom</code></li></ul></div>
+    
+  </section>
+<section id="day-6-ai-assisted-frontend-development-learning-objectives" class="content-section reveal-left">
+    <span class="section-label">1.2 &middot; Learning Objectives</span>
+    <h2 class="slide-heading">Learning Objectives</h2>
+    <div class="section-body"><p>By the end of today, you will be able to:</p>
+<ol class="linear-list"><li>Generate production-quality React TypeScript components from natural language descriptions using Claude Code, Cursor, and Copilot — and know which tool to reach for based on task scope.</li><li>Produce accurate TypeScript types and interfaces from API response schemas, reducing manual type authoring by 80% or more.</li><li>Use AI tools to write Tailwind CSS layouts — responsive grids, dark mode variants, and design-token-consistent styling — without memorizing hundreds of utility classes.</li><li>Apply AI-assisted accessibility patterns (ARIA attributes, keyboard navigation, focus management) and verify them with automated checks.</li><li>Critically review AI-generated frontend code for correctness, performance pitfalls, and accessibility gaps before committing it.</li></ol></div>
+    
+  </section>
+<section id="day-6-ai-assisted-frontend-development-1-the-ai-assisted-frontend-engineering-mindset" class="content-section reveal-left">
+    <span class="section-label">1.3 &middot; 1. The AI-Assisted Frontend Engineering Mindset</span>
+    <h2 class="slide-heading">1. The AI-Assisted Frontend Engineering Mindset</h2>
+    <div class="section-body"><p>Before you generate a single component, you need the right mental model. AI tools in May 2026 can generate entire React features — but the bottleneck has shifted from writing code to designing context, reviewing output, and maintaining architectural quality.</p></div>
+    <section id="day-6-ai-assisted-frontend-development-1-the-ai-assisted-frontend-engineering-mindset-where-ai-helps-vs-where-it-fails" class="content-section reveal-left">
+    <span class="section-label">1.3.1 &middot; Where AI Helps vs Where It Fails</span>
+    <h3 class="slide-heading">Where AI Helps vs Where It Fails</h3>
+    <div class="section-body"><div class="comp-container"><div class="comp-header comp-left-h">AI Is Strong At</div><div class="comp-header comp-right-h">AI Is Weak At</div><div class="comp-body"><div class="two-col-grid"><div>Boilerplate and repetitive component construction</div><div>Long-range architecture consistency across files</div></div><div class="two-col-grid"><div>TypeScript inference and interface generation</div><div>Complex async state synchronization</div></div><div class="two-col-grid"><div>Tailwind utility-class composition</div><div>Accessibility nuance (focus traps, live regions)</div></div><div class="two-col-grid"><div>Scaffolding hooks and reducers</div><div>Security assumptions and input sanitization</div></div><div class="two-col-grid"><div>Test generation and accessibility suggestions</div><div>Domain-specific correctness</div></div><div class="two-col-grid"><div>Translating intent into implementation</div><div>Maintaining codebase conventions without context</div></div></div></div>
+<p>The winning engineers in 2026 are not the fastest typists. They are the ones who design context, constrain generation, and review critically.</p></div>
+    
+  </section>
+<section id="day-6-ai-assisted-frontend-development-1-the-ai-assisted-frontend-engineering-mindset-ai-pair-programming-vs-ai-delegation" class="content-section reveal-left">
+    <span class="section-label">1.3.2 &middot; AI Pair Programming vs AI Delegation</span>
+    <h3 class="slide-heading">AI Pair Programming vs AI Delegation</h3>
+    <div class="section-body"><p>There is a critical difference between these two prompts:</p>
+<ul class="linear-list"><li>Delegation: &quot;Generate a button component.&quot; → AI makes all decisions. You get generic output that may not fit your architecture.</li><li>Pair programming: &quot;Implement the dashboard filter module following our architecture in CLAUDE.md. Use the FilterState type from src/types/. Match the styling pattern in FilterBar.tsx.&quot; → You set the constraints, AI handles the implementation within them.</li></ul>
+<p>Delegation works for throwaway prototypes. Pair programming is what ships to production. The difference is context: when you provide your architecture, conventions, and constraints, AI output quality jumps dramatically. When you delegate without context, you create <strong>AI-generated code debt</strong> — duplicated hooks, inconsistent styling, over-engineered abstractions, and incorrect state ownership that costs more to fix than it saved to generate.</p></div>
+    
+  </section>
+<section id="day-6-ai-assisted-frontend-development-1-the-ai-assisted-frontend-engineering-mindset-multi-step-prompting" class="content-section reveal-left">
+    <span class="section-label">1.3.3 &middot; Multi-Step Prompting</span>
+    <h3 class="slide-heading">Multi-Step Prompting</h3>
+    <div class="section-body"><p>One giant prompt produces worse output than a sequence of focused prompts. Instead of asking AI to build an entire feature at once, break it into steps:</p>
+<ol class="linear-list"><li>Scaffold the layout — page shell, component boundaries, file structure</li><li>Generate the data model — TypeScript types, interfaces, mock data</li><li>Build leaf components — smallest pieces first, each independently testable</li><li>Add responsive behavior — mobile-first Tailwind, breakpoint-specific layouts</li><li>Add accessibility — ARIA attributes, keyboard navigation, focus management</li><li>Generate tests — component rendering, interaction, accessibility assertions</li></ol>
+<p>Each step builds on verified output from the previous step. This is slower per-prompt but produces significantly better results because each generation has focused context and a clear, narrow scope. It also makes review easier — you catch problems at each layer instead of debugging a 500-line monolith.</p></div>
+    
+  </section>
+  </section>
+<section id="day-6-ai-assisted-frontend-development-2-react-component-generation-from-natural-language" class="content-section reveal-left">
+    <span class="section-label">1.4 &middot; 2. React Component Generation from Natural Language</span>
+    <h2 class="slide-heading">2. React Component Generation from Natural Language</h2>
+    <div class="section-body"></div>
+    <section id="day-6-ai-assisted-frontend-development-2-react-component-generation-from-natural-language-what-it-is" class="content-section reveal-left">
+    <span class="section-label">1.4.1 &middot; What It Is</span>
+    <h3 class="slide-heading">What It Is</h3>
+    <div class="section-body"><p>You describe what a component should do in plain English, and the AI tool generates the React TypeScript code. The quality of what you get back depends almost entirely on how you describe the component. A vague prompt like &quot;make a dashboard&quot; produces generic boilerplate. A prompt that specifies the data shape, interaction behavior, responsive breakpoints, and accessibility requirements produces something you can actually ship after a review pass.</p>
+<p>All three major tools handle this differently. Understanding the differences is what separates an intern who wastes two hours fighting a tool from one who picks the right tool and finishes in fifteen minutes.</p></div>
+    
+  </section>
+<section id="day-6-ai-assisted-frontend-development-2-react-component-generation-from-natural-language-why-it-matters-for-product-engineers" class="content-section reveal-left">
+    <span class="section-label">1.4.2 &middot; Why It Matters for Product Engineers</span>
+    <h3 class="slide-heading">Why It Matters for Product Engineers</h3>
+    <div class="section-body"><p>You are constantly building UI components: forms, tables, cards, modals, navigation, filters. These follow well-known structural patterns, which is exactly why AI tools generate them reliably. The productivity gain is real but conditional. If you spend an hour debugging hallucinated props after generation, you have not saved time. The skill is writing prompts that produce correct output on the first or second try, then reviewing with enough understanding to catch what slips through.</p></div>
+    
+  </section>
+<section id="day-6-ai-assisted-frontend-development-2-react-component-generation-from-natural-language-how-to-do-it-step-by-step" class="content-section reveal-left">
+    <span class="section-label">1.4.3 &middot; How to Do It — Step by Step</span>
+    <h3 class="slide-heading">How to Do It — Step by Step</h3>
+    <div class="section-body"><p><strong>Setting up your project context (Claude Code)</strong></p>
+<p>Before you generate anything, create a <code>CLAUDE.md</code> file in your project root. This file acts as persistent instructions that Claude Code reads on every invocation. Without it, Claude Code makes assumptions about your stack that may be wrong.</p>
+<div class="code-container"><div class="code-header"><span class="code-title">markdown</span><button class="copy-btn" type="button">Copy</button></div><pre><code># CLAUDE.md
+## Stack
+- React 19 + TypeScript 5.7
+- Vite 6 for bundling
+- Tailwind CSS v4 (CSS-first config — no tailwind.config.js)
+- Vitest + React Testing Library for tests
+- No Redux — use useState/useReducer for local state, React Context for shared state
+
+## Conventions
+- Functional components only, no class components
+- Named exports, not default exports
+- Props interfaces named {ComponentName}Props
+- One component per file in src/components/
+- Tests in __tests__/ directories next to the component
+- Use semantic HTML elements (nav, main, aside, section, article)
+- All interactive elements must have ARIA labels</code></pre></div>
+<p>A well-crafted <code>CLAUDE.md</code> reduces wrong-architecture suggestions by roughly 70%. Claude Code stops suggesting Redux when you have specified Zustand. It follows your naming conventions. It puts files where you expect them.</p>
+<p><strong>Generating a component with Claude Code</strong></p>
+<p>Open your terminal in the project root, run <code>claude</code>, and type:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>Create a FilterBar component for a dashboard. It should have:
+- A search input with debounced onChange (300ms delay)
+- A dropdown to select status (All, Active, Inactive, Pending)
+- A date range picker with &quot;from&quot; and &quot;to&quot; date inputs
+- A &quot;Reset Filters&quot; button that clears all fields
+- Props: onFilterChange callback that receives { search: string, status: string, dateFrom: string, dateTo: string }
+- Responsive: stack vertically on mobile (&lt;768px), horizontal row on desktop
+- Tailwind CSS v4 utility classes</code></pre></div>
+<p>Claude Code reads your <code>CLAUDE.md</code>, checks your project structure, and generates <code>FilterBar.tsx</code>, its test file, and any needed export updates — all in one pass. This multi-file generation is Claude Code&#39;s signature strength.</p>
+<p><strong>Using Plan Mode for complex components</strong></p>
+<p>For any component that touches three or more files, use Plan Mode before generating code. In Claude Code, press <code>Shift+Tab</code> twice or type <code>/plan</code>:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>/plan
+
+I need a DataTable component that:
+- Accepts generic typed data via props: DataTable&lt;T&gt;
+- Supports column sorting (click header to toggle asc/desc/none)
+- Supports pagination (page size selector: 10, 25, 50)
+- Highlights the currently sorted column
+- Shows a loading skeleton when data is being fetched
+- Is fully keyboard navigable (arrow keys move between cells, Enter activates sort)
+
+How should I structure this? What files will be created or modified?</code></pre></div>
+<p>Claude Code will analyze your codebase, propose a file structure, explain the approach, and wait for your approval before writing any code. This prevents the &quot;AI wrote 500 lines in the wrong directory&quot; problem.</p>
+<p><strong>Generating with Cursor Agent Mode</strong></p>
+<p>In Cursor, open the Composer panel (<code>Cmd+I</code> on Mac) and toggle &quot;Agent&quot; mode. Then type:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>Create a Sidebar component in src/components/Sidebar.tsx with these specs:
+- Navigation items: Dashboard, Analytics, Settings, Help
+- Each item has an icon (use Lucide React icons), label, and route path
+- Active item highlighted with a left border accent and background color
+- Collapsible: a toggle button at the top switches between expanded (icon + label) and collapsed (icon only)
+- Collapsed width: 64px, expanded width: 240px, smooth transition
+- Mobile: hidden by default, slides in from left as an overlay
+- Props: currentPath (string), onNavigate (path: string) =&gt; void
+- @src/components/FilterBar.tsx for style consistency</code></pre></div>
+<p>The <code>@src/components/FilterBar.tsx</code> reference is important. Cursor&#39;s <code>@</code>-mention system lets you explicitly include files as context. Cursor will read that file and match the styling patterns, naming conventions, and code structure of your existing component.</p>
+<p><strong>Inline generation with Copilot</strong></p>
+<p>Copilot does not generate entire files from a prompt. You create the file, write descriptive comments, and Copilot suggests code block by block. In VS Code, create <code>src/components/StatusBadge.tsx</code> and type:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">typescript</span><button class="copy-btn" type="button">Copy</button></div><pre><code>// StatusBadge: colored badge indicating item status
+// Props: status (&#39;active&#39; | &#39;inactive&#39; | &#39;pending&#39; | &#39;error&#39;), size (&#39;sm&#39; | &#39;md&#39; | &#39;lg&#39;)
+// Colors: active=green, inactive=gray, pending=yellow, error=red
+// Dot indicator + text label, Tailwind CSS
+
+interface StatusBadgeProps {</code></pre></div>
+<p>Copilot suggests the full interface. Accept with <code>Tab</code>, start the function signature, and Copilot completes the component. This works well for small components. For multi-file work, switch to Claude Code or Cursor.</p></div>
+    
+  </section>
+<section id="day-6-ai-assisted-frontend-development-2-react-component-generation-from-natural-language-10-minute-exercise-component-prompt-upgrade" class="content-section reveal-left">
+    <span class="section-label">1.4.4 &middot; 10-Minute Exercise: Component Prompt Upgrade</span>
+    <div class="activity-card">
+      <div class="activity-title">10-Minute Exercise: Component Prompt Upgrade</div>
+      <div class="section-body"><p>Take this weak prompt: &quot;Build a dashboard filter component.&quot; Rewrite it into a production-ready AI prompt.</p>
+<p>Expected output: one improved prompt that another intern could paste into Claude Code or Cursor and use without extra explanation.</p></div>
+      <div class="checklist"><div class="checklist-row" onclick="toggleChecklist(this)" role="checkbox" aria-checked="false" tabindex="0"><span class="checklist-checkbox"></span><span class="checklist-text">Add the exact props contract, including the callback shape.</span></div><div class="checklist-row" onclick="toggleChecklist(this)" role="checkbox" aria-checked="false" tabindex="0"><span class="checklist-checkbox"></span><span class="checklist-text">Add responsive layout behavior for mobile and desktop.</span></div><div class="checklist-row" onclick="toggleChecklist(this)" role="checkbox" aria-checked="false" tabindex="0"><span class="checklist-checkbox"></span><span class="checklist-text">Add accessibility requirements for labels, focus states, and button names.</span></div><div class="checklist-row" onclick="toggleChecklist(this)" role="checkbox" aria-checked="false" tabindex="0"><span class="checklist-checkbox"></span><span class="checklist-text">Ask an AI tool to identify one missing requirement before you generate code.</span></div></div>
+      
+    </div>
+    
+  </section>
+<section id="day-6-ai-assisted-frontend-development-2-react-component-generation-from-natural-language-what-can-go-wrong" class="content-section reveal-left">
+    <span class="section-label">1.4.5 &middot; What Can Go Wrong</span>
+    <h3 class="slide-heading">What Can Go Wrong</h3>
+    <div class="section-body"><p><strong>Hallucinated imports.</strong> AI tools frequently import packages that are not in your <code>package.json</code>. Claude Code is better about checking your actual dependencies, but Copilot and Cursor regularly suggest imports from <code>@headlessui/react</code>, <code>react-icons</code>, or <code>date-fns</code> without verifying they are installed. Always check imports first.</p>
+<p><strong>Stale API patterns.</strong> Claude&#39;s training data includes older React patterns. You may see <code>React.FC&lt;Props&gt;</code> (discouraged since React 18), <code>useEffect</code> for data fetching instead of a data fetching library, or <code>forwardRef</code> usage that is unnecessary in React 19 (which supports <code>ref</code> as a regular prop). Review generated code against current React conventions.</p>
+<p><strong>Tailwind v3 vs v4 syntax.</strong> AI tools, especially Copilot, sometimes generate Tailwind v3 configuration syntax (<code>tailwind.config.js</code>, <code>@apply</code> in PostCSS files) when you are using Tailwind v4&#39;s CSS-first configuration. If your <code>CLAUDE.md</code> or Cursor Rules specify v4, this happens less, but still watch for it.</p>
+<p><strong>Over-engineered solutions.</strong> Ask for a simple toggle and get a full state machine with five states. AI tools tend to generate more abstraction than you need. If the generated code has a custom hook, a context provider, and a reducer for what should be a single <code>useState</code>, simplify it.</p></div>
+    
+  </section>
+<section id="day-6-ai-assisted-frontend-development-2-react-component-generation-from-natural-language-tool-comparison-how-each-tool-handles-this" class="content-section reveal-left">
+    <span class="section-label">1.4.6 &middot; Tool Comparison: How Each Tool Handles This</span>
+    <h3 class="slide-heading">Tool Comparison: How Each Tool Handles This</h3>
+    <div class="section-body"><div class="table-wrap"><table><thead><tr><th>Aspect</th><th>Claude Code</th><th>Cursor</th><th>Copilot</th></tr></thead><tbody><tr><td>Input method</td><td>Natural language prompt in terminal</td><td>Composer panel with Agent mode</td><td>Inline comments in editor</td></tr><tr><td>Scope</td><td>Multi-file: component + test + exports</td><td>Multi-file: reads and edits across project</td><td>Single file at a time</td></tr><tr><td>Context</td><td>Reads entire codebase + CLAUDE.md</td><td>Indexes project + @-mentions + .cursor/rules/</td><td>Current file + open tabs</td></tr><tr><td>Best for</td><td>Generating a component with its test, updating routes, touching 3+ files</td><td>Generating within an existing codebase where style matching matters</td><td>Small components, filling in boilerplate, completing known patterns</td></tr><tr><td>Weakness</td><td>Cannot see your UI — works from code only</td><td>Can be slow on large projects indexing</td><td>No multi-file awareness; cannot create new files from scratch</td></tr></tbody></table></div></div>
+    
+  </section>
+<section id="day-6-ai-assisted-frontend-development-2-react-component-generation-from-natural-language-smart-vs-presentational-components" class="content-section reveal-left">
+    <span class="section-label">1.4.7 &middot; Smart vs Presentational Components</span>
+    <h3 class="slide-heading">Smart vs Presentational Components</h3>
+    <div class="section-body"><p>AI tools frequently mix data fetching, state management, transformation logic, and rendering into a single giant file. This creates components that are hard to test, hard to reuse, and hard to review.</p>
+<p>Train yourself to separate:</p>
+<ul class="linear-list"><li>Presentational (dumb) components: Receive data via props, render UI, emit events via callbacks. No <code>useEffect</code>, no <code>fetch</code>, no business logic. Example: <code>StatusBadge</code>, <code>Pagination</code>, <code>FilterBar</code>.</li><li>Container (smart) components: Own state, fetch data, transform it, and pass it down to presentational components. Example: <code>DashboardPage</code> that uses <code>useTableFilters</code> and passes filtered data to <code>DataTable</code>.</li></ul>
+<p>When reviewing AI-generated code, check: does this component both fetch data AND render a complex UI? If yes, split it. Ask the AI explicitly:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>Refactor DashboardPage.tsx: extract all data fetching and state management
+into a custom hook useDashboardData. The component should only handle layout
+and pass data to child components. No useEffect in the component file.</code></pre></div>
+<p>This separation makes each piece independently testable and keeps AI generation focused on one concern at a time.</p></div>
+    
+  </section>
+  </section>
+<section id="day-6-ai-assisted-frontend-development-3-typescript-type-generation-from-api-schemas" class="content-section reveal-left">
+    <span class="section-label">1.5 &middot; 3. TypeScript Type Generation from API Schemas</span>
+    <h2 class="slide-heading">3. TypeScript Type Generation from API Schemas</h2>
+    <div class="section-body"></div>
+    <section id="day-6-ai-assisted-frontend-development-3-typescript-type-generation-from-api-schemas-what-it-is" class="content-section reveal-left">
+    <span class="section-label">1.5.1 &middot; What It Is</span>
+    <h3 class="slide-heading">What It Is</h3>
+    <div class="section-body"><p>Every frontend that talks to a backend needs TypeScript types matching the API&#39;s request and response shapes. AI tools can generate these interfaces directly from API documentation, JSON response samples, or OpenAPI/Swagger schemas — eliminating the tedious manual authoring that falls out of sync the moment the backend changes.</p></div>
+    
+  </section>
+<section id="day-6-ai-assisted-frontend-development-3-typescript-type-generation-from-api-schemas-why-it-matters-for-product-engineers" class="content-section reveal-left">
+    <span class="section-label">1.5.2 &middot; Why It Matters for Product Engineers</span>
+    <h3 class="slide-heading">Why It Matters for Product Engineers</h3>
+    <div class="section-body"><p>Type mismatches between frontend and backend are among the most common sources of runtime bugs. A field renamed from <code>userName</code> to <code>username</code> on the backend silently breaks the frontend if the types are not updated. AI-generated types from actual API responses give you a fast first draft that is far better than writing everything by hand, though you still need to verify optional fields, union types, and nested objects.</p></div>
+    
+  </section>
+<section id="day-6-ai-assisted-frontend-development-3-typescript-type-generation-from-api-schemas-how-to-do-it-step-by-step" class="content-section reveal-left">
+    <span class="section-label">1.5.3 &middot; How to Do It — Step by Step</span>
+    <h3 class="slide-heading">How to Do It — Step by Step</h3>
+    <div class="section-body"><p><strong>From a JSON response sample (Claude Code)</strong></p>
+<p>Paste an actual API response into your prompt:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>Generate TypeScript interfaces for this API response. The endpoint is GET /api/dashboard/stats.
+Make all date fields Date type, IDs as string, and numeric values as number.
+Mark fields that could be missing as optional.
+
+{
+  &quot;summary&quot;: {
+    &quot;totalUsers&quot;: 14502,
+    &quot;activeUsers&quot;: 8923,
+    &quot;revenue&quot;: 245890.50,
+    &quot;revenueChange&quot;: 12.5,
+    &quot;period&quot;: &quot;2026-Q1&quot;
+  },
+  &quot;recentActivity&quot;: [
+    {
+      &quot;id&quot;: &quot;act_8f3k2&quot;,
+      &quot;userId&quot;: &quot;usr_29d1a&quot;,
+      &quot;action&quot;: &quot;purchase&quot;,
+      &quot;amount&quot;: 49.99,
+      &quot;timestamp&quot;: &quot;2026-05-20T14:32:00Z&quot;,
+      &quot;metadata&quot;: null
+    }
+  ],
+  &quot;filters&quot;: {
+    &quot;availableStatuses&quot;: [&quot;active&quot;, &quot;inactive&quot;, &quot;pending&quot;],
+    &quot;dateRange&quot;: { &quot;min&quot;: &quot;2026-01-01&quot;, &quot;max&quot;: &quot;2026-05-20&quot; }
+  }
+}</code></pre></div>
+<p>Claude Code will generate interfaces like <code>DashboardStats</code>, <code>Summary</code>, <code>ActivityItem</code>, and <code>DashboardFilters</code>, place them in a <code>src/types/</code> directory (if that is your convention from <code>CLAUDE.md</code>), and use proper TypeScript features: string literal unions for status values, optional chaining for nullable fields, and <code>Date</code> type annotations where appropriate.</p>
+<p><strong>From an OpenAPI spec (Cursor)</strong></p>
+<p>If your backend exposes an OpenAPI/Swagger spec, you can reference it directly in Cursor:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>@openapi.yaml
+
+Generate TypeScript request and response types for all endpoints under /api/dashboard/.
+Use discriminated unions for error responses.
+Export everything from src/types/api.ts.</code></pre></div></div>
+    
+  </section>
+<section id="day-6-ai-assisted-frontend-development-3-typescript-type-generation-from-api-schemas-10-minute-exercise-tighten-generated-types" class="content-section reveal-left">
+    <span class="section-label">1.5.4 &middot; 10-Minute Exercise: Tighten Generated Types</span>
+    <div class="activity-card">
+      <div class="activity-title">10-Minute Exercise: Tighten Generated Types</div>
+      <div class="section-body"><p>Use the dashboard JSON sample above and generate TypeScript interfaces with Claude Code, Cursor, or Copilot Chat.</p>
+<p>Expected output: a revised <code>dashboard.ts</code> type block with no <code>any</code>, no avoidable broad <code>string</code> types, and accurate optional/null handling.</p></div>
+      <div class="checklist"><div class="checklist-row" onclick="toggleChecklist(this)" role="checkbox" aria-checked="false" tabindex="0"><span class="checklist-checkbox"></span><span class="checklist-text">Circle every field that should be a string literal union instead of plain <code>string</code>.</span></div><div class="checklist-row" onclick="toggleChecklist(this)" role="checkbox" aria-checked="false" tabindex="0"><span class="checklist-checkbox"></span><span class="checklist-text">Mark every field that can be <code>null</code> or missing.</span></div><div class="checklist-row" onclick="toggleChecklist(this)" role="checkbox" aria-checked="false" tabindex="0"><span class="checklist-checkbox"></span><span class="checklist-text">Add one generic wrapper type such as <code>ApiResponse&lt;T&gt;</code> or <code>PaginatedResponse&lt;T&gt;</code>.</span></div><div class="checklist-row" onclick="toggleChecklist(this)" role="checkbox" aria-checked="false" tabindex="0"><span class="checklist-checkbox"></span><span class="checklist-text">Write a two-sentence note explaining which type you changed manually and why.</span></div></div>
+      
+    </div>
+    
+  </section>
+<section id="day-6-ai-assisted-frontend-development-3-typescript-type-generation-from-api-schemas-what-can-go-wrong" class="content-section reveal-left">
+    <span class="section-label">1.5.5 &middot; What Can Go Wrong</span>
+    <h3 class="slide-heading">What Can Go Wrong</h3>
+    <div class="section-body"><p><strong>Overly permissive types.</strong> AI tools default to <code>string</code> when unsure. A field that should be <code>&#39;active&#39; | &#39;inactive&#39; | &#39;pending&#39;</code> gets typed as <code>string</code>. Always tighten union types manually.</p>
+<p><strong>Missing optionality.</strong> AI tends to make every field required. Compare generated types against your API docs or multiple response samples to catch missing <code>?</code> modifiers.</p>
+<p><strong>Nested generics confusion.</strong> For responses like <code>PaginatedResponse&lt;T&gt;</code> wrapping <code>ApiResult&lt;DashboardStats&gt;</code>, AI sometimes flattens the structure instead of preserving the generic hierarchy.</p></div>
+    
+  </section>
+<section id="day-6-ai-assisted-frontend-development-3-typescript-type-generation-from-api-schemas-tool-comparison-how-each-tool-handles-this" class="content-section reveal-left">
+    <span class="section-label">1.5.6 &middot; Tool Comparison: How Each Tool Handles This</span>
+    <h3 class="slide-heading">Tool Comparison: How Each Tool Handles This</h3>
+    <div class="section-body"><div class="table-wrap"><table><thead><tr><th>Aspect</th><th>Claude Code</th><th>Cursor</th><th>Copilot</th></tr></thead><tbody><tr><td>Input</td><td>JSON sample or spec pasted in prompt</td><td>@-reference to spec file</td><td>Inline comment description</td></tr><tr><td>Output quality</td><td>Strong — derives exact types from data</td><td>Strong with file reference</td><td>Moderate — guesses without data</td></tr><tr><td>Generics</td><td>Handles well</td><td>Handles well</td><td>Often flattens</td></tr><tr><td>Best for</td><td>Batch-generating types for an entire API</td><td>Generating from an existing spec file in the project</td><td>Completing a type you have already started writing</td></tr></tbody></table></div></div>
+    
+  </section>
+  </section>
+<section id="day-6-ai-assisted-frontend-development-4-tailwind-css-with-ai-tools" class="content-section reveal-left">
+    <span class="section-label">1.6 &middot; 4. Tailwind CSS with AI Tools</span>
+    <h2 class="slide-heading">4. Tailwind CSS with AI Tools</h2>
+    <div class="section-body"></div>
+    <section id="day-6-ai-assisted-frontend-development-4-tailwind-css-with-ai-tools-what-it-is" class="content-section reveal-left">
+    <span class="section-label">1.6.1 &middot; What It Is</span>
+    <h3 class="slide-heading">What It Is</h3>
+    <div class="section-body"><p>Tailwind CSS uses utility classes directly in JSX (<code>className=&quot;flex items-center gap-4 p-6 bg-white rounded-lg shadow-md&quot;</code>). Every styling decision is visible in the markup with no separate CSS file. AI tools generate Tailwind reliably because intent and implementation live in the same place.</p>
+<p>Tailwind v4 (early 2025) moved to CSS-first configuration — no <code>tailwind.config.js</code> needed. You import Tailwind in CSS (<code>@import &quot;tailwindcss&quot;</code>) and customize via CSS variables. AI tools trained on older data may still generate v3-style configuration.</p></div>
+    
+  </section>
+<section id="day-6-ai-assisted-frontend-development-4-tailwind-css-with-ai-tools-why-it-matters-for-product-engineers" class="content-section reveal-left">
+    <span class="section-label">1.6.2 &middot; Why It Matters for Product Engineers</span>
+    <h3 class="slide-heading">Why It Matters for Product Engineers</h3>
+    <div class="section-body"><p>Tailwind has over 500 utility classes plus responsive (<code>md:</code>, <code>lg:</code>), state (<code>hover:</code>, <code>focus:</code>, <code>dark:</code>), and arbitrary value variants. Nobody memorizes all of them. AI tools serve as an always-available Tailwind reference that writes the classes for you in context.</p></div>
+    
+  </section>
+<section id="day-6-ai-assisted-frontend-development-4-tailwind-css-with-ai-tools-how-to-do-it-step-by-step" class="content-section reveal-left">
+    <span class="section-label">1.6.3 &middot; How to Do It — Step by Step</span>
+    <h3 class="slide-heading">How to Do It — Step by Step</h3>
+    <div class="section-body"><p><strong>Responsive layouts (Claude Code)</strong></p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>Create a responsive 3-panel dashboard layout component using Tailwind CSS v4:
+- Left sidebar: fixed width 256px on desktop, hidden on mobile with a hamburger toggle
+- Main content area: takes remaining width, scrollable
+- Right panel: 320px on desktop, full-width drawer on mobile that slides up from bottom
+- Use CSS Grid on desktop (grid-cols-[256px_1fr_320px])
+- Stack vertically on mobile (below 1024px)
+- Sidebar and right panel have a subtle border separator
+- Main content has 24px padding, max-width 1200px, centered</code></pre></div>
+<p><strong>Dark mode (Cursor)</strong></p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>Add dark mode support to @src/components/DataTable.tsx:
+- Use Tailwind&#39;s dark: variant for all color classes
+- Light: white background, gray-900 text, gray-200 borders
+- Dark: gray-900 background, gray-100 text, gray-700 borders
+- Alternating row colors: light gray-50/white, dark gray-800/gray-900
+- Hover state: light gray-100, dark gray-700
+- Ensure contrast ratio meets WCAG AA (4.5:1 for text)</code></pre></div>
+<p><strong>Copilot for utility class completion</strong></p>
+<p>This is where Copilot genuinely shines. When you are in JSX and start typing a <code>className</code>, Copilot suggests the next utility classes based on context:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">tsx</span><button class="copy-btn" type="button">Copy</button></div><pre><code>// You type:
+&lt;button className=&quot;px-4 py-2 bg-blue-600 text-white rounded-
+// Copilot suggests:
+lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed&quot;</code></pre></div>
+<p>This is faster than typing each class manually and Copilot typically gets the hover/focus/disabled states right because this is one of the most common patterns in its training data.</p>
+<p><strong>Design system enforcement</strong></p>
+<p>Before asking AI to generate styled components, provide your design tokens. In Claude Code, include them in your prompt or <code>CLAUDE.md</code>:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>Our design tokens: Primary blue-600/hover blue-700. Spacing: 4px grid.
+Radius: rounded-md (cards), rounded-lg (modals), rounded-full (avatars).
+Shadows: shadow-sm (cards), shadow-lg (modals). Use ONLY these tokens.</code></pre></div></div>
+    
+  </section>
+<section id="day-6-ai-assisted-frontend-development-4-tailwind-css-with-ai-tools-10-minute-exercise-responsive-tailwind-prompt" class="content-section reveal-left">
+    <span class="section-label">1.6.4 &middot; 10-Minute Exercise: Responsive Tailwind Prompt</span>
+    <div class="activity-card">
+      <div class="activity-title">10-Minute Exercise: Responsive Tailwind Prompt</div>
+      <div class="section-body"><p>Write a prompt that asks an AI tool to style a <code>DashboardShell</code> layout with Tailwind CSS v4.</p>
+<p>Expected output: one styling prompt plus a quick checklist of three things you would visually inspect after generation.</p></div>
+      <div class="checklist"><div class="checklist-row" onclick="toggleChecklist(this)" role="checkbox" aria-checked="false" tabindex="0"><span class="checklist-checkbox"></span><span class="checklist-text">Specify mobile-first behavior at 320px, 768px, and 1024px widths.</span></div><div class="checklist-row" onclick="toggleChecklist(this)" role="checkbox" aria-checked="false" tabindex="0"><span class="checklist-checkbox"></span><span class="checklist-text">Include allowed colors, spacing, radius, and shadow tokens.</span></div><div class="checklist-row" onclick="toggleChecklist(this)" role="checkbox" aria-checked="false" tabindex="0"><span class="checklist-checkbox"></span><span class="checklist-text">Require visible focus states and dark-mode variants.</span></div><div class="checklist-row" onclick="toggleChecklist(this)" role="checkbox" aria-checked="false" tabindex="0"><span class="checklist-checkbox"></span><span class="checklist-text">Add a final instruction: &quot;Do not create <code>tailwind.config.js</code>; this project uses Tailwind v4 CSS-first configuration.&quot;</span></div></div>
+      
+    </div>
+    
+  </section>
+<section id="day-6-ai-assisted-frontend-development-4-tailwind-css-with-ai-tools-what-can-go-wrong" class="content-section reveal-left">
+    <span class="section-label">1.6.5 &middot; What Can Go Wrong</span>
+    <h3 class="slide-heading">What Can Go Wrong</h3>
+    <div class="section-body"><p><strong>Class soup.</strong> AI-generated Tailwind often produces long, unreadable class strings. A single <code>div</code> with 15+ utility classes is hard to maintain. Ask the AI to extract repeated patterns into reusable component compositions or use <code>@apply</code> sparingly for truly repeated patterns.</p>
+<p><strong>Inconsistent spacing and colors.</strong> Without design system context, AI tools pick whatever looks reasonable. You get <code>p-3</code> in one component and <code>p-4</code> in another, <code>blue-500</code> here and <code>blue-600</code> there. Always provide your design tokens upfront.</p>
+<p><strong>Responsive breakpoints in the wrong direction.</strong> Tailwind is mobile-first: unprefixed classes apply to all sizes, <code>md:</code> applies at 768px and up. AI tools sometimes generate desktop-first layouts and then add <code>sm:</code> overrides for mobile, which is backwards and creates specificity issues.</p>
+<p><strong>Tailwind v4 vs v3 configuration.</strong> If you see generated code that includes a <code>tailwind.config.js</code> or <code>tailwind.config.ts</code> file, the AI is using v3 patterns. In v4, theme customization happens in CSS with <code>@theme</code> blocks. Correct this immediately or you will have conflicting configuration sources.</p></div>
+    
+  </section>
+<section id="day-6-ai-assisted-frontend-development-4-tailwind-css-with-ai-tools-tool-comparison-how-each-tool-handles-this" class="content-section reveal-left">
+    <span class="section-label">1.6.6 &middot; Tool Comparison: How Each Tool Handles This</span>
+    <h3 class="slide-heading">Tool Comparison: How Each Tool Handles This</h3>
+    <div class="section-body"><div class="table-wrap"><table><thead><tr><th>Aspect</th><th>Claude Code</th><th>Cursor</th><th>Copilot</th></tr></thead><tbody><tr><td>Strength</td><td>Generates full responsive layouts with consistent token usage</td><td>Matches existing Tailwind patterns in your codebase</td><td>Real-time class suggestions as you type</td></tr><tr><td>Dark mode</td><td>Generates complete dark variants in one pass</td><td>Can add dark mode to existing components via Agent</td><td>Suggests dark: variants inline but misses some</td></tr><tr><td>Risk</td><td>May use v3 config syntax</td><td>Picks up project conventions better</td><td>Suggests classes outside your design system</td></tr></tbody></table></div></div>
+    
+  </section>
+  </section>
+<section id="day-6-ai-assisted-frontend-development-5-ai-assisted-accessibility" class="content-section reveal-left">
+    <span class="section-label">1.7 &middot; 5. AI-Assisted Accessibility</span>
+    <h2 class="slide-heading">5. AI-Assisted Accessibility</h2>
+    <div class="section-body"></div>
+    <section id="day-6-ai-assisted-frontend-development-5-ai-assisted-accessibility-what-it-is" class="content-section reveal-left">
+    <span class="section-label">1.7.1 &middot; What It Is</span>
+    <h3 class="slide-heading">What It Is</h3>
+    <div class="section-body"><p>Web accessibility means building interfaces that work for everyone — keyboard navigation, screen readers, low vision, motor impairments. The European Accessibility Act became law across all 27 EU member states on June 28, 2025. Accessibility-related lawsuits against US sites continue to grow. This is not optional.</p>
+<p>AI tools can generate ARIA attributes, keyboard navigation handlers, focus management logic, and semantic HTML. They cannot replace manual testing, but they get you 60-70% of the way there.</p></div>
+    
+  </section>
+<section id="day-6-ai-assisted-frontend-development-5-ai-assisted-accessibility-why-it-matters-for-product-engineers" class="content-section reveal-left">
+    <span class="section-label">1.7.2 &middot; Why It Matters for Product Engineers</span>
+    <h3 class="slide-heading">Why It Matters for Product Engineers</h3>
+    <div class="section-body"><p>Accessibility bugs are expensive to fix retroactively because they often require rethinking component structure, not just adding attributes. A table built with <code>&lt;div&gt;</code> elements needs full rebuilding as a semantic <code>&lt;table&gt;</code>. If AI generates correct semantic HTML from the start, you avoid the rewrite. Automated tools (axe-core, Pa11y, WAVE) catch roughly 30-40% of WCAG violations; the rest require manual testing.</p></div>
+    
+  </section>
+<section id="day-6-ai-assisted-frontend-development-5-ai-assisted-accessibility-how-to-do-it-step-by-step" class="content-section reveal-left">
+    <span class="section-label">1.7.3 &middot; How to Do It — Step by Step</span>
+    <h3 class="slide-heading">How to Do It — Step by Step</h3>
+    <div class="section-body"><p><strong>Generating accessible components (Claude Code)</strong></p>
+<p>Include accessibility requirements directly in your component prompt:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>Create an accessible DataTable component. Accessibility requirements:
+- Use semantic HTML: &lt;table&gt;, &lt;thead&gt;, &lt;tbody&gt;, &lt;th scope=&quot;col&quot;&gt;, &lt;td&gt;
+- Sortable columns: clicking a &lt;th&gt; sorts. Add aria-sort=&quot;ascending&quot;/&quot;descending&quot;/&quot;none&quot;
+- Keyboard navigation: Tab moves between sortable headers, Enter/Space triggers sort
+- Add role=&quot;status&quot; live region that announces &quot;Sorted by [column] [direction]&quot; on sort change
+- Caption: &lt;caption&gt; element with a visually hidden table description
+- Focus indicator: visible focus ring (Tailwind ring-2 ring-blue-500) on all interactive elements
+- Row selection: checkbox column with aria-label=&quot;Select row [item name]&quot;
+- Loading state: aria-busy=&quot;true&quot; on the table, skeleton rows with aria-hidden=&quot;true&quot;</code></pre></div>
+<p><strong>Adding ARIA to existing components (Cursor)</strong></p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>Review @src/components/Sidebar.tsx for accessibility issues and fix them:
+- Add role=&quot;navigation&quot; and aria-label=&quot;Main navigation&quot;
+- Each nav item should be a &lt;button&gt; or &lt;a&gt;, not a &lt;div&gt; with onClick
+- Add aria-current=&quot;page&quot; to the active item
+- Collapse toggle: aria-expanded=&quot;true/false&quot;, aria-controls=&quot;sidebar-nav&quot;
+- Keyboard: arrow keys move between items, Home/End jump to first/last
+- Ensure all icons have aria-hidden=&quot;true&quot; and text labels are visible or in sr-only spans</code></pre></div>
+<p><strong>Focus management for modals (Cursor)</strong></p>
+<p>Focus management is one of the hardest patterns. When a modal opens, focus moves to it. When it closes, focus returns to the trigger. Tab cycles within the modal only (focus trap).</p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>Add focus management to @src/components/Modal.tsx:
+- On open: focus first focusable element. Focus trap: Tab/Shift+Tab cycle within modal only.
+- On close (Escape or close button): return focus to trigger element
+- aria-modal=&quot;true&quot;, role=&quot;dialog&quot;, aria-labelledby pointing to title
+- Backdrop click closes. Prevent body scroll when open.</code></pre></div>
+<p><strong>Running automated accessibility checks</strong></p>
+<p>After generating components, verify them. Install axe-core for your test suite:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">bash</span><button class="copy-btn" type="button">Copy</button></div><pre><code>npm install -D axe-core @axe-core/react vitest-axe</code></pre></div>
+<p>Then ask Claude Code to generate an accessibility test:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>Write a Vitest accessibility test for src/components/DataTable.tsx using axe-core.
+- Render the component with sample data
+- Run axe on the rendered output
+- Assert zero violations
+- Also test the sorted state and loading state</code></pre></div>
+<p>The generated test will look something like:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">typescript</span><button class="copy-btn" type="button">Copy</button></div><pre><code>import { render } from &#39;@testing-library/react&#39;;
+import { axe, toHaveNoViolations } from &#39;vitest-axe&#39;;
+import { DataTable } from &#39;../DataTable&#39;;
+import { expect, test } from &#39;vitest&#39;;
+
+expect.extend(toHaveNoViolations);
+
+test(&#39;DataTable has no accessibility violations&#39;, async () =&gt; {
+  const { container } = render(
+    &lt;DataTable
+      data={sampleData}
+      columns={sampleColumns}
+    /&gt;
+  );
+  const results = await axe(container);
+  expect(results).toHaveNoViolations();
+});</code></pre></div></div>
+    
+  </section>
+<section id="day-6-ai-assisted-frontend-development-5-ai-assisted-accessibility-10-minute-exercise-accessibility-patch-request" class="content-section reveal-left">
+    <span class="section-label">1.7.4 &middot; 10-Minute Exercise: Accessibility Patch Request</span>
+    <div class="activity-card">
+      <div class="activity-title">10-Minute Exercise: Accessibility Patch Request</div>
+      <div class="section-body"><p>Pick any generated component prompt from earlier in the day and add an accessibility patch request.</p>
+<p>Expected output: an accessibility-focused follow-up prompt that improves an existing component without rewriting unrelated code.</p></div>
+      <div class="checklist"><div class="checklist-row" onclick="toggleChecklist(this)" role="checkbox" aria-checked="false" tabindex="0"><span class="checklist-checkbox"></span><span class="checklist-text">Require semantic HTML before ARIA.</span></div><div class="checklist-row" onclick="toggleChecklist(this)" role="checkbox" aria-checked="false" tabindex="0"><span class="checklist-checkbox"></span><span class="checklist-text">Add keyboard behavior for every interactive element.</span></div><div class="checklist-row" onclick="toggleChecklist(this)" role="checkbox" aria-checked="false" tabindex="0"><span class="checklist-checkbox"></span><span class="checklist-text">Add at least three specific ARIA attributes, such as <code>aria-sort</code>, <code>aria-expanded</code>, or <code>aria-live</code>, only where they are appropriate.</span></div><div class="checklist-row" onclick="toggleChecklist(this)" role="checkbox" aria-checked="false" tabindex="0"><span class="checklist-checkbox"></span><span class="checklist-text">Include one manual verification step: keyboard-only tab-through, screen reader label review, or axe-core test.</span></div></div>
+      
+    </div>
+    
+  </section>
+<section id="day-6-ai-assisted-frontend-development-5-ai-assisted-accessibility-what-can-go-wrong" class="content-section reveal-left">
+    <span class="section-label">1.7.5 &middot; What Can Go Wrong</span>
+    <h3 class="slide-heading">What Can Go Wrong</h3>
+    <div class="section-body"><p><strong>ARIA overuse.</strong> A <code>&lt;button&gt;</code> does not need <code>role=&quot;button&quot;</code>. A <code>&lt;nav&gt;</code> does not need <code>role=&quot;navigation&quot;</code>. The first rule of ARIA: if a native HTML element provides the semantics, use it. Redundant ARIA confuses screen readers.</p>
+<p><strong>Useless labels.</strong> AI generates <code>aria-label=&quot;Icon&quot;</code> on icon buttons. It should be <code>aria-label=&quot;Close dialog&quot;</code> or <code>aria-label=&quot;Sort by name&quot;</code> — describe the action, not the visual.</p>
+<p><strong>Tab order chaos.</strong> AI sometimes adds positive <code>tabIndex</code> values (1, 2, 3...) which forces an explicit tab order conflicting with DOM order. Use only <code>tabIndex={0}</code> and <code>tabIndex={-1}</code>. Never positive values.</p>
+<p><strong>Missing focus management on route changes.</strong> In SPAs, client-side navigation leaves focus on the previous link. AI tools rarely add route-change focus management unless you specifically ask.</p></div>
+    
+  </section>
+<section id="day-6-ai-assisted-frontend-development-5-ai-assisted-accessibility-tool-comparison-how-each-tool-handles-this" class="content-section reveal-left">
+    <span class="section-label">1.7.6 &middot; Tool Comparison: How Each Tool Handles This</span>
+    <h3 class="slide-heading">Tool Comparison: How Each Tool Handles This</h3>
+    <div class="section-body"><div class="table-wrap"><table><thead><tr><th>Aspect</th><th>Claude Code</th><th>Cursor</th><th>Copilot</th></tr></thead><tbody><tr><td>Semantic HTML</td><td>Generates proper semantic elements when prompted</td><td>Good at fixing existing elements</td><td>Suggests semantic HTML inline</td></tr><tr><td>ARIA attributes</td><td>Comprehensive but sometimes redundant — review carefully</td><td>Adds to existing components well</td><td>Suggests common patterns (aria-label, role)</td></tr><tr><td>Keyboard nav</td><td>Can generate full keyboard handlers with arrow key support</td><td>Good at adding to existing components</td><td>Limited — suggests basic tabIndex</td></tr><tr><td>Focus management</td><td>Handles modal focus traps, route change focus</td><td>Can add to existing modals/drawers</td><td>Does not generate focus management</td></tr><tr><td>Best for</td><td>New components with full accessibility built in</td><td>Remediating accessibility in existing code</td><td>Adding ARIA attributes to code you are actively writing</td></tr></tbody></table></div></div>
+    
+  </section>
+  </section>
+<section id="day-6-ai-assisted-frontend-development-6-state-management-and-custom-hooks-via-ai" class="content-section reveal-left">
+    <span class="section-label">1.8 &middot; 6. State Management and Custom Hooks via AI</span>
+    <h2 class="slide-heading">6. State Management and Custom Hooks via AI</h2>
+    <div class="section-body"></div>
+    <section id="day-6-ai-assisted-frontend-development-6-state-management-and-custom-hooks-via-ai-what-it-is" class="content-section reveal-left">
+    <span class="section-label">1.8.1 &middot; What It Is</span>
+    <h3 class="slide-heading">What It Is</h3>
+    <div class="section-body"><p>State management tracks data changes in your React application: <code>useState</code> for simple values, <code>useReducer</code> for complex state transitions, custom hooks for reusable logic, and Context for shared state. AI tools are effective here because the patterns are highly regular — a pagination hook always needs current page, page size, total count, and navigation functions. These patterns exist millions of times in AI training data.</p></div>
+    
+  </section>
+<section id="day-6-ai-assisted-frontend-development-6-state-management-and-custom-hooks-via-ai-why-it-matters-for-product-engineers" class="content-section reveal-left">
+    <span class="section-label">1.8.2 &middot; Why It Matters for Product Engineers</span>
+    <h3 class="slide-heading">Why It Matters for Product Engineers</h3>
+    <div class="section-body"><p>State management bugs — stale closures, unnecessary re-renders, race conditions — are among the hardest frontend bugs to diagnose. AI-generated state logic typically follows best practices that junior developers might miss, but it can also be subtly wrong in ways that only appear under specific conditions (rapid state changes, component unmounting during async operations).</p></div>
+    
+  </section>
+<section id="day-6-ai-assisted-frontend-development-6-state-management-and-custom-hooks-via-ai-how-to-do-it-step-by-step" class="content-section reveal-left">
+    <span class="section-label">1.8.3 &middot; How to Do It — Step by Step</span>
+    <h3 class="slide-heading">How to Do It — Step by Step</h3>
+    <div class="section-body"><p><strong>Custom hook generation (Claude Code)</strong></p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>Create a custom hook useTableFilters that manages filter state for the dashboard.
+
+Requirements:
+- State shape: { search: string, status: &#39;all&#39; | &#39;active&#39; | &#39;inactive&#39; | &#39;pending&#39;, dateFrom: string, dateTo: string, sortColumn: string, sortDirection: &#39;asc&#39; | &#39;desc&#39; | &#39;none&#39;, page: number, pageSize: number }
+- useReducer-based (multiple related state fields that change together)
+- Actions: SET_SEARCH, SET_STATUS, SET_DATE_RANGE, SET_SORT, SET_PAGE, SET_PAGE_SIZE, RESET_ALL
+- SET_SEARCH resets page to 1 (new search = new results)
+- SET_STATUS resets page to 1
+- Debounced search value (300ms) exposed separately from the raw input value
+- Derive a URL search params string from current state (for shareable URLs)
+- Parse initial state from URL search params on mount
+- Return: state, dispatch functions (setSearch, setStatus, etc.), debouncedSearch, urlParams</code></pre></div>
+<p>This prompt is detailed because state management logic has many edge cases. The requirement that <code>SET_SEARCH</code> resets the page to 1 is the kind of detail AI tools miss if you do not specify it.</p>
+<p><strong>useReducer patterns (Cursor)</strong></p>
+<p>Cursor is effective at generating reducers when you give it the action types and state shape. In Composer:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>Generate a useReducer for managing a multi-step form wizard. Steps:
+1. Personal Info (name, email)
+2. Preferences (theme, notifications, language)
+3. Review &amp; Submit
+
+State tracks: currentStep, formData for each step, validation errors per step, isSubmitting, submitError.
+Actions: NEXT_STEP (validates current step first), PREV_STEP, UPDATE_FIELD, SET_VALIDATION_ERRORS, SUBMIT_START, SUBMIT_SUCCESS, SUBMIT_ERROR.
+Type every action with discriminated unions.</code></pre></div>
+<p><strong>Async state patterns</strong></p>
+<p>Async state (loading, error, data) is a common pattern that AI tools generate well:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>Create a custom hook useDashboardData that fetches dashboard data.
+
+- Accepts: filters object (from useTableFilters)
+- Returns: { data: DashboardStats | null, isLoading: boolean, error: Error | null, refetch: () =&gt; void }
+- Aborts previous request when filters change (AbortController)
+- Cleanup on unmount (no state updates after unmount)
+- Retry once on network error, then expose the error
+- Do NOT use useEffect for the fetch trigger — use a callback pattern that the component calls</code></pre></div>
+<p>That last instruction (&quot;do NOT use useEffect for the fetch trigger&quot;) is important. AI tools default to <code>useEffect</code> for data fetching because it dominates their training data, but modern React patterns prefer libraries like TanStack Query or explicit callback-triggered fetches. If your project uses a specific data-fetching pattern, state it explicitly.</p></div>
+    
+  </section>
+<section id="day-6-ai-assisted-frontend-development-6-state-management-and-custom-hooks-via-ai-10-minute-exercise-build-a-tiny-filter-hook" class="content-section reveal-left">
+    <span class="section-label">1.8.4 &middot; 10-Minute Exercise: Build a Tiny Filter Hook</span>
+    <div class="activity-card">
+      <div class="activity-title">10-Minute Exercise: Build a Tiny Filter Hook</div>
+      <div class="section-body"><p>Create a small isolated hook before touching the full dashboard lab.</p>
+<p>Expected output: a typed hook draft plus one note describing the most important review finding.</p></div>
+      <div class="checklist"><div class="checklist-row" onclick="toggleChecklist(this)" role="checkbox" aria-checked="false" tabindex="0"><span class="checklist-checkbox"></span><span class="checklist-text">Ask Claude Code or Cursor to create <code>useSimpleFilters</code> with <code>search</code>, <code>status</code>, <code>page</code>, and <code>pageSize</code>.</span></div><div class="checklist-row" onclick="toggleChecklist(this)" role="checkbox" aria-checked="false" tabindex="0"><span class="checklist-checkbox"></span><span class="checklist-text">Require <code>SET_SEARCH</code> and <code>SET_STATUS</code> to reset <code>page</code> to <code>1</code>.</span></div><div class="checklist-row" onclick="toggleChecklist(this)" role="checkbox" aria-checked="false" tabindex="0"><span class="checklist-checkbox"></span><span class="checklist-text">Add a 300ms debounced search value with cleanup.</span></div><div class="checklist-row" onclick="toggleChecklist(this)" role="checkbox" aria-checked="false" tabindex="0"><span class="checklist-checkbox"></span><span class="checklist-text">Review the generated hook for stale closures, missing cleanup, and overly loose TypeScript types.</span></div></div>
+      
+    </div>
+    
+  </section>
+<section id="day-6-ai-assisted-frontend-development-6-state-management-and-custom-hooks-via-ai-what-can-go-wrong" class="content-section reveal-left">
+    <span class="section-label">1.8.5 &middot; What Can Go Wrong</span>
+    <h3 class="slide-heading">What Can Go Wrong</h3>
+    <div class="section-body"><p><strong>Stale closure bugs.</strong> AI-generated <code>useEffect</code> and <code>useCallback</code> hooks sometimes have incorrect dependency arrays. The code runs, but it captures a stale value of a prop or state variable. This produces bugs that only appear when a value changes — easy to miss in a quick review.</p>
+<div class="code-container"><div class="code-header"><span class="code-title">typescript</span><button class="copy-btn" type="button">Copy</button></div><pre><code>// AI might generate this (WRONG — stale count value):
+const increment = useCallback(() =&gt; {
+  setCount(count + 1); // captures count at creation time
+}, []); // missing count dependency
+
+// Correct:
+const increment = useCallback(() =&gt; {
+  setCount(prev =&gt; prev + 1); // functional update, no dependency needed
+}, []);</code></pre></div>
+<p><strong>Over-abstraction and AI overengineering.</strong> This is one of the most common problems with AI-generated state code. Ask for a toggle and get a generic state machine with five states. Ask for a form and get a full form library with validators, formatters, and submission handlers. If the abstraction is more complex than the problem, simplify it. You do not need a reducer for a boolean toggle.</p>
+<p>Signs of AI overengineering in state management:</p>
+<ul class="linear-list"><li>A <code>useReducer</code> with 8 action types for what should be two <code>useState</code> calls</li><li>A custom hook that wraps another custom hook that wraps <code>useReducer</code> — three layers deep for a search filter</li><li><code>useMemo</code> and <code>useCallback</code> on every single value, including static strings and simple calculations</li><li>A Context provider for state that only one component tree needs</li><li>Generic type parameters (<code>useForm&lt;T extends Record&lt;string, unknown&gt;&gt;</code>) on a hook used with exactly one type</li></ul>
+<p>The fix is simple: after AI generates state logic, ask yourself &quot;could I replace this with fewer <code>useState</code> calls?&quot; If yes, do it. The simpler version is almost always correct, easier to test, and easier for the next developer to understand.</p>
+<p><strong>Missing cleanup.</strong> AI-generated hooks that create timers (<code>setTimeout</code>, <code>setInterval</code>), event listeners, or subscriptions sometimes forget cleanup functions. Always check that every side effect has a corresponding cleanup in the return function of <code>useEffect</code>.</p>
+<p><strong>Incorrect generic types.</strong> Custom hooks with generics (<code>useForm&lt;T&gt;</code>) sometimes have type constraints that are too loose (accepting <code>any</code>) or too tight (not accepting your actual data shape). Test the types by passing real data before assuming they work.</p></div>
+    
+  </section>
+  </section>
+<section id="day-6-ai-assisted-frontend-development-7-reviewing-and-understanding-ai-generated-frontend-code" class="content-section reveal-left">
+    <span class="section-label">1.9 &middot; 7. Reviewing and Understanding AI-Generated Frontend Code</span>
+    <h2 class="slide-heading">7. Reviewing and Understanding AI-Generated Frontend Code</h2>
+    <div class="section-body"></div>
+    <section id="day-6-ai-assisted-frontend-development-7-reviewing-and-understanding-ai-generated-frontend-code-what-it-is" class="content-section reveal-left">
+    <span class="section-label">1.9.1 &middot; What It Is</span>
+    <h3 class="slide-heading">What It Is</h3>
+    <div class="section-body"><p>This is the most important section of this guide. Every line of AI-generated code that reaches your codebase is your responsibility. The review process differs from reviewing human code because AI errors follow distinct patterns: internally consistent (the same mistake repeated everywhere), confidently wrong (no TODO or FIXME markers), and structurally plausible (looks correct at first glance).</p></div>
+    
+  </section>
+<section id="day-6-ai-assisted-frontend-development-7-reviewing-and-understanding-ai-generated-frontend-code-why-it-matters-for-product-engineers" class="content-section reveal-left">
+    <span class="section-label">1.9.2 &middot; Why It Matters for Product Engineers</span>
+    <h3 class="slide-heading">Why It Matters for Product Engineers</h3>
+    <div class="section-body"><p>The tool amplifies your skill level: careful developers become faster and more careful; developers who accept AI output without review ship significantly more bugs. Review is the differentiator.</p></div>
+    
+  </section>
+<section id="day-6-ai-assisted-frontend-development-7-reviewing-and-understanding-ai-generated-frontend-code-how-to-do-it-step-by-step" class="content-section reveal-left">
+    <span class="section-label">1.9.3 &middot; How to Do It — Step by Step</span>
+    <h3 class="slide-heading">How to Do It — Step by Step</h3>
+    <div class="section-body"><p><strong>The five-point review checklist for AI-generated React code:</strong></p>
+<ol class="linear-list"><li>Imports and dependencies. Does every import resolve to an actual installed package? Are there imports from packages not in your <code>package.json</code>? Run <code>npx tsc --noEmit</code> immediately after generation to catch these.</li></ol>
+<ol class="linear-list"><li>Types and interfaces. Are prop types accurate? Are optional fields marked with <code>?</code>? Are union types tight (string literals) or loose (<code>string</code>)? Click through every type and verify it matches your API contract.</li></ol>
+<ol class="linear-list"><li>Side effects and cleanup. For every <code>useEffect</code>, verify: (a) the dependency array is complete and correct, (b) there is a cleanup function if the effect creates subscriptions, timers, or listeners, (c) async operations handle the &quot;component unmounted&quot; case.</li></ol>
+<ol class="linear-list"><li>Accessibility audit. Tab through the component. Does every interactive element receive focus? Is focus visible? Do screen reader announcements make sense? Run axe-core on the rendered output.</li></ol>
+<ol class="linear-list"><li>Responsive behavior. Resize the browser from 320px to 1440px. Are there breakpoints where layout breaks? Does text overflow its container? Do touch targets meet the 44x44px minimum on mobile?</li></ol>
+<p>Beyond the quick checklist, high-performing teams in 2026 use a <strong>layered review framework</strong> that goes deeper:</p>
+<ul class="linear-list"><li>Layer 1 — Correctness: Does it actually work? Are edge cases handled? Are loading, error, and empty states all covered? Are types accurate?</li><li>Layer 2 — Maintainability: Is the file too large (over 200 lines)? Is logic separated properly between hooks and components? Are components reusable? Is naming consistent with the rest of the codebase?</li><li>Layer 3 — Performance: Are there unnecessary re-renders? Are expensive calculations running on every render without memoization? Are dependency arrays bloated? Is list virtualization needed for large datasets?</li><li>Layer 4 — Accessibility: (Covered in checklist item 4 above.) Keyboard accessible? Correct semantics? Proper labels? Focus visible? Screen-reader behavior?</li><li>Layer 5 — Security and Reliability: Is there unsafe HTML rendering (raw innerHTML without sanitization)? Is the code trusting unvalidated user input? Are API responses being used without validation? Is sensitive data being logged to the console?</li></ul>
+<p>The full 7-step AI review workflow used by strong engineering teams:</p>
+<ol class="linear-list"><li>Generate with AI</li><li>Run static analysis (<code>tsc --noEmit</code>, ESLint)</li><li>Run tests (<code>vitest run</code>)</li><li>Run accessibility audit (axe-core)</li><li>Ask a second AI model to critique the code</li><li>Human review against the 5 layers above</li><li>Merge</li></ol>
+<p><strong>Using AI to review AI-generated code</strong></p>
+<p>Use one AI tool to review another&#39;s output. In Claude Code:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>Review src/components/DataTable.tsx for:
+1. TypeScript: any use of `any`, missing types, loose generics
+2. React anti-patterns: missing keys, direct mutation, effects without cleanup
+3. Accessibility: missing ARIA, non-semantic elements, keyboard nav gaps
+4. Performance: unnecessary re-renders, missing memoization
+5. Tailwind: inconsistent spacing, missing responsive variants
+Be specific — show the line and the problem.</code></pre></div>
+<p><strong>Run tests and type checks immediately after generation:</strong></p>
+<div class="code-container"><div class="code-header"><span class="code-title">bash</span><button class="copy-btn" type="button">Copy</button></div><pre><code>npx vitest run --reporter=verbose
+npx tsc --noEmit</code></pre></div>
+<p>Common failure patterns in AI-generated tests: hallucinated assertions (referencing text the component does not render), missing <code>waitFor</code> for async operations, and <code>getByRole</code> with incorrect roles.</p>
+<p><strong>Writing effective tests with role-based queries and userEvent</strong></p>
+<p>React Testing Library encourages testing the way users interact with your UI, not implementation details. AI tools frequently generate tests using <code>getByTestId</code> or CSS selectors — these are brittle and miss accessibility problems. Use role-based queries instead:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">typescript</span><button class="copy-btn" type="button">Copy</button></div><pre><code>import { render, screen } from &#39;@testing-library/react&#39;;
+import userEvent from &#39;@testing-library/user-event&#39;;
+
+test(&#39;FilterBar updates search and resets page&#39;, async () =&gt; {
+  const user = userEvent.setup();
+  const onFilterChange = vi.fn();
+  render(&lt;FilterBar filters={defaultFilters} onFilterChange={onFilterChange} /&gt;);
+
+  // Role-based queries — test what the user sees, not implementation
+  const searchInput = screen.getByRole(&#39;searchbox&#39;, { name: /search/i });
+  const statusDropdown = screen.getByRole(&#39;combobox&#39;, { name: /status/i });
+  const resetButton = screen.getByRole(&#39;button&#39;, { name: /reset/i });
+
+  // userEvent simulates real user behavior (typing, clicking, tabbing)
+  await user.type(searchInput, &#39;John&#39;);
+  await user.selectOptions(statusDropdown, &#39;active&#39;);
+  await user.click(resetButton);
+
+  // Assert on behavior, not internal state
+  expect(searchInput).toHaveValue(&#39;&#39;);
+  expect(statusDropdown).toHaveValue(&#39;all&#39;);
+});</code></pre></div>
+<p>The query priority order matters: <code>getByRole</code> &gt; <code>getByLabelText</code> &gt; <code>getByPlaceholderText</code> &gt; <code>getByText</code> &gt; <code>getByTestId</code>. If you cannot find an element by role, that is often an accessibility bug — the element is missing a role or label that a screen reader user would also miss. When reviewing AI-generated tests, replace any <code>getByTestId</code> with a role-based query and fix the component if the role query fails.</p></div>
+    
+  </section>
+<section id="day-6-ai-assisted-frontend-development-7-reviewing-and-understanding-ai-generated-frontend-code-10-minute-exercise-review-one-ai-generated-component" class="content-section reveal-left">
+    <span class="section-label">1.9.4 &middot; 10-Minute Exercise: Review One AI-Generated Component</span>
+    <div class="activity-card">
+      <div class="activity-title">10-Minute Exercise: Review One AI-Generated Component</div>
+      <div class="section-body"><p>Use a generated <code>FilterBar.tsx</code>, <code>StatusBadge.tsx</code>, or <code>DataTable.tsx</code> from today.</p>
+<p>Expected output: a short review note with three concrete fixes or confirmations.</p></div>
+      <div class="checklist"><div class="checklist-row" onclick="toggleChecklist(this)" role="checkbox" aria-checked="false" tabindex="0"><span class="checklist-checkbox"></span><span class="checklist-text">Run <code>npx tsc --noEmit</code> and note the first error or confirm there are none.</span></div><div class="checklist-row" onclick="toggleChecklist(this)" role="checkbox" aria-checked="false" tabindex="0"><span class="checklist-checkbox"></span><span class="checklist-text">Review the file with the five-point checklist: imports, types, side effects, accessibility, and responsive behavior.</span></div><div class="checklist-row" onclick="toggleChecklist(this)" role="checkbox" aria-checked="false" tabindex="0"><span class="checklist-checkbox"></span><span class="checklist-text">Ask a second AI tool to review the same file and list line-specific risks.</span></div><div class="checklist-row" onclick="toggleChecklist(this)" role="checkbox" aria-checked="false" tabindex="0"><span class="checklist-checkbox"></span><span class="checklist-text">Compare your review with the AI review and write the top three fixes you would make before committing.</span></div></div>
+      
+    </div>
+    
+  </section>
+<section id="day-6-ai-assisted-frontend-development-7-reviewing-and-understanding-ai-generated-frontend-code-what-can-go-wrong" class="content-section reveal-left">
+    <span class="section-label">1.9.5 &middot; What Can Go Wrong</span>
+    <h3 class="slide-heading">What Can Go Wrong</h3>
+    <div class="section-body"><p><strong>Rubber-stamping.</strong> The biggest risk is that AI code looks good enough to skip review. The code compiles, the happy path works, and you merge it. Then edge cases fail in production. Force yourself through the five-point checklist on every generated component.</p>
+<p><strong>Reviewing too much at once.</strong> Generate one component, review it, commit it, then move to the next. Generating 10 components and reviewing them as a batch means none get reviewed carefully.</p>
+<p><strong>Shared blind spots in AI-on-AI review.</strong> AI tools tend to miss race conditions, performance issues from unnecessary re-rendering, and whether ARIA attributes actually make sense in context (vs. merely existing).</p></div>
+    
+  </section>
+  </section>
+<section id="day-6-ai-assisted-frontend-development-8-latest-trends-emerging-patterns-may-2026" class="content-section reveal-left">
+    <span class="section-label">1.10 &middot; 8. Latest Trends &amp; Emerging Patterns (May 2026)</span>
+    <h2 class="slide-heading">8. Latest Trends &amp; Emerging Patterns (May 2026)</h2>
+    <div class="section-body"><p>The frontend AI tooling landscape has shifted rapidly in the first half of 2026. These trends are not hypothetical — they are already in production at companies shipping real products. As a product engineering intern, understanding where the ecosystem is heading helps you pick tools that will still be relevant in six months and contribute to conversations about technology direction, not just execute tickets.</p></div>
+    <section id="day-6-ai-assisted-frontend-development-8-latest-trends-emerging-patterns-may-2026-8-1-shadcn-ui-as-the-ai-component-substrate" class="content-section reveal-left">
+    <span class="section-label">1.10.1 &middot; 8.1 shadcn/ui as the AI Component Substrate</span>
+    <h3 class="slide-heading">8.1 shadcn/ui as the AI Component Substrate</h3>
+    <div class="section-body"><p>shadcn/ui is not a traditional npm package — you do not install it as a dependency and import from a node_modules folder. Instead, the CLI copies raw TypeScript and Tailwind source files directly into your project (<code>src/components/ui/</code>). You own the code from the moment it lands. This design decision turns out to be perfectly suited for AI tooling: because the source is in your repository, every AI coding tool (Claude Code, Cursor, Copilot, v0) can read the exact implementation, understand your component API, and generate code that integrates cleanly without guessing at props.</p>
+<p>Every major AI coding tool defaults to shadcn/ui when generating React components in 2026. The shadcn MCP Server takes this further: it exposes live component specifications (props, variants, composable sub-components) directly to Claude Code and Cursor, eliminating hallucinated props entirely. If an AI suggests <code>&lt;Button variant=&quot;ghost&quot;&gt;</code> it knows that variant exists because it read the spec, not because it guessed.</p>
+<div class="code-container"><div class="code-header"><span class="code-title">bash</span><button class="copy-btn" type="button">Copy</button></div><pre><code># Initialize shadcn/ui in an existing Vite + React + TS project
+npx shadcn@latest init
+
+# Add individual components — source lands in src/components/ui/
+npx shadcn@latest add button card dialog data-table
+
+# Configure shadcn MCP Server in .cursor/mcp.json or Claude Code MCP config
+# { &quot;mcpServers&quot;: { &quot;shadcn&quot;: { &quot;command&quot;: &quot;npx&quot;, &quot;args&quot;: [&quot;shadcn-mcp&quot;] } } }</code></pre></div>
+<p><strong>Maturity: Mainstream</strong> — shadcn/ui has become the default component substrate for new React projects across the industry.</p></div>
+    
+  </section>
+<section id="day-6-ai-assisted-frontend-development-8-latest-trends-emerging-patterns-may-2026-8-2-figma-mcp-server-figma-make" class="content-section reveal-left">
+    <span class="section-label">1.10.2 &middot; 8.2 Figma MCP Server &amp; Figma Make</span>
+    <h3 class="slide-heading">8.2 Figma MCP Server &amp; Figma Make</h3>
+    <div class="section-body"><p>Figma released an official MCP server in 2025 that feeds the design tree — component hierarchy, auto-layout constraints, spacing, typography, and design variable values — directly into AI coding tools. When you reference a Figma frame in Cursor or Claude Code, the AI reads the actual design structure rather than working from a screenshot description. Code Connect links Figma components to their GitHub repository equivalents, so the AI knows that the Figma <code>Button/Primary</code> component maps to <code>src/components/ui/button.tsx</code> with <code>variant=&quot;default&quot;</code>.</p>
+<p>Figma Make (open beta, announced at Config 2025) goes further: it generates interactive, functional applications directly inside Figma from a prompt, powered by Claude. The result is not a static mockup — it is running React code you can hand off to Claude Code for production implementation.</p>
+<p>Key Dev Mode MCP endpoints for AI tools:</p>
+<ul class="linear-list"><li><code>get_design_context</code> — returns component hierarchy, layout properties, and applied variables for a selection</li><li><code>get_code_connect_map</code> — maps Figma component IDs to repository file paths and prop signatures</li></ul>
+<p><strong>Maturity: Growing</strong> — the MCP server is production-ready; Figma Make is still in open beta with feature limitations.</p></div>
+    
+  </section>
+<section id="day-6-ai-assisted-frontend-development-8-latest-trends-emerging-patterns-may-2026-8-3-generative-ui-runtime-ui-from-llms" class="content-section reveal-left">
+    <span class="section-label">1.10.3 &middot; 8.3 Generative UI — Runtime UI from LLMs</span>
+    <h3 class="slide-heading">8.3 Generative UI — Runtime UI from LLMs</h3>
+    <div class="section-body"><p>Generative UI is the pattern where language models produce UI components at runtime, not at build time. The user sends a prompt, the server streams React component trees back, and the client renders them live. This is fundamentally different from AI-assisted code generation: the AI is part of the request/response cycle in production, not just a development tool.</p>
+<p>v0 by Vercel has crossed 6 million developers and is the dominant prompt-to-UI tool for React/TypeScript/Tailwind/shadcn stacks. The Vercel AI SDK provides the primitives: <code>streamUI</code> streams component trees from the server, <code>useChat</code> drives conversational UI, and <code>useCompletion</code> handles streaming text. CopilotKit (31.5k GitHub stars) extends this to agentic patterns: <code>&lt;CopilotChat&gt;</code> embeds an AI assistant in your app, <code>useCoAgent</code> connects frontend state to LangGraph agents, and <code>renderAndWait</code> pauses agent execution for human approval of UI actions.</p>
+<p>The AG-UI Protocol (open specification, adopted by Google, AWS, Microsoft, and LangChain) standardizes the event stream format between AI agents and frontend UIs — enabling frontend components that work with any agent backend.</p>
+<div class="code-container"><div class="code-header"><span class="code-title">tsx</span><button class="copy-btn" type="button">Copy</button></div><pre><code>// Vercel AI SDK: streaming a generative UI response
+import { streamUI } from &#39;ai/rsc&#39;;
+
+const result = await streamUI({
+  model: openai(&#39;gpt-4o&#39;),
+  prompt: &#39;Show a chart of Q1 revenue by region&#39;,
+  text: ({ content }) =&gt; &lt;div&gt;{content}&lt;/div&gt;,
+  tools: {
+    showChart: {
+      description: &#39;Render a bar chart&#39;,
+      parameters: z.object({ data: z.array(z.object({ region: z.string(), revenue: z.number() })) }),
+      generate: async ({ data }) =&gt; &lt;RevenueChart data={data} /&gt;,
+    },
+  },
+});</code></pre></div>
+<p><strong>Maturity: Growing</strong> — production-ready for conversational apps; generative UI in enterprise dashboards is early-stage.</p></div>
+    
+  </section>
+<section id="day-6-ai-assisted-frontend-development-8-latest-trends-emerging-patterns-may-2026-8-4-google-stitch-design-md" class="content-section reveal-left">
+    <span class="section-label">1.10.4 &middot; 8.4 Google Stitch + DESIGN.md</span>
+    <h3 class="slide-heading">8.4 Google Stitch + DESIGN.md</h3>
+    <div class="section-body"><p>Google Stitch (released 2026) is a free AI-native design tool that generates multi-screen, interactive UI flows from a prompt in roughly three minutes. Unlike Figma, Stitch is designed from the ground up for AI-to-code workflows: the output is structured for direct handoff to AI coding tools, not for manual developer interpretation.</p>
+<p>DESIGN.md (Apache 2.0, released April 2026) is an emerging convention analogous to CLAUDE.md or AGENTS.md — a markdown file with embedded YAML design tokens that serves as a persistent, machine-readable brand contract for AI agents. Where CLAUDE.md tells AI coding tools about your code conventions, DESIGN.md tells them about your visual design system: color palette, typography scale, spacing grid, component naming conventions, and interaction patterns.</p>
+<div class="code-container"><div class="code-header"><span class="code-title">yaml</span><button class="copy-btn" type="button">Copy</button></div><pre><code># DESIGN.md (excerpt)
+## Design Tokens</code></pre></div>
+<p>color: brand-primary: &quot;#2563EB&quot;   # blue-600 brand-hover:   &quot;#1D4ED8&quot;   # blue-700 surface:       &quot;#FFFFFF&quot; surface-muted: &quot;#F9FAFB&quot;   # gray-50 spacing: base: 4px component-padding: &quot;16px 24px&quot; radius: card: 8px modal: 12px avatar: 9999px</p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code></code></pre></div>
+<p>The DESIGN.md CLI includes a linter that validates WCAG AA contrast ratios and exports design tokens as a Tailwind v3-compatible configuration. When AI coding tools read DESIGN.md alongside CLAUDE.md, they generate components that are consistent with your brand without requiring you to re-specify colors and spacing in every prompt.</p>
+<p><strong>Maturity: Emerging</strong> — early adopters are using it; no broad toolchain integration yet, but trajectory is strong.</p></div>
+    
+  </section>
+<section id="day-6-ai-assisted-frontend-development-8-latest-trends-emerging-patterns-may-2026-8-5-claude-design-frontend-design-plugin" class="content-section reveal-left">
+    <span class="section-label">1.10.5 &middot; 8.5 Claude Design &amp; Frontend Design Plugin</span>
+    <h3 class="slide-heading">8.5 Claude Design &amp; Frontend Design Plugin</h3>
+    <div class="section-body"><p>Claude Design is Anthropic&#39;s capability for generating functional, visually complete UI from natural language — producing HTML, React components, and SVG illustrations that are immediately renderable, not just code skeletons. Unlike previous AI code generation that tended toward functional-but-plain output, Claude Design applies aesthetic judgment: it considers visual hierarchy, whitespace, color relationships, and typographic rhythm as first-class concerns alongside correctness.</p>
+<p>The Frontend Design plugin for Claude Code (277k+ installs as of May 2026) formalizes a workflow that separates aesthetic direction from implementation. You establish the visual direction first — choosing from modes like brutalist, maximalist, retro-futuristic, or luxury — and the plugin generates a design handoff bundle (component specs, token values, layout constraints) that Claude Code then implements. This separation prevents the most common failure mode of AI frontend work: generating code that is technically correct but visually mediocre because aesthetic intent was never specified.</p>
+<p>The handoff bundle passes directly to Claude Code for implementation, eliminating the translation step between design and engineering that causes most design-to-code fidelity loss.</p>
+<p><strong>Maturity: Emerging</strong> — the plugin is production-installed but the handoff bundle format is still evolving.</p></div>
+    
+  </section>
+<section id="day-6-ai-assisted-frontend-development-8-latest-trends-emerging-patterns-may-2026-8-6-design-to-code-extraction-tools" class="content-section reveal-left">
+    <span class="section-label">1.10.6 &middot; 8.6 Design-to-Code Extraction Tools</span>
+    <h3 class="slide-heading">8.6 Design-to-Code Extraction Tools</h3>
+    <div class="section-body"><p>Design-to-code tools convert static design files or screenshots into runnable frontend code. The market has consolidated around a few distinct approaches, each with a real use case and real limitations.</p>
+<p><strong>Locofy.ai</strong> converts Figma and Penpot designs to React, Next.js, and Vue components. It preserves auto-layout as CSS flexbox/grid, maps Figma styles to Tailwind classes, and generates component props from Figma variants. Best for product teams that maintain a production Figma file with clean layer structure. The output quality is directly proportional to Figma layer naming discipline — if your layers are named &quot;Group 47&quot; instead of &quot;Card/User/Active&quot;, the output is unusable.</p>
+<p><strong>Screenshot-to-code</strong> uses GPT-4 Vision (and now Claude) to analyze screenshots or live URLs and generate React/Tailwind implementations. It is faster for one-off extraction from existing UIs where no Figma source exists. Quality is lower than Locofy for production use but higher for rapid prototyping.</p>
+<p>The honest benchmark: these tools deliver roughly 10-15% actual time savings in production workflows, compared to the 60-90% savings vendors claim. The gap is real and predictable — generated code requires significant cleanup for accessibility, responsive behavior, and integration with your state management. The tools are most valuable for generating the layout skeleton, which you then refine. The critical workflow insight: <strong>clean Figma layer naming matters more than which tool you choose.</strong></p>
+<p><strong>Maturity: Growing</strong> — useful for layout scaffolding; not reliable for production-ready output without review.</p></div>
+    
+  </section>
+<section id="day-6-ai-assisted-frontend-development-8-latest-trends-emerging-patterns-may-2026-8-7-tailwind-v4-css-in-ai-era" class="content-section reveal-left">
+    <span class="section-label">1.10.7 &middot; 8.7 Tailwind v4 + CSS-in-AI Era</span>
+    <h3 class="slide-heading">8.7 Tailwind v4 + CSS-in-AI Era</h3>
+    <div class="section-body"><p>Tailwind CSS v4 (released early 2025) made two foundational changes. First, CSS-first configuration: there is no <code>tailwind.config.js</code>. You configure your theme with <code>@theme</code> blocks in CSS, and Tailwind reads CSS variables rather than a JavaScript config object. Second, the Oxide engine (written in Rust) makes full rebuilds 3-5x faster than v3 and incremental builds near-instant.</p>
+<p>The more significant shift is structural: Tailwind has become the dominant styling language for AI-generated frontend code. AI tools generate Tailwind because it is in the vast majority of their training data. More Tailwind in training means better Tailwind generation, which means more Tailwind adoption, which means more training data. This self-reinforcing loop has made Tailwind v4 the de facto standard for AI-generated UI in 2026.</p>
+<p>UnoCSS offers a compelling alternative for teams with extreme build performance requirements: it is 100x faster than Tailwind at dev build time, with a Tailwind-compatible preset that means most Tailwind class names work without modification. Worth knowing about for large codebases where build times are a constraint.</p>
+<p>The broader CSS renaissance is also relevant: native CSS now supports container queries (<code>@container</code>), CSS nesting, cascade layers (<code>@layer</code>), and <code>:has()</code> pseudo-class. AI tools generate these native features alongside Tailwind — understanding the distinction between Tailwind utilities and native CSS helps you review generated code accurately.</p>
+<div class="code-container"><div class="code-header"><span class="code-title">css</span><button class="copy-btn" type="button">Copy</button></div><pre><code>/* Tailwind v4: CSS-first configuration in src/index.css */
+@import &quot;tailwindcss&quot;;
+
+@theme {
+  --color-brand: #2563eb;
+  --color-brand-hover: #1d4ed8;
+  --font-display: &quot;Inter&quot;, sans-serif;
+  --radius-card: 8px;
+}</code></pre></div>
+<p><strong>Maturity: Mainstream</strong> — Tailwind v4 is the current stable release and the expected target for new projects.</p></div>
+    
+  </section>
+<section id="day-6-ai-assisted-frontend-development-8-latest-trends-emerging-patterns-may-2026-8-8-w3c-design-tokens-specification-2025-10" class="content-section reveal-left">
+    <span class="section-label">1.10.8 &middot; 8.8 W3C Design Tokens Specification (2025.10)</span>
+    <h3 class="slide-heading">8.8 W3C Design Tokens Specification (2025.10)</h3>
+    <div class="section-body"><p>The W3C Design Tokens Community Group published the first stable version of the Design Tokens specification in October 2025. It defines a vendor-neutral JSON format for expressing design decisions — colors, typography, spacing, motion, and component-level tokens — in a way that any tool can read and transform.</p>
+<p>Before this specification, every tool had its own token format: Figma exported one JSON shape, Style Dictionary consumed another, Tailwind config had its own structure, and Token Studio used yet another. Design systems teams spent significant time writing transformation scripts between formats. The W3C format provides a common source of truth.</p>
+<p>The specification&#39;s deeper significance is that it makes design systems machine-readable for AI agents. A token file in W3C format is not just a build artifact — it is structured data that AI coding tools can read to understand your design constraints without requiring a Figma file or a prose description. DESIGN.md uses this format for its embedded token blocks. Figma Variables and Token Studio both export to W3C format as of 2026.</p>
+<div class="code-container"><div class="code-header"><span class="code-title">json</span><button class="copy-btn" type="button">Copy</button></div><pre><code>// W3C Design Tokens format (design-tokens.json)
+{
+  &quot;color&quot;: {
+    &quot;brand&quot;: {
+      &quot;$value&quot;: &quot;#2563EB&quot;,
+      &quot;$type&quot;: &quot;color&quot;,
+      &quot;$description&quot;: &quot;Primary brand color, maps to Tailwind blue-600&quot;
+    },
+    &quot;surface&quot;: {
+      &quot;$value&quot;: &quot;#FFFFFF&quot;,
+      &quot;$type&quot;: &quot;color&quot;
+    }
+  },
+  &quot;spacing&quot;: {
+    &quot;base&quot;: { &quot;$value&quot;: &quot;4px&quot;, &quot;$type&quot;: &quot;dimension&quot; },
+    &quot;component-md&quot;: { &quot;$value&quot;: &quot;16px&quot;, &quot;$type&quot;: &quot;dimension&quot; }
+  }
+}</code></pre></div>
+<p><strong>Maturity: Growing</strong> — the specification is stable; tool adoption is accelerating but not yet universal.</p>
+<blockquote>💡 <strong>Key Takeaway</strong>  The 2026 frontend stack is converging on AI-readable design contracts (DESIGN.md, W3C tokens), AI-native component libraries (shadcn/ui + MCP), and generative UI patterns (Vercel AI SDK, CopilotKit) — moving from AI-assisted coding to AI-native UI development. The engineers who thrive in this environment are not the ones who know the most Tailwind classes or the most React patterns; they are the ones who understand how to structure context for AI tools, evaluate AI output critically, and design systems that AI can operate correctly within.</blockquote></div>
+    
+  </section>
+  </section>
+<section id="day-6-ai-assisted-frontend-development-hands-on-lab-build-a-dashboard-page-in-under-45-minutes" class="content-section reveal-left">
+    <span class="section-label">1.11 &middot; Hands-On Lab: Build a Dashboard Page in Under 45 Minutes</span>
+    <div class="activity-card">
+      <div class="activity-title">Hands-On Lab: Build a Dashboard Page in Under 45 Minutes</div>
+      <div class="section-body"><p>You will build a complete, accessible, responsive React TypeScript dashboard from a written wireframe description using Claude Code and Cursor.</p></div>
+      
+      
+    </div>
+    <section id="day-6-ai-assisted-frontend-development-hands-on-lab-build-a-dashboard-page-in-under-45-minutes-wireframe-description" class="content-section reveal-left">
+    <span class="section-label">1.11.1 &middot; Wireframe Description</span>
+    <h3 class="slide-heading">Wireframe Description</h3>
+    <div class="section-body"><p>Build a 3-panel dashboard page:</p>
+<ul class="linear-list"><li>Left sidebar (256px): Navigation with five items (Overview, Users, Analytics, Reports, Settings). Each item has an icon placeholder, a label, and an active state. The sidebar collapses to icon-only (64px) via a toggle button. On mobile (&lt;768px), it is hidden and opens as an overlay.</li><li>Center panel (flexible width): A data table showing user records. Columns: Name, Email, Status (Active/Inactive/Pending), Last Active (date), Actions (Edit/Delete buttons). The table supports column sorting (click header), search filtering (text input above table), status filtering (dropdown), and pagination (10/25/50 per page). A loading skeleton shows while data is being fetched.</li><li>Right panel: Filter bar sits above the data table. It contains: search input (debounced), status dropdown, date range picker (from/to), and a Reset button. On mobile, it stacks vertically.</li></ul></div>
+    
+  </section>
+<section id="day-6-ai-assisted-frontend-development-hands-on-lab-build-a-dashboard-page-in-under-45-minutes-setup" class="content-section reveal-left">
+    <span class="section-label">1.11.2 &middot; Setup</span>
+    <h3 class="slide-heading">Setup</h3>
+    <div class="section-body"><div class="code-container"><div class="code-header"><span class="code-title">bash</span><button class="copy-btn" type="button">Copy</button></div><pre><code># Create project
+npm create vite@latest dashboard-lab -- --template react-ts
+cd dashboard-lab
+
+# Install dependencies
+npm install
+npm install tailwindcss @tailwindcss/vite
+npm install -D vitest @testing-library/react @testing-library/jest-dom @testing-library/user-event jsdom axe-core vitest-axe
+
+# Add Tailwind to Vite config (vite.config.ts):
+# import tailwindcss from &#39;@tailwindcss/vite&#39;
+# plugins: [react(), tailwindcss()]
+
+# Add to src/index.css:
+# @import &quot;tailwindcss&quot;;
+
+# Initialize git
+git init &amp;&amp; git add -A &amp;&amp; git commit -m &quot;Initial Vite + React + TS + Tailwind setup&quot;</code></pre></div>
+<p>Create a <code>CLAUDE.md</code> in the project root:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">markdown</span><button class="copy-btn" type="button">Copy</button></div><pre><code># Dashboard Lab
+
+## Stack
+- React 19 + TypeScript 5.7
+- Vite 6 + Tailwind CSS v4 (CSS-first, no tailwind.config.js)
+- Vitest + React Testing Library
+
+## Conventions
+- Functional components, named exports only
+- Props interface: {ComponentName}Props
+- Components in src/components/, one per file
+- Tests in src/components/__tests__/
+- Custom hooks in src/hooks/
+- Types in src/types/
+- Semantic HTML, ARIA labels on all interactive elements
+- Tailwind for styling, no CSS modules or styled-components</code></pre></div></div>
+    
+  </section>
+<section id="day-6-ai-assisted-frontend-development-hands-on-lab-build-a-dashboard-page-in-under-45-minutes-part-1-types-and-data-10-minutes" class="content-section reveal-left">
+    <span class="section-label">1.11.3 &middot; Part 1: Types and Data (10 minutes)</span>
+    <h3 class="slide-heading">Part 1: Types and Data (10 minutes)</h3>
+    <div class="section-body"><p>Open Claude Code in the project directory:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>Create TypeScript types for a dashboard that shows user records.
+
+src/types/dashboard.ts should export:
+- User: { id: string, name: string, email: string, status: &#39;active&#39; | &#39;inactive&#39; | &#39;pending&#39;, lastActive: string, department: string }
+- FilterState: { search: string, status: &#39;all&#39; | &#39;active&#39; | &#39;inactive&#39; | &#39;pending&#39;, dateFrom: string, dateTo: string }
+- SortConfig: { column: keyof User | null, direction: &#39;asc&#39; | &#39;desc&#39; | &#39;none&#39; }
+- PaginationState: { page: number, pageSize: 10 | 25 | 50, totalCount: number }
+
+Also create src/data/mockUsers.ts with 50 realistic mock user records using the User type.</code></pre></div>
+<p>Verify: Run <code>npx tsc --noEmit</code>. Zero errors should appear.</p></div>
+    
+  </section>
+<section id="day-6-ai-assisted-frontend-development-hands-on-lab-build-a-dashboard-page-in-under-45-minutes-part-2-leaf-components-15-minutes" class="content-section reveal-left">
+    <span class="section-label">1.11.4 &middot; Part 2: Leaf Components (15 minutes)</span>
+    <h3 class="slide-heading">Part 2: Leaf Components (15 minutes)</h3>
+    <div class="section-body"><p>Generate components bottom-up. Start with the smallest:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>Create these components using Tailwind CSS v4, all fully accessible:
+
+1. src/components/StatusBadge.tsx — displays user status as a colored badge
+   - &#39;active&#39; = green, &#39;inactive&#39; = gray, &#39;pending&#39; = yellow
+   - Small dot indicator + text label
+   - role=&quot;status&quot;, aria-label=&quot;Status: {status}&quot;
+
+2. src/components/FilterBar.tsx — filter controls bar
+   - Search input with magnifying glass icon (use an SVG or Unicode)
+   - Status dropdown (All, Active, Inactive, Pending)
+   - Date range: two date inputs (From, To)
+   - Reset button
+   - Props: filters: FilterState, onFilterChange: (filters: FilterState) =&gt; void
+   - Responsive: horizontal on desktop, stacked on mobile
+   - All inputs labeled with &lt;label&gt; elements
+
+3. src/components/Pagination.tsx — page controls
+   - Previous/Next buttons (disabled at boundaries)
+   - Page size selector (10, 25, 50)
+   - &quot;Showing X-Y of Z results&quot; text
+   - Props: PaginationState + onPageChange + onPageSizeChange
+   - aria-label=&quot;Pagination navigation&quot;, aria-live region for page announcements
+
+Write Vitest + RTL tests for each component in __tests__/ directories.</code></pre></div>
+<p>Verify each component:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">bash</span><button class="copy-btn" type="button">Copy</button></div><pre><code>npx tsc --noEmit
+npx vitest run --reporter=verbose</code></pre></div></div>
+    
+  </section>
+<section id="day-6-ai-assisted-frontend-development-hands-on-lab-build-a-dashboard-page-in-under-45-minutes-part-3-data-table-and-sidebar-15-minutes" class="content-section reveal-left">
+    <span class="section-label">1.11.5 &middot; Part 3: Data Table and Sidebar (15 minutes)</span>
+    <h3 class="slide-heading">Part 3: Data Table and Sidebar (15 minutes)</h3>
+    <div class="section-body"><p>Now the larger components:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>Create src/components/DataTable.tsx:
+- Semantic HTML table
+- Columns: Name, Email, Status (StatusBadge), Last Active, Actions
+- Sortable column headers: click to cycle asc/desc/none
+- aria-sort on each sortable &lt;th&gt;
+- Keyboard: Tab between headers, Enter/Space to sort
+- Loading state: skeleton rows with aria-busy=&quot;true&quot;
+- Empty state: &quot;No users match your filters&quot; message
+- Row hover highlight
+- Props: users: User[], sort: SortConfig, onSortChange, isLoading: boolean
+
+Create src/components/Sidebar.tsx:
+- Navigation items: Overview, Users, Analytics, Reports, Settings
+- Active item has left border accent + subtle background
+- Collapsible: toggle button with aria-expanded
+- Collapsed: 64px (icons only), expanded: 256px, smooth transition
+- Mobile: hidden by default
+- &lt;nav&gt; element with aria-label=&quot;Main navigation&quot;
+- aria-current=&quot;page&quot; on active item
+- Keyboard: arrow keys between items
+
+Write tests for both.</code></pre></div>
+<p>Run tests again after generation. Fix any failures.</p></div>
+    
+  </section>
+<section id="day-6-ai-assisted-frontend-development-hands-on-lab-build-a-dashboard-page-in-under-45-minutes-part-4-dashboard-page-composition-5-minutes" class="content-section reveal-left">
+    <span class="section-label">1.11.6 &middot; Part 4: Dashboard Page Composition (5 minutes)</span>
+    <h3 class="slide-heading">Part 4: Dashboard Page Composition (5 minutes)</h3>
+    <div class="section-body"><div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>Create src/components/DashboardPage.tsx that composes everything:
+- Uses a custom hook useTableFilters for all filter/sort/pagination state
+- Creates the 3-panel layout: Sidebar | (FilterBar + DataTable) 
+- Filters and sorts the mock user data based on state
+- Debounced search (300ms)
+- Responsive: sidebar hidden on mobile, panels stack vertically
+- Grid layout: grid-cols-[256px_1fr] on desktop
+
+Also create src/hooks/useTableFilters.ts with a useReducer managing all state.
+Update src/App.tsx to render DashboardPage.</code></pre></div>
+<p>Start the dev server and visually inspect:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">bash</span><button class="copy-btn" type="button">Copy</button></div><pre><code>npm run dev</code></pre></div></div>
+    
+  </section>
+<section id="day-6-ai-assisted-frontend-development-hands-on-lab-build-a-dashboard-page-in-under-45-minutes-lab-evaluation-criteria" class="content-section reveal-left">
+    <span class="section-label">1.11.7 &middot; Lab Evaluation Criteria</span>
+    <div class="activity-card">
+      <div class="activity-title">Lab Evaluation Criteria</div>
+      <div class="section-body"><p>Your lab output will be evaluated on five dimensions:</p>
+<div class="table-wrap"><table><thead><tr><th>Dimension</th><th>What We Look For</th><th>Weight</th></tr></thead><tbody><tr><td>Architecture</td><td>Clean component separation, understandable file structure, state ownership makes sense (smart components own state, presentational components receive props)</td><td>20%</td></tr><tr><td>Type Safety</td><td>Accurate TypeScript types, typed props on every component, no <code>any</code>, string literal unions where appropriate, safe state handling</td><td>20%</td></tr><tr><td>Accessibility</td><td>Semantic HTML elements, keyboard navigation works, visible focus states, correct ARIA attributes (not redundant), screen-reader labels make sense</td><td>25%</td></tr><tr><td>Tailwind Quality</td><td>Responsive layout works from 320px to 1440px, consistent spacing and color tokens, readable utility composition, dark mode support if attempted</td><td>15%</td></tr><tr><td>Review Discipline</td><td>AI-generated code has been validated (no hallucinated imports, no unused variables), unnecessary complexity removed, edge cases identified and handled</td><td>20%</td></tr></tbody></table></div>
+<p><strong>Submission:</strong> Push your lab to a GitHub repository and include an accessibility checklist as a markdown file (<code>ACCESSIBILITY.md</code>) documenting: semantic landmarks used, keyboard navigation tested, visible focus states confirmed, screen-reader labels verified, color contrast checked, table semantics verified, responsive behavior verified, loading states accessible, and empty states accessible.</p></div>
+      
+      
+    </div>
+    
+  </section>
+<section id="day-6-ai-assisted-frontend-development-hands-on-lab-build-a-dashboard-page-in-under-45-minutes-stretch-goals" class="content-section reveal-left">
+    <span class="section-label">1.11.8 &middot; Stretch Goals</span>
+    <h3 class="slide-heading">Stretch Goals</h3>
+    <div class="section-body"><ol class="linear-list"><li>Dark mode toggle: Add a theme toggle in the sidebar header. Use Tailwind&#39;s <code>dark:</code> variant throughout. Store preference in localStorage.</li><li>Row selection: Add checkboxes to the data table. &quot;Select all&quot; checkbox in header. Show a bulk action bar when rows are selected. Fully accessible: <code>aria-label=&quot;Select [user name]&quot;</code> on each checkbox.</li><li>Keyboard-only navigation test: Unplug your mouse. Can you reach every interactive element by pressing Tab? Can you sort columns, change filters, paginate, collapse the sidebar, all with keyboard only? File bugs for anything that fails.</li><li>axe-core CI integration: Write a test that renders the full DashboardPage and runs axe-core. Assert zero violations. Fix any that appear.</li></ol></div>
+    
+  </section>
+  </section>
+<section id="day-6-ai-assisted-frontend-development-key-takeaways" class="content-section reveal-left">
+    <span class="section-label">1.12 &middot; Key Takeaways</span>
+    <h2 class="slide-heading">Key Takeaways</h2>
+    <div class="section-body"><ol class="linear-list"><li>Pick the right tool for the scope. Claude Code for multi-file generation, Cursor for codebase-aware editing, Copilot for inline completions. Using Copilot for a 5-file feature or Claude Code for a single-line fix is the wrong tool for the job.</li></ol>
+<ol class="linear-list"><li>Context is everything. A <code>CLAUDE.md</code> file, Cursor Rules, or <code>copilot-instructions.md</code> with your stack, conventions, and design tokens dramatically improves generated code quality. Invest 15 minutes in writing these before your first generation prompt.</li></ol>
+<ol class="linear-list"><li>Generate bottom-up, not top-down. Types first, then leaf components, then composed pages. Each layer is verifiable before you build the next. Top-down generation produces more integrated bugs.</li></ol>
+<ol class="linear-list"><li>Accessibility is a first-pass requirement, not a second-pass fix. Include ARIA, keyboard navigation, and semantic HTML requirements in your initial component prompts. Retrofitting accessibility is two to three times more work than building it in.</li></ol>
+<ol class="linear-list"><li>Review is not optional. Run <code>tsc --noEmit</code>, run tests, tab through the UI, resize the viewport, and read the generated code line by line. AI-generated code that ships without review is a liability, not a productivity gain.</li></ol></div>
+    
+  </section>
+<section id="day-6-ai-assisted-frontend-development-self-assessment-checklist" class="content-section reveal-left">
+    <span class="section-label">1.13 &middot; Self-Assessment Checklist</span>
+    <h2 class="slide-heading">Self-Assessment Checklist</h2>
+    <div class="section-body"><ul class="linear-list"><li>[ ] I can write a component specification detailed enough that Claude Code generates a working component on the first try (with correct types, imports, and file placement)</li><li>[ ] I can generate TypeScript interfaces from a JSON API response and identify where the AI made types too loose or too tight</li><li>[ ] I can produce a responsive Tailwind layout that works from 320px to 1440px using AI tools, and I know how to provide design tokens to keep styling consistent</li><li>[ ] I can list five ARIA attributes (aria-label, aria-sort, aria-expanded, aria-current, aria-live) and explain when each is appropriate</li><li>[ ] I can identify at least three common mistakes in AI-generated React code (stale closures, missing cleanup, hallucinated imports) and know how to check for them</li><li>[ ] I can run axe-core accessibility checks in my test suite and fix the violations it reports</li><li>[ ] I completed the lab: my dashboard has a sidebar, data table, and filter bar, all with typed props, Tailwind styling, responsive layout, and ARIA attributes</li><li>[ ] I can explain why I would choose Claude Code over Cursor over Copilot for a given frontend task</li></ul></div>
+    
+  </section>
+<section id="day-6-ai-assisted-frontend-development-references-further-reading" class="content-section reveal-left">
+    <span class="section-label">1.14 &middot; References &amp; Further Reading</span>
+    <h2 class="slide-heading">References &amp; Further Reading</h2>
+    <div class="section-body"></div>
+    <section id="day-6-ai-assisted-frontend-development-references-further-reading-official-documentation" class="content-section reveal-left">
+    <span class="section-label">1.14.1 &middot; Official Documentation</span>
+    <h3 class="slide-heading">Official Documentation</h3>
+    <div class="section-body"><ul class="linear-list"><li>Claude Code: https://code.claude.com/docs/en/overview</li><li>Claude Code product page: https://www.anthropic.com/product/claude-code</li><li>GitHub Copilot: https://docs.github.com/en/copilot</li><li>Cursor IDE: https://cursor.com/</li><li>Vitest: https://vitest.dev/</li></ul></div>
+    
+  </section>
+<section id="day-6-ai-assisted-frontend-development-references-further-reading-blog-posts-articles-2025-2026" class="content-section reveal-left">
+    <span class="section-label">1.14.2 &middot; Blog Posts &amp; Articles (2025-2026)</span>
+    <h3 class="slide-heading">Blog Posts &amp; Articles (2025-2026)</h3>
+    <div class="section-body"><ul class="linear-list"><li>&quot;Replacing a Plop React component generator with a Claude Code Skill&quot; — https://dev.to/mbarzeev/replacing-a-plop-react-component-generator-with-a-claude-code-skill-5do</li><li>&quot;Claude Code for React &amp; React Native: Workflows That Actually Move the Needle&quot; — https://medium.com/cars24/claude-code-for-react-react-native-workflows-that-actually-move-the-needle-33b8bb410b14</li><li>&quot;Claude Code 2.5: New Features for Web Developers&quot; — https://www.sitepoint.com/claude-code-25-new-features-for-web-developers/</li><li>&quot;How to Build React Apps with Claude Code&quot; — https://apidog.com/blog/build-react-apps-with-claude-code/</li><li>&quot;Claude Code Skills for React Developers — Component Patterns (2026)&quot; — https://www.agensi.io/learn/claude-code-skills-for-react-developers</li><li>&quot;GitHub Copilot Review 2026&quot; — https://bitsfrombytes.com/github-copilot-review-2026-tested/</li><li>&quot;GitHub Copilot in 2026: Still Worth It for TypeScript Developers?&quot; — https://www.developersdigest.tech/blog/github-copilot-guide</li><li>&quot;Copilot Instructions for React and Next.js Projects&quot; — https://gist.github.com/marceloglacial/225498005299493be4b8712e5c97a3e2</li><li>&quot;The Perfect Cursor AI setup for React and Next.js&quot; — https://www.builder.io/blog/cursor-ai-tips-react-nextjs</li><li>&quot;Cursor 2.0 for Web Developers: React &amp; Next.js Setup Guide&quot; — https://skywork.ai/blog/vibecoding/cursor-2-0-web-developers-react-nextjs/</li><li>&quot;Cursor AI 2026: The Complete Guide to the AI-Native IDE&quot; — https://dev.to/sahilkhurana/cursor-ai-2026-the-complete-guide-to-the-ai-native-ide-3n4h</li><li>&quot;Best AI Tools for Tailwind CSS Generation [2026 Guide]&quot; — https://www.qwe.edu.pl/tutorial/best-ai-tools-tailwind-css-generation/</li><li>&quot;Future of Front-End | Tailwind CSS + AI Code Tools in 2025&quot; — https://ititans.com/blog/future-of-front-end-tailwind-css-and-ai-code-tools/</li><li>&quot;Automating Accessibility Testing in 2026 [Tools included]&quot; — https://www.browserstack.com/guide/automate-accessibility-testing</li><li>&quot;Test Automation for ARIA&quot; — https://www.tricentis.com/blog/test-automation-for-aria</li><li>&quot;Vitest 4.1: Test Tags, Native Node.js Execution and AI Agent Reporter&quot; — https://www.infoq.com/news/2026/05/vitest-4-1-ai-agents/</li><li>&quot;Generate Unit Tests with AI | Vitest + React Testing Workflow&quot; — https://keyholesoftware.com/ai-generated-unit-tests-vite/</li></ul></div>
+    
+  </section>
+<section id="day-6-ai-assisted-frontend-development-references-further-reading-open-source-repos-to-study" class="content-section reveal-left">
+    <span class="section-label">1.14.3 &middot; Open-Source Repos to Study</span>
+    <h3 class="slide-heading">Open-Source Repos to Study</h3>
+    <div class="section-body"><ul class="linear-list"><li>Vitest GitHub repository (test runner configuration and patterns): https://github.com/vitest-dev/vitest</li><li>React Testing Library (testing patterns for accessible components): https://github.com/testing-library/react-testing-library</li><li>axe-core (automated accessibility testing engine): https://github.com/dequelabs/axe-core</li></ul></div>
+    
+  </section>
+  </section>
+  </section>
+    </main>
+
+    <script>
+
+function toggleChecklist(el){
+  el.classList.toggle("checked");
+  el.setAttribute("aria-checked",String(el.classList.contains("checked")));
+}
+
+document.getElementById("themeBtn").addEventListener("click",()=>{
+  const root=document.documentElement;
+  root.dataset.theme=root.dataset.theme==="dark"?"light":"dark";
+});
+
+// Sidebar toggle
+(function(){
+  const btn=document.getElementById("sidebarBtn");
+  const sidebar=document.getElementById("workshopSidebar");
+  const body=document.body;
+  const stored=localStorage.getItem("workshop-sidebar");
+  if(stored!=="expanded"){body.classList.add("sidebar-collapsed");sidebar.classList.add("collapsed");}
+  btn.addEventListener("click",()=>{
+    const isCollapsed=body.classList.toggle("sidebar-collapsed");
+    sidebar.classList.toggle("collapsed");
+    localStorage.setItem("workshop-sidebar",isCollapsed?"collapsed":"expanded");
+  });
+})();
+
+document.addEventListener("mousemove",e=>{
+  document.getElementById("spotlight").style.background="radial-gradient(540px circle at "+e.clientX+"px "+e.clientY+"px,var(--glow),transparent 45%)";
+},{passive:true});
+document.addEventListener("keydown",e=>{
+  if((e.key===" "||e.key==="Enter")&&document.activeElement.classList.contains("checklist-row")){
+    e.preventDefault();toggleChecklist(document.activeElement);
+  }
+});
+
+const revealEls=document.querySelectorAll(".reveal,.reveal-left,.reveal-right,.reveal-scale,.reveal-blur");
+const observer=new IntersectionObserver(entries=>{
+  entries.forEach(entry=>{if(entry.isIntersecting)entry.target.classList.add("visible");});
+},{threshold:.08});
+revealEls.forEach(el=>observer.observe(el));
+setTimeout(()=>{revealEls.forEach(el=>el.classList.add("visible"));},1200);
+
+const navItems=[...document.querySelectorAll(".nav-item")];
+const sections=navItems.map(item=>document.querySelector(item.getAttribute("href"))).filter(Boolean);
+window.addEventListener("scroll",()=>{
+  let current=sections[0]?.id;
+  for(const section of sections){if(window.scrollY>=section.offsetTop-150)current=section.id;}
+  navItems.forEach(item=>item.classList.toggle("active",item.getAttribute("href")==="#"+current));
+},{passive:true});
+
+document.querySelectorAll(".copy-btn").forEach(btn=>btn.addEventListener("click",()=>{
+  const text=btn.closest(".code-container").querySelector("code").innerText;
+  navigator.clipboard?.writeText(text);
+  btn.textContent="Copied";
+  setTimeout(()=>btn.textContent="Copy",900);
+}));
+
+document.querySelectorAll(".tab-container").forEach(tc=>{
+  const headers=[...tc.querySelectorAll(".tab-header")];
+  const panels=[...tc.querySelectorAll(".tab-panel")];
+  headers.forEach((hdr,i)=>{
+    hdr.addEventListener("click",()=>{
+      headers.forEach(h=>h.classList.remove("active"));
+      panels.forEach(p=>p.classList.remove("active"));
+      hdr.classList.add("active");
+      if(panels[i])panels[i].classList.add("active");
+    });
+  });
+  if(headers[0])headers[0].classList.add("active");
+  if(panels[0])panels[0].classList.add("active");
+});
+
+    </script>
+</body>
+</html>

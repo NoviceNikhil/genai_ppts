@@ -1,0 +1,3925 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 5 Workshop Guide — RAG, Embeddings & Semantic Search</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+    /* ═══════════════════════════════════════
+       DESIGN TOKENS — DARK & LIGHT THEMES
+       ═══════════════════════════════════════ */
+    :root, [data-theme="dark"] {
+        --bg:           #0e0e10;
+        --bg-deep:      #080809;
+        --surface:      #18181b;
+        --surface-2:    #212124;
+        --border:       rgba(255,255,255,0.07);
+        --border-hover: rgba(139,92,246,0.3);
+        --text:         #f4f4f5;
+        --text-2:       #a1a1aa;
+        --text-3:       #52525b;
+        --accent:       #8b5cf6;
+        --accent-2:     #a78bfa;
+        --accent-3:     #c4b5fd;
+        --glow:         rgba(139,92,246,0.1);
+        --glow-strong:  rgba(139,92,246,0.2);
+        --tag-bg:       rgba(139,92,246,0.12);
+        --tag-border:   rgba(139,92,246,0.22);
+        --tag-text:     #a78bfa;
+        --card-bg:      rgba(255,255,255,0.03);
+        --card-bg-h:    rgba(255,255,255,0.055);
+        --grid-line:    rgba(255,255,255,0.016);
+        --accent-line:  rgba(139,92,246,0.55);
+        --nav-bg:       rgba(18,18,20,0.92);
+        --stat-grad:    linear-gradient(135deg,#f4f4f5 30%,#8b5cf6);
+        --bar-track:    rgba(255,255,255,0.06);
+        --bar-fill:     linear-gradient(90deg,#7c3aed,#a78bfa);
+        --shadow:       0 0 0 1px rgba(255,255,255,0.07);
+        --noise-op:     0.025;
+        --spring:       cubic-bezier(0.16, 1.1, 0.3, 1);
+        --sidebar-width: 280px;
+
+        /* Code syntax highlighting (Dark) */
+        --code-bg:       #121214;
+        --code-kw:       #c792ea;
+        --code-fn:       #82aaff;
+        --code-str:      #c3e88d;
+        --code-cls:      #f07178;
+        --code-cmt:      #676e95;
+        --code-var:      #f78c6c;
+        --code-num:      #f78c6c;
+    }
+
+    [data-theme="light"] {
+        --bg:           #fafafa;
+        --bg-deep:      #f3f3f6;
+        --surface:      #ffffff;
+        --surface-2:    #f5f5f7;
+        --border:       rgba(0,0,0,0.08);
+        --border-hover: rgba(109,40,217,0.35);
+        --text:         #111113;
+        --text-2:       #6b6b74;
+        --text-3:       #b0b0b8;
+        --accent:       #7c3aed;
+        --accent-2:     #6d28d9;
+        --accent-3:     #5b21b6;
+        --glow:         rgba(124,58,237,0.05);
+        --glow-strong:  rgba(124,58,237,0.1);
+        --tag-bg:       rgba(124,58,237,0.08);
+        --tag-border:   rgba(124,58,237,0.18);
+        --tag-text:     #6d28d9;
+        --card-bg:      rgba(0,0,0,0.025);
+        --card-bg-h:    rgba(0,0,0,0.04);
+        --grid-line:    rgba(0,0,0,0.04);
+        --accent-line:  rgba(124,58,237,0.45);
+        --nav-bg:       rgba(250,250,250,0.94);
+        --stat-grad:    linear-gradient(135deg,#111113 30%,#7c3aed);
+        --bar-track:    rgba(0,0,0,0.07);
+        --bar-fill:     linear-gradient(90deg,#6d28d9,#8b5cf6);
+        --shadow:       0 1px 3px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.06);
+        --noise-op:     0.015;
+
+        /* Code syntax highlighting (Light) */
+        --code-bg:       #f5f5f7;
+        --code-kw:       #a71d5d;
+        --code-fn:       #0086b3;
+        --code-str:      #183691;
+        --code-cls:      #795da3;
+        --code-cmt:      #969896;
+        --code-var:      #e36209;
+        --code-num:      #0086b3;
+    }
+
+    /* ═══════════════════════════════════════
+       BASE RESET & LAYOUT
+       ═══════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html {
+        scroll-behavior: smooth;
+    }
+    body {
+        background: var(--bg);
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        color: var(--text);
+        -webkit-font-smoothing: antialiased;
+        min-height: 100vh;
+        overflow-x: hidden;
+        transition: background 0.3s, color 0.3s;
+    }
+
+    /* Layout framework */
+    .app-container {
+        display: flex;
+        width: 100%;
+        position: relative;
+    }
+
+    /* ═══════════════════════════════════════
+       DECORATIVE EFFECTS (SPOTLIGHT, GRID, NOISE)
+       ═══════════════════════════════════════ */
+    #spotlight {
+        position: fixed;
+        inset: 0;
+        z-index: 1;
+        pointer-events: none;
+    }
+    .grid-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        background-image:
+            linear-gradient(var(--grid-line) 1px, transparent 1px),
+            linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+        background-size: 56px 56px;
+        transition: background-image 0.3s;
+    }
+    .noise-layer {
+        content: '';
+        position: fixed;
+        inset: 0;
+        z-index: 2;
+        pointer-events: none;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+        background-size: 256px;
+        opacity: var(--noise-op);
+        mix-blend-mode: overlay;
+        transition: opacity 0.3s;
+    }
+
+    /* ═══════════════════════════════════════
+       HEADER & NAVIGATION
+       ═══════════════════════════════════════ */
+    .top-header {
+        position: fixed;
+        top: 0;
+        right: 0;
+        left: 0;
+        height: 64px;
+        background: var(--nav-bg);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 32px;
+        z-index: 100;
+        transition: background 0.3s, border-color 0.3s;
+    }
+    .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 800;
+        font-size: 1.15rem;
+        letter-spacing: -0.02em;
+    }
+    .brand-accent {
+        background: linear-gradient(135deg, var(--accent), var(--accent-2));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+    .theme-toggle {
+        width: 38px;
+        height: 38px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 1.05rem;
+        box-shadow: var(--shadow);
+        transition: background 0.3s, border-color 0.3s, transform 0.15s;
+        color: var(--text);
+    }
+    .theme-toggle:hover {
+        transform: scale(1.06);
+        background: var(--card-bg-h);
+    }
+    .theme-toggle:active {
+        transform: scale(0.95);
+    }
+
+    /* ═══════════════════════════════════════
+       SIDEBAR NAVIGATION Drawer
+       ═══════════════════════════════════════ */
+    .sidebar {
+        position: fixed;
+        top: 64px;
+        left: 0;
+        bottom: 0;
+        width: var(--sidebar-width);
+        background: var(--bg-deep);
+        border-right: 1px solid var(--border);
+        padding: 24px 16px;
+        z-index: 90;
+        overflow-y: auto;
+        transition: background 0.3s, border-color 0.3s;
+    }
+    .sidebar::-webkit-scrollbar {
+        width: 4px;
+    }
+    .sidebar::-webkit-scrollbar-thumb {
+        background: var(--border-hover);
+        border-radius: 99px;
+    }
+    .sidebar-label {
+        font-size: 0.65rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        color: var(--text-3);
+        margin-bottom: 12px;
+        padding-left: 12px;
+    }
+    .nav-list {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+    .nav-item a {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 14px;
+        border-radius: 8px;
+        color: var(--text-2);
+        font-size: 0.84rem;
+        font-weight: 500;
+        text-decoration: none;
+        border-left: 2px solid transparent;
+        transition: background 0.2s, color 0.2s, border-left-color 0.2s;
+    }
+    .nav-item a:hover {
+        background: var(--card-bg-h);
+        color: var(--text);
+    }
+    .nav-item.active a {
+        background: var(--tag-bg);
+        color: var(--text);
+        font-weight: 600;
+        border-left-color: var(--accent);
+    }
+    .nav-item-num {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.68rem;
+        color: var(--text-3);
+        width: 18px;
+    }
+    .nav-item.active .nav-item-num {
+        color: var(--accent);
+    }
+
+    /* ═══════════════════════════════════════
+       MAIN CONTENT CONTAINER
+       ═══════════════════════════════════════ */
+    .main-content {
+        margin-left: var(--sidebar-width);
+        padding: 108px 48px 80px;
+        width: calc(100% - var(--sidebar-width));
+        position: relative;
+        z-index: 10;
+        max-width: 1280px;
+    }
+
+    /* Section anchors offset */
+    section {
+        scroll-margin-top: 100px;
+        margin-bottom: 120px;
+        position: relative;
+    }
+
+    .accent-bar {
+        height: 1px;
+        background: linear-gradient(90deg, transparent, var(--accent-line), transparent);
+        margin: 64px 0;
+        border: none;
+    }
+
+    /* ═══════════════════════════════════════
+       TYPOGRAPHY & HERO ELEMENT
+       ═══════════════════════════════════════ */
+    .tag {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 12px;
+        border-radius: 6px;
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        background: var(--tag-bg);
+        color: var(--tag-text);
+        border: 1px solid var(--tag-border);
+        margin-bottom: 16px;
+        transition: background 0.3s, color 0.3s, border-color 0.3s;
+    }
+    .section-label {
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 10px;
+    }
+    .slide-heading {
+        font-size: clamp(2rem, 3.8vw, 3rem);
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        line-height: 1.15;
+        color: var(--text);
+        margin-bottom: 24px;
+        position: relative;
+    }
+    .subtitle {
+        font-size: clamp(1rem, 1.6vw, 1.25rem);
+        color: var(--text-2);
+        line-height: 1.6;
+        font-weight: 400;
+        margin-bottom: 32px;
+    }
+
+    /* ═══════════════════════════════════════
+       COMPONENTS: CARDS, LISTS, TIMELINES
+       ═══════════════════════════════════════ */
+    .card-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 24px;
+        margin-top: 32px;
+    }
+    .card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 28px;
+        position: relative;
+        transition: background 0.25s, border-color 0.25s, transform 0.25s, box-shadow 0.25s;
+        box-shadow: var(--shadow);
+    }
+    .card:hover {
+        background: var(--card-bg-h);
+        border-color: var(--border-hover);
+        transform: translateY(-4px);
+    }
+    .card-icon {
+        font-size: 24px;
+        margin-bottom: 18px;
+        display: inline-block;
+        color: var(--accent);
+    }
+    .card h3 {
+        font-size: 1.15rem;
+        font-weight: 700;
+        margin-bottom: 12px;
+        color: var(--text);
+    }
+    .card p {
+        font-size: 0.94rem;
+        color: var(--text-2);
+        line-height: 1.6;
+    }
+
+    /* Interactive checklist activity */
+    .activity-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 32px;
+        box-shadow: var(--shadow);
+        margin: 32px 0;
+    }
+    .activity-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--text);
+    }
+    .activity-title::before {
+        content: '⚙️';
+        font-size: 1.2rem;
+    }
+    .checklist {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+    .checklist-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 14px;
+        padding: 12px 16px;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        background: var(--card-bg);
+        cursor: pointer;
+        transition: background 0.2s, border-color 0.2s;
+    }
+    .checklist-row:hover {
+        background: var(--card-bg-h);
+        border-color: var(--border-hover);
+    }
+    .checklist-checkbox {
+        flex-shrink: 0;
+        width: 20px;
+        height: 20px;
+        border: 2px solid var(--accent);
+        border-radius: 5px;
+        margin-top: 2px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s, border-color 0.2s;
+        position: relative;
+    }
+    .checklist-checkbox::after {
+        content: '✓';
+        font-size: 12px;
+        font-weight: bold;
+        color: white;
+        opacity: 0;
+        transform: scale(0.6);
+        transition: opacity 0.15s, transform 0.15s var(--spring);
+    }
+    .checklist-text {
+        font-size: 0.96rem;
+        color: var(--text-2);
+        line-height: 1.55;
+        transition: color 0.2s;
+    }
+    /* Checked State */
+    .checklist-row.checked {
+        border-color: rgba(139,92,246,0.2);
+        background: rgba(139,92,246,0.03);
+    }
+    .checklist-row.checked .checklist-checkbox {
+        background: var(--accent);
+        border-color: var(--accent);
+    }
+    .checklist-row.checked .checklist-checkbox::after {
+        opacity: 1;
+        transform: scale(1);
+    }
+    .checklist-row.checked .checklist-text {
+        color: var(--text-3);
+        text-decoration: line-through;
+    }
+
+    /* Lists */
+    .linear-list {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        margin: 24px 0;
+    }
+    .linear-list li {
+        display: flex;
+        gap: 14px;
+        align-items: flex-start;
+        padding: 12px 16px;
+        border-radius: 8px;
+        font-size: 0.98rem;
+        color: var(--text-2);
+        line-height: 1.6;
+        transition: background 0.2s, color 0.2s;
+    }
+    .linear-list li:hover {
+        background: var(--card-bg-h);
+        color: var(--text);
+    }
+    .linear-list li::before {
+        content: '';
+        flex-shrink: 0;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--accent);
+        margin-top: 9px;
+        transition: background 0.3s;
+    }
+
+    /* Vertical Timeline */
+    .timeline {
+        position: relative;
+        padding-left: 32px;
+        margin: 32px 0;
+    }
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 8px;
+        top: 8px;
+        bottom: 8px;
+        width: 2px;
+        background: linear-gradient(to bottom, var(--accent), rgba(139,92,246,0.1));
+    }
+    .timeline-item {
+        position: relative;
+        padding-bottom: 32px;
+    }
+    .timeline-item:last-child {
+        padding-bottom: 0;
+    }
+    .timeline-item::before {
+        content: '';
+        position: absolute;
+        left: -29px;
+        top: 6px;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--accent);
+        box-shadow: 0 0 0 4px var(--tag-bg);
+        transition: background 0.3s, transform 0.2s;
+    }
+    .timeline-item:hover::before {
+        transform: scale(1.3);
+    }
+    .timeline-date {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.72rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        color: var(--accent-2);
+        margin-bottom: 4px;
+        letter-spacing: 0.05em;
+    }
+    .timeline-title {
+        font-size: 1.05rem;
+        font-weight: 700;
+        margin-bottom: 8px;
+        color: var(--text);
+    }
+    .timeline-desc {
+        font-size: 0.94rem;
+        color: var(--text-2);
+        line-height: 1.6;
+    }
+
+    /* Workflow Horizontal Map */
+    .workflow-container {
+        display: flex;
+        align-items: stretch;
+        gap: 16px;
+        margin: 32px 0;
+        flex-wrap: wrap;
+    }
+    .workflow-step {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 20px 24px;
+        flex: 1;
+        min-width: 200px;
+        transition: background 0.2s, border-color 0.2s, transform 0.2s;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    .workflow-step:hover {
+        background: var(--card-bg-h);
+        border-color: var(--border-hover);
+        transform: translateY(-2px);
+    }
+    .workflow-num {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.68rem;
+        font-weight: 700;
+        color: var(--accent);
+        margin-bottom: 6px;
+    }
+    .workflow-title {
+        font-size: 0.96rem;
+        font-weight: 700;
+        color: var(--text);
+        margin-bottom: 4px;
+    }
+    .workflow-desc {
+        font-size: 0.84rem;
+        color: var(--text-2);
+        line-height: 1.5;
+    }
+    .workflow-arrow {
+        color: var(--accent);
+        font-size: 1.4rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        user-select: none;
+    }
+    @media (max-width: 768px) {
+        .workflow-arrow {
+            transform: rotate(90deg);
+            padding: 8px 0;
+        }
+        .workflow-container {
+            flex-direction: column;
+        }
+    }
+
+    /* ═══════════════════════════════════════
+       PREMIUM CODE BLOCKS WITH SYNTAX
+       ═══════════════════════════════════════ */
+    .code-container {
+        background: var(--code-bg);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        margin: 24px 0;
+        overflow: hidden;
+        box-shadow: var(--shadow);
+    }
+    .code-header {
+        background: var(--bg-deep);
+        padding: 12px 20px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .code-title {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.74rem;
+        color: var(--text-2);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .code-title::before {
+        content: '';
+        display: block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--accent);
+    }
+    .copy-btn {
+        background: transparent;
+        border: none;
+        color: var(--text-3);
+        cursor: pointer;
+        font-size: 0.72rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 4px 8px;
+        border-radius: 4px;
+        transition: color 0.2s, background-color 0.2s;
+    }
+    .copy-btn:hover {
+        color: var(--text-2);
+        background: var(--card-bg-h);
+    }
+    .code-container pre {
+        padding: 20px 24px;
+        overflow-x: auto;
+        margin: 0;
+    }
+    .code-container code {
+        font-family: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+        font-size: 0.85rem;
+        line-height: 1.6;
+        color: var(--text-2);
+    }
+
+    /* CSS Syntax Highlighter colors */
+    .kw  { color: var(--code-kw); font-weight: 500; }
+    .fn  { color: var(--code-fn); }
+    .str { color: var(--code-str); }
+    .cls { color: var(--code-cls); }
+    .cmt { color: var(--code-cmt); font-style: italic; }
+    .var { color: var(--code-var); }
+    .num { color: var(--code-num); }
+
+    /* Interactive tabs */
+    .tab-container {
+        margin: 28px 0;
+    }
+    .tab-headers {
+        display: flex;
+        gap: 8px;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 8px;
+        margin-bottom: 20px;
+    }
+    .tab-header {
+        background: transparent;
+        border: none;
+        color: var(--text-3);
+        padding: 8px 16px;
+        cursor: pointer;
+        font-size: 0.88rem;
+        font-weight: 600;
+        border-radius: 6px;
+        transition: background-color 0.2s, color 0.2s;
+    }
+    .tab-header:hover {
+        color: var(--text-2);
+        background: var(--card-bg-h);
+    }
+    .tab-header.active {
+        color: var(--accent-2);
+        background: var(--tag-bg);
+    }
+    .tab-panels {
+        position: relative;
+    }
+    .tab-panel {
+        display: none;
+    }
+    .tab-panel.active {
+        display: block;
+    }
+
+    /* ═══════════════════════════════════════
+       INTERACTIVE WIDGETS
+       ═══════════════════════════════════════ */
+    .two-col-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 32px;
+        margin: 32px 0;
+    }
+    @media (max-width: 992px) {
+        .two-col-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* Custom visual comparison */
+    .comp-container {
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        overflow: hidden;
+        background: var(--surface);
+    }
+    .comp-header {
+        padding: 16px 24px;
+        font-weight: 700;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .comp-left-h {
+        background: rgba(139,92,246,0.06);
+        color: var(--accent-2);
+    }
+    .comp-right-h {
+        background: rgba(255,255,255,0.02);
+        color: var(--text-2);
+    }
+    .comp-body {
+        padding: 24px;
+        font-size: 0.94rem;
+        line-height: 1.6;
+        color: var(--text-2);
+    }
+
+    /* ═══════════════════════════════════════
+       REMOTION-STYLE SPRING ENTRANCE SYSTEM
+       ═══════════════════════════════════════ */
+    .reveal        { opacity: 0; transform: translateY(18px); }
+    .reveal-left   { opacity: 0; transform: translateX(-28px); }
+    .reveal-right  { opacity: 0; transform: translateX(28px); }
+    .reveal-scale  { opacity: 0; transform: scale(0.92) translateY(10px); }
+    .reveal-blur   { opacity: 0; transform: translateY(14px); filter: blur(6px); }
+    .reveal-pop    { opacity: 0; transform: scale(0.72); }
+
+    .reveal.visible, .reveal-left.visible, .reveal-right.visible,
+    .reveal-scale.visible, .reveal-blur.visible, .reveal-pop.visible {
+        opacity: 1;
+        transform: translate(0) scale(1);
+        filter: blur(0);
+        transition: opacity 0.65s var(--spring),
+                    transform 0.65s var(--spring),
+                    filter 0.5s ease;
+    }
+
+    /* Cascade delays for reveals inside an active viewport */
+    .visible-delay-1 { transition-delay: 0.08s !important; }
+    .visible-delay-2 { transition-delay: 0.16s !important; }
+    .visible-delay-3 { transition-delay: 0.24s !important; }
+    .visible-delay-4 { transition-delay: 0.32s !important; }
+
+    /* Typewriter heading style */
+    @keyframes cursor-blink {
+        0%, 100% { opacity: 1; }
+        50%       { opacity: 0; }
+    }
+    .typewriter-active { }
+    .typewriter-done   { }
+    .tw-cursor {
+        display: inline;
+        color: var(--accent);
+        animation: cursor-blink 0.65s step-end infinite;
+        margin-left: 2px;
+        font-weight: 300;
+        line-height: 1;
+    }
+
+    /* ═══════════════════════════════════════
+       RESPONSIVE WRAP
+       ═══════════════════════════════════════ */
+    @media (max-width: 992px) {
+        .sidebar {
+            display: none;
+        }
+        .main-content {
+            margin-left: 0;
+            width: 100%;
+            padding: 96px 24px 64px;
+        }
+        .top-header {
+            padding: 0 20px;
+        }
+    }
+    </style>
+</head>
+<body>
+
+    <!-- Target Spotlight glow tracker -->
+    <div id="spotlight"></div>
+    <div class="grid-overlay"></div>
+    <div class="noise-layer"></div>
+
+    <!-- Sticky Top Header -->
+    <header class="top-header">
+        <div class="brand">
+            <span class="brand-accent">◈</span>
+            <span>GenAI Workshop <span class="brand-accent">Day 5</span></span>
+        </div>
+        <div class="header-actions">
+            <button class="theme-toggle" id="themeBtn" title="Switch Theme">☀️</button>
+        </div>
+    </header>
+
+    <div class="app-container">
+        <!-- Sidebar Navigation Drawer -->
+        <aside class="sidebar">
+            <div class="sidebar-label">Day Outline</div>
+            <nav>
+                <ul class="nav-list">
+
+                                        <li class="nav-item active"><a href="#intro"><span class="nav-item-num">00</span><span>Introduction</span></a></li>
+                    <li class="nav-item"><a href="#setup"><span class="nav-item-num">01</span><span>Setup Sprint</span></a></li>
+                    <li class="nav-item"><a href="#mod1"><span class="nav-item-num">02</span><span>1. Embeddings Intuition</span></a></li>
+                    <li class="nav-item"><a href="#mod2"><span class="nav-item-num">03</span><span>2. RAG Fundamentals</span></a></li>
+                    <li class="nav-item"><a href="#mod3"><span class="nav-item-num">04</span><span>3. Chunking & Retrieval</span></a></li>
+                    <li class="nav-item"><a href="#mod4"><span class="nav-item-num">05</span><span>4. Vector Databases</span></a></li>
+                    <li class="nav-item"><a href="#mod5"><span class="nav-item-num">06</span><span>5. App Architecture</span></a></li>
+                    <li class="nav-item"><a href="#mod6"><span class="nav-item-num">07</span><span>6. Enterprise Use Cases</span></a></li>
+                    <li class="nav-item"><a href="#recap"><span class="nav-item-num">08</span><span>Week 1 Review</span></a></li>
+                    <li class="nav-item"><a href="#retro"><span class="nav-item-num">09</span><span>Assessment & Retro</span></a></li>
+
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Scrolling Content Column -->
+        <main class="main-content">
+
+            
+            <!-- INTRO -->
+            <section id="intro">
+                <span class="tag">Foundation Track · Courseware</span>
+                <h1 class="slide-heading typewriter-target">Day 5: RAG, Embeddings & Semantic Search</h1>
+                <p class="subtitle">Foundation Track · Comprehensive Courseware Guide</p>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">RAG, Embeddings & Semantic Search</h3>
+                    <blockquote>
+<p>Search is no longer keyword matching. This is how AI understands meaning.</p>
+</blockquote>
+                </div>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Embeddings as Semantic Coordinates</h3>
+                    <ul class="linear-list">
+<li>
+<p>An embedding is a list of numbers that encodes the meaning of text — not its letters, not its keywords, but its semantic content</p>
+</li>
+<li>
+<p>Words, sentences, and documents with similar meanings produce vectors that are close together in high-dimensional space</p>
+</li>
+<li>
+<p>OpenAI's text-embedding-3-small produces 1536 numbers per input — that's your semantic coordinate</p>
+</li>
+<li>
+<p>Unlike keyword search, embeddings capture synonyms, paraphrases, and conceptual similarity automatically</p>
+</li>
+<li>
+<p>This is the mathematical foundation of every AI search system, recommendation engine, and RAG pipeline you will build</p>
+</li>
+</ul>
+                </div>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Why Semantic Retrieval Changes Products</h3>
+                    <p><strong>◈ Keyword Search Breaks:</strong> User types 'cancel account' — keyword search misses articles titled 'terminate subscription' or 'close my plan'. Semantic search finds them because meaning matches, not words.</p>
+<p><strong>◉ Grounded AI Outputs:</strong> Instead of an LLM inventing answers from training data, RAG retrieves real documents first. The model reads them, then responds. Hallucinations drop dramatically.</p>
+<p><strong>◇ Personalisation at Scale:</strong> Embeddings let you represent users and content in the same space. Find content close to a user's interest vector. No hand-crafted rules — the geometry does the work.</p>
+                </div>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Agenda + Quiz Preview</h3>
+                    <ul class="linear-list">
+<li>
+<p>Module 1: Embeddings intuition — what they are, how similarity works, why they replace keywords</p>
+</li>
+<li>
+<p>Module 2: RAG fundamentals — retrieve → augment → generate pipeline, LangChain + LlamaIndex</p>
+</li>
+<li>
+<p>Module 3: Chunking &amp; retrieval — chunk size tradeoffs, overlap, hybrid search, failure modes</p>
+</li>
+<li>
+<p>Module 4: Vector databases — pgvector, FAISS, Pinecone, embedding contracts, schema consistency</p>
+</li>
+<li>
+<p>Module 5: Semantic search architecture — full pipeline from query to grounded response + React UI</p>
+</li>
+<li>
+<p>By end of day: working FAQ semantic search with FastAPI backend, FAISS index, similarity scores, and debounced React frontend</p>
+</li>
+</ul>
+                </div>
+
+            </section>
+
+            <hr class="accent-bar">
+
+            <!-- SETUP -->
+            <section id="setup">
+                <span class="section-label">01 · Environment Sync</span>
+                <h2 class="slide-heading typewriter-target">Embeddings & RAG Setup Sprint</h2>
+                <p class="subtitle">Complete this step immediately. A clean local environment is mandatory to implement the RAG pipelines and vector database integrations in the subsequent modules.</p>
+
+                
+    <div class="timeline reveal reveal-left">
+        <div class="timeline-item">
+            <div class="timeline-date">Step 1</div>
+            <h4 class="timeline-title">OpenAI Embeddings Client Validation</h4>
+            <p class="timeline-desc">Isolate your workspace, activate your environment, and verify that the OpenAI client successfully completes high-dimensional semantic indexing. Install the package and run the test script. Output should print <strong>1536</strong>.</p>
+            
+<div class="code-container">
+    <div class="code-header">
+        <span class="code-title">terminal</span>
+        <button class="copy-btn">Copy</button>
+    </div>
+    <pre><code class="language-shell"><span class="kw">pip</span> <span class="kw">install</span> openai</code></pre>
+</div>
+
+            
+<div class="code-container">
+    <div class="code-header">
+        <span class="code-title">verify_openai.py</span>
+        <button class="copy-btn">Copy</button>
+    </div>
+    <pre><code class="language-python"><span class="cmt"># Verify: from openai import OpenAI</span>
+<span class="kw">from</span> openai <span class="kw">import</span> <span class="cls">OpenAI</span>
+client = <span class="cls">OpenAI</span>()
+r = client.embeddings.create(
+    model=<span class="str">&#x27;text-embedding-3-small&#x27;</span>, 
+    input=<span class="str">&#x27;hello world&#x27;</span>
+)
+<span class="fn">print</span>(<span class="fn">len</span>(r.data[<span class="num">0</span>].embedding))</code></pre>
+</div>
+
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-date">Step 2</div>
+            <h4 class="timeline-title">LangChain RAG Integration Suite</h4>
+            <p class="timeline-desc">Establish local search indexes using LangChain, OpenAI embeddings, and FAISS vector stores. Install the community and OpenAI wrappers and verify loading correctness.</p>
+            
+<div class="code-container">
+    <div class="code-header">
+        <span class="code-title">terminal</span>
+        <button class="copy-btn">Copy</button>
+    </div>
+    <pre><code class="language-shell"><span class="kw">pip</span> <span class="kw">install</span> langchain langchain-openai faiss-cpu</code></pre>
+</div>
+
+            
+<div class="code-container">
+    <div class="code-header">
+        <span class="code-title">verify_langchain.py</span>
+        <button class="copy-btn">Copy</button>
+    </div>
+    <pre><code class="language-python"><span class="cmt"># Verify: from langchain_openai import OpenAIEmbeddings</span>
+<span class="kw">from</span> langchain_openai <span class="kw">import</span> <span class="cls">OpenAIEmbeddings</span>
+<span class="kw">from</span> langchain_community.vectorstores <span class="kw">import</span> <span class="cls">FAISS</span>
+<span class="kw">from</span> langchain.text_splitter <span class="kw">import</span> <span class="cls">RecursiveCharacterTextSplitter</span>
+
+<span class="fn">print</span>(<span class="str">&#x27;LangChain RAG stack ready&#x27;</span>)</code></pre>
+</div>
+
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-date">Step 3</div>
+            <h4 class="timeline-title">LlamaIndex Purpose-Built Document Parser</h4>
+            <p class="timeline-desc">LlamaIndex provides robust out-of-the-box loaders for high-fidelity document parsing and ingestion pipelines. Install the integration packages and verify environment completeness.</p>
+            
+<div class="code-container">
+    <div class="code-header">
+        <span class="code-title">terminal</span>
+        <button class="copy-btn">Copy</button>
+    </div>
+    <pre><code class="language-shell"><span class="kw">pip</span> <span class="kw">install</span> llama-index llama-index-llms-openai llama-index-embeddings-openai</code></pre>
+</div>
+
+            
+<div class="code-container">
+    <div class="code-header">
+        <span class="code-title">verify_llamaindex.py</span>
+        <button class="copy-btn">Copy</button>
+    </div>
+    <pre><code class="language-python"><span class="cmt"># Verify: from llama_index.core import VectorStoreIndex</span>
+<span class="kw">from</span> llama_index.core <span class="kw">import</span> <span class="cls">VectorStoreIndex</span>, <span class="cls">SimpleDirectoryReader</span>
+<span class="fn">print</span>(<span class="str">&#x27;LlamaIndex ready&#x27;</span>)</code></pre>
+</div>
+
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-date">Step 4</div>
+            <h4 class="timeline-title">Supabase pgvector Database Schema</h4>
+            <p class="timeline-desc">Provision your cloud-native Postgres database, enable the vector extension, and configure a table with the schema contracts mapping <strong>1536-dimension</strong> vectors (matching <em>text-embedding-3-small</em>). Load environment variables into <code>.env</code>.</p>
+            
+<div class="code-container">
+    <div class="code-header">
+        <span class="code-title">schema.sql</span>
+        <button class="copy-btn">Copy</button>
+    </div>
+    <pre><code class="language-sql"><span class="cmt">-- schema.sql</span>
+<span class="cmt">-- Enable the pgvector extension to allow vector data types</span>
+<span class="kw">CREATE</span> <span class="kw">EXTENSION</span> IF NOT EXISTS <span class="kw">vector</span>;
+
+<span class="cmt">-- Create table to house knowledge fragments and high-dimensional coordinates</span>
+<span class="kw">CREATE</span> <span class="kw">TABLE</span> faq_embeddings (
+    id serial <span class="kw">PRIMARY</span> <span class="kw">KEY</span>,
+    content text,
+    embedding <span class="kw">vector</span>(<span class="num">1536</span>)
+);</code></pre>
+</div>
+
+            
+<div class="code-container">
+    <div class="code-header">
+        <span class="code-title">.env</span>
+        <button class="copy-btn">Copy</button>
+    </div>
+    <pre><code class="language-shell">SUPABASE_URL=your-supabase-project-url
+SUPABASE_KEY=your-supabase-anon-key</code></pre>
+</div>
+
+        </div>
+    </div>
+    
+    <div class="activity-card reveal reveal-scale" style="margin-top: 32px;">
+        <div class="activity-title">Environment Verification Checklist</div>
+        <div class="checklist">
+            <div class="checklist-row" onclick="toggleChecklist(this)">
+                <div class="checklist-checkbox"></div>
+                <span class="checklist-text"><strong>Python Env Activation:</strong> Local virtual environment is fully initialized and active.</span>
+            </div>
+            <div class="checklist-row" onclick="toggleChecklist(this)">
+                <div class="checklist-checkbox"></div>
+                <span class="checklist-text"><strong>Credential Sync:</strong> Project keys inside <code>.env</code> map directly to active Supabase and OpenAI API services.</span>
+            </div>
+            <div class="checklist-row" onclick="toggleChecklist(this)">
+                <div class="checklist-checkbox"></div>
+                <span class="checklist-text"><strong>Dimension Bounds Asserted:</strong> <code>len(r.data[0].embedding) == 1536</code> passes without throwing coordinate exceptions.</span>
+            </div>
+        </div>
+    </div>
+    
+
+            </section>
+
+            <hr class="accent-bar">
+
+            <!-- MOD1 -->
+            <section id="mod1">
+                <span class="section-label">02 · 1. Embeddings Intuition</span>
+                <h2 class="slide-heading typewriter-target">Embeddings Intuition & Semantic Search</h2>
+                <p class="subtitle">Establish a solid mathematical and intuitive understanding of high-dimensional semantic spaces.</p>
+
+                <hr style="border: 0; border-top: 1px dashed var(--border); margin: 32px 0;">
+                
+    <div class="reveal reveal-scale">
+        <div class="comp-container">
+            <div class="comp-header comp-left-h">
+                <span>Choose Your Model</span>
+                <span>OpenAI Embeddings API</span>
+            </div>
+            <div class="comp-body">
+                
+                <div class="two-col-grid" style="margin: 0; gap: 24px;">
+                    <div>
+                        <h4 style="color: var(--accent-3); margin-bottom: 8px;">text-embedding-3-small</h4>
+                        <ul class="linear-list" style="margin: 0; font-size: 0.9rem;">
+<li>
+<p>1536 dimensions.</p>
+</li>
+<li>
+<p>$0.02 per million tokens.</p>
+</li>
+<li>
+<p>Best choice for most production RAG systems — excellent quality-to-cost ratio.</p>
+</li>
+<li>
+<p>Use for: FAQ search, support Q&amp;A, docs retrieval.</p>
+</li>
+<li>
+<p>This is what today's lab uses.</p>
+</li>
+</ul>
+                    </div>
+                    <div>
+                        <h4 style="color: var(--text); margin-bottom: 8px;">text-embedding-3-large</h4>
+                        <ul class="linear-list" style="margin: 0; font-size: 0.9rem;">
+<li>
+<p>3072 dimensions.</p>
+</li>
+<li>
+<p>$0.13 per million tokens — 6.5× more expensive.</p>
+</li>
+<li>
+<p>Use for: code search, multilingual retrieval, fine-grained ranking where small quality differences matter.</p>
+</li>
+<li>
+<p>Doubles vector storage size.</p>
+</li>
+</ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Embeddings Without Math</h3>
+                    <ul class="linear-list">
+<li>
+<p>Think of embeddings as GPS coordinates for meaning — 'bank' (financial) and 'bank' (river) get different coordinates because their context differs</p>
+</li>
+<li>
+<p>You don't need to understand the math to use embeddings — you need to understand what they encode and what they cannot encode</p>
+</li>
+<li>
+<p>Embeddings are trained on billions of text examples — the model learns that 'cancel subscription' and 'terminate my account' appear in similar contexts</p>
+</li>
+<li>
+<p>The output is always a fixed-length vector regardless of input length — one sentence and one paragraph both become 1536 numbers</p>
+</li>
+<li>
+<p>Distance in embedding space = semantic distance. Close vectors = similar meaning. Far vectors = different meaning.</p>
+</li>
+</ul>
+                </div>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Semantic Similarity</h3>
+                    <ul class="linear-list">
+<li>
+<p>Two pieces of text are semantically similar if they convey the same information, even with completely different words</p>
+</li>
+<li>
+<p>'How do I cancel?' and 'What is the termination process?' are semantically similar — keyword search misses this, embeddings catch it</p>
+</li>
+<li>
+<p>Similarity is symmetric: if A is close to B, then B is close to A — embeddings respect this geometry</p>
+</li>
+<li>
+<p>Semantic similarity is not the same as factual correctness — two wrong answers about the same topic score as similar</p>
+</li>
+<li>
+<p>This has a practical implication: embeddings retrieve text that sounds relevant, not text that is accurate — your grounding step must validate</p>
+</li>
+</ul>
+                </div>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Vector Intuition</h3>
+                    <ul class="linear-list">
+<li>
+<p>A vector is just a list of numbers: [0.21, -0.84, 0.13, ...] with 1536 entries for text-embedding-3-small</p>
+</li>
+<li>
+<p>Each dimension loosely encodes some semantic feature — though no single dimension has a clean human-readable interpretation</p>
+</li>
+<li>
+<p>The direction of a vector matters more than its magnitude — cosine similarity measures angle, not distance</p>
+</li>
+<li>
+<p>Adding and subtracting vectors can encode relationships: king - man + woman ≈ queen (the famous Word2Vec result)</p>
+</li>
+<li>
+<p>You don't store or inspect individual dimensions — you compare vectors using similarity functions, and the database does the nearest-neighbour search</p>
+</li>
+</ul>
+                </div>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Why Embeddings Power AI Search</h3>
+                    <ul class="linear-list">
+<li>
+<p>Traditional search: tokenise query → match exact or stemmed tokens → rank by TF-IDF or BM25. Breaks on vocabulary mismatch.</p>
+</li>
+<li>
+<p>Embedding search: encode query → find nearest vectors → return semantically similar documents. Vocabulary-independent.</p>
+</li>
+<li>
+<p>Embeddings also enable cross-modal search — same space can encode text and images, enabling image search from text queries</p>
+</li>
+<li>
+<p>Every major AI product (ChatGPT memory, Notion AI, GitHub Copilot, Perplexity) uses embedding retrieval at the core</p>
+</li>
+<li>
+<p>The engineering decision is not whether to use embeddings — it's which model, which chunk size, and which vector store</p>
+</li>
+</ul>
+                </div>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Similarity Scoring</h3>
+                    <ul class="linear-list">
+<li>
+<p><strong>1.0</strong> — Perfect match: identical or near-duplicate text</p>
+</li>
+<li>
+<p><strong>0.85+</strong> — Strong semantic match: different wording, same intent</p>
+</li>
+<li>
+<p><strong>0.60–0.85</strong> — Related topic: thematically connected but different focus</p>
+</li>
+<li>
+<p><strong>&lt;0.50</strong> — Weak or unrelated: likely retrieval noise, should be filtered</p>
+</li>
+</ul>
+                </div>
+
+                <hr style="border: 0; border-top: 1px dashed var(--border); margin: 32px 0;">
+                
+    <div class="reveal reveal-scale">
+        <div class="comp-container">
+            <div class="comp-header comp-left-h">
+                <span>Comparative Analysis</span>
+                <span>Cosine Similarity Concept</span>
+            </div>
+            <div class="comp-body">
+                
+                <div class="two-col-grid" style="margin: 0; gap: 24px;">
+                    <div>
+                        <h4 style="color: var(--accent-3); margin-bottom: 8px;">The Formula</h4>
+                        <ul class="linear-list" style="margin: 0; font-size: 0.9rem;">
+<li>
+<p>cosine_similarity(A, B) = dot(A, B) / (|A| × |B|).</p>
+</li>
+<li>
+<p>Ranges from -1 (opposite) to +1 (identical direction).</p>
+</li>
+<li>
+<p>Ignores vector magnitude — only the direction matters.</p>
+</li>
+<li>
+<p>This makes it robust to text length differences.</p>
+</li>
+</ul>
+                    </div>
+                    <div>
+                        <h4 style="color: var(--text); margin-bottom: 8px;">Why It Works for Text</h4>
+                        <ul class="linear-list" style="margin: 0; font-size: 0.9rem;">
+<li>
+<p>A long document and a short sentence about the same topic point in the same direction even if their magnitudes differ.</p>
+</li>
+<li>
+<p>Euclidean distance would penalise the long document unfairly.</p>
+</li>
+<li>
+<p>Cosine similarity is length-normalised by design.</p>
+</li>
+</ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+                <hr style="border: 0; border-top: 1px dashed var(--border); margin: 32px 0;">
+                
+    <div class="reveal reveal-scale">
+        <div class="comp-container">
+            <div class="comp-header comp-left-h">
+                <span>Comparative Analysis</span>
+                <span>Embeddings vs Keywords</span>
+            </div>
+            <div class="comp-body">
+                
+                <div class="two-col-grid" style="margin: 0; gap: 24px;">
+                    <div>
+                        <h4 style="color: var(--accent-3); margin-bottom: 8px;">Keywords Win When</h4>
+                        <ul class="linear-list" style="margin: 0; font-size: 0.9rem;">
+<li>
+<p>Exact phrase must match (product SKU, error code, legal citation).</p>
+</li>
+<li>
+<p>Query and document use identical terminology.</p>
+</li>
+<li>
+<p>You need explainability — keyword match is auditable.</p>
+</li>
+<li>
+<p>Latency is critical — BM25 is faster than ANN search at small scale.</p>
+</li>
+</ul>
+                    </div>
+                    <div>
+                        <h4 style="color: var(--text); margin-bottom: 8px;">Embeddings Win When</h4>
+                        <ul class="linear-list" style="margin: 0; font-size: 0.9rem;">
+<li>
+<p>Users paraphrase naturally.</p>
+</li>
+<li>
+<p>Synonyms and related concepts must match.</p>
+</li>
+<li>
+<p>Cross-lingual retrieval is needed.</p>
+</li>
+<li>
+<p>Documents are long and varied.</p>
+</li>
+<li>
+<p>The query is a natural-language question, not a search keyword.</p>
+</li>
+<li>
+<p>Best practice: hybrid search uses both.</p>
+</li>
+</ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Personalization via Embeddings</h3>
+                    <ul class="linear-list">
+<li>
+<p>Represent users as vectors by averaging the embeddings of their viewed/liked content — this is a 'user interest vector'</p>
+</li>
+<li>
+<p>At query time, bias retrieval toward content close to the user vector — personalised without hand-coded rules</p>
+</li>
+<li>
+<p>Netflix, Spotify, LinkedIn, and Amazon all use embedding-based personalisation at their core</p>
+</li>
+<li>
+<p>Cold start problem: new users have no history → no user vector → use demographic or onboarding signals as a proxy</p>
+</li>
+<li>
+<p>Privacy implication: user interest vectors can be highly sensitive — treat them as PII, encrypt at rest, scope access tightly</p>
+</li>
+</ul>
+                </div>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Semantic Clustering Intuition</h3>
+                    <ul class="linear-list">
+<li>
+<p>Cluster embeddings with k-means or HDBSCAN to discover topic groups in your document corpus — no labels needed</p>
+</li>
+<li>
+<p>Support tickets cluster into: billing issues, login problems, feature requests, performance complaints — automatically</p>
+</li>
+<li>
+<p>Cluster centroids become 'topic anchors' — useful for routing queries to specialised retrieval indexes</p>
+</li>
+<li>
+<p>Outliers in embedding space signal novel queries or content that doesn't fit existing patterns — worth flagging for review</p>
+</li>
+<li>
+<p>This is how LLM providers detect prompt injection clusters and misuse patterns across millions of API calls</p>
+</li>
+</ul>
+                </div>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Interactive Activity: Human Embedding Clustering Workshop</h3>
+                    
+    <div class="activity-card reveal reveal-scale">
+        <div class="activity-title">Activity Directions</div>
+        <div class="checklist" style="margin-bottom: 24px;">
+            <div class="checklist-row" onclick="toggleChecklist(this)">
+                <div class="checklist-checkbox"></div>
+                <span class="checklist-text"><strong>Step 1 (4 min) — Semantic Neighborhood Plotting:</strong> Arrange the 15 concept cards on your A3 paper strictly by contextual similarity. Rely solely on developer intuition — no structural labels are allowed.</span>
+            </div>
+            <div class="checklist-row" onclick="toggleChecklist(this)">
+                <div class="checklist-checkbox"></div>
+                <span class="checklist-text"><strong>Step 2 (3 min) — Cluster Categorization:</strong> Draw sharp circles around each logical semantic group and name each cluster with a single, clear terminology heading.</span>
+            </div>
+            <div class="checklist-row" onclick="toggleChecklist(this)">
+                <div class="checklist-checkbox"></div>
+                <span class="checklist-text"><strong>Step 3 (3 min) — Conflict Identification:</strong> Identify the single card that was most difficult to classify. This highlights where human semantic logic diverges from multi-dimensional mathematical similarity scores.</span>
+            </div>
+        </div>
+        
+        <h4 style="color: var(--accent-3); margin-bottom: 12px; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem;">Concept Cards to Cluster:</h4>
+        <div class="concept-tags" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px;">
+            <span class="tag" style="background: var(--tag-bg); border: 1px solid var(--tag-border); color: var(--tag-text); padding: 4px 10px; border-radius: 4px; font-size: 0.85rem; font-family: 'JetBrains Mono', monospace;">useState</span>
+            <span class="tag" style="background: var(--tag-bg); border: 1px solid var(--tag-border); color: var(--tag-text); padding: 4px 10px; border-radius: 4px; font-size: 0.85rem; font-family: 'JetBrains Mono', monospace;">useEffect</span>
+            <span class="tag" style="background: var(--tag-bg); border: 1px solid var(--tag-border); color: var(--tag-text); padding: 4px 10px; border-radius: 4px; font-size: 0.85rem; font-family: 'JetBrains Mono', monospace;">SQL JOIN</span>
+            <span class="tag" style="background: var(--tag-bg); border: 1px solid var(--tag-border); color: var(--tag-text); padding: 4px 10px; border-radius: 4px; font-size: 0.85rem; font-family: 'JetBrains Mono', monospace;">vector similarity</span>
+            <span class="tag" style="background: var(--tag-bg); border: 1px solid var(--tag-border); color: var(--tag-text); padding: 4px 10px; border-radius: 4px; font-size: 0.85rem; font-family: 'JetBrains Mono', monospace;">debounce</span>
+            <span class="tag" style="background: var(--tag-bg); border: 1px solid var(--tag-border); color: var(--tag-text); padding: 4px 10px; border-radius: 4px; font-size: 0.85rem; font-family: 'JetBrains Mono', monospace;">REST API</span>
+            <span class="tag" style="background: var(--tag-bg); border: 1px solid var(--tag-border); color: var(--tag-text); padding: 4px 10px; border-radius: 4px; font-size: 0.85rem; font-family: 'JetBrains Mono', monospace;">RAG</span>
+            <span class="tag" style="background: var(--tag-bg); border: 1px solid var(--tag-border); color: var(--tag-text); padding: 4px 10px; border-radius: 4px; font-size: 0.85rem; font-family: 'JetBrains Mono', monospace;">temperature</span>
+            <span class="tag" style="background: var(--tag-bg); border: 1px solid var(--tag-border); color: var(--tag-text); padding: 4px 10px; border-radius: 4px; font-size: 0.85rem; font-family: 'JetBrains Mono', monospace;">FAISS</span>
+            <span class="tag" style="background: var(--tag-bg); border: 1px solid var(--tag-border); color: var(--tag-text); padding: 4px 10px; border-radius: 4px; font-size: 0.85rem; font-family: 'JetBrains Mono', monospace;">Postgres</span>
+            <span class="tag" style="background: var(--tag-bg); border: 1px solid var(--tag-border); color: var(--tag-text); padding: 4px 10px; border-radius: 4px; font-size: 0.85rem; font-family: 'JetBrains Mono', monospace;">cosine distance</span>
+            <span class="tag" style="background: var(--tag-bg); border: 1px solid var(--tag-border); color: var(--tag-text); padding: 4px 10px; border-radius: 4px; font-size: 0.85rem; font-family: 'JetBrains Mono', monospace;">system prompt</span>
+            <span class="tag" style="background: var(--tag-bg); border: 1px solid var(--tag-border); color: var(--tag-text); padding: 4px 10px; border-radius: 4px; font-size: 0.85rem; font-family: 'JetBrains Mono', monospace;">fine-tuning</span>
+            <span class="tag" style="background: var(--tag-bg); border: 1px solid var(--tag-border); color: var(--tag-text); padding: 4px 10px; border-radius: 4px; font-size: 0.85rem; font-family: 'JetBrains Mono', monospace;">embedding</span>
+            <span class="tag" style="background: var(--tag-bg); border: 1px solid var(--tag-border); color: var(--tag-text); padding: 4px 10px; border-radius: 4px; font-size: 0.85rem; font-family: 'JetBrains Mono', monospace;">attention</span>
+        </div>
+        
+        <p style="font-size: 0.9rem; color: var(--text-2); line-height: 1.6; border-left: 2px solid var(--accent); padding-left: 12px; margin: 0;">
+            <strong>Key Insight:</strong> Your physical paper coordinates exactly map to a two-dimensional vector space. Relative proximity equals contextual similarity. Semantic search does this across 1536 mathematical dimensions in parallel!
+        </p>
+    </div>
+    
+                </div>
+
+            </section>
+
+            <hr class="accent-bar">
+
+            <!-- MOD2 -->
+            <section id="mod2">
+                <span class="section-label">03 · 2. RAG Fundamentals</span>
+                <h2 class="slide-heading typewriter-target">RAG Fundamentals & Orchestration</h2>
+                <p class="subtitle">Master the core Retrieve-Augment-Generate orchestration flow and understand structural tool design frameworks.</p>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Retrieve → Augment → Generate</h3>
+                    <ol>
+<li>
+<p><strong>Step 1</strong> — Retrieve: Embed the user query. Run nearest-neighbour search against your vector index. Return top-k most semantically similar document chunks.</p>
+</li>
+<li>
+<p><strong>Step 2</strong> — Augment: Insert retrieved chunks into the LLM prompt as context. The prompt now contains the question AND the relevant knowledge. The LLM is grounded, not guessing.</p>
+</li>
+<li>
+<p><strong>Step 3</strong> — Generate: LLM reads the retrieved context and generates an answer. It should cite the source chunks. If the answer isn't in the context, it should say so — not hallucinate.</p>
+</li>
+</ol>
+                </div>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Why RAG Exists</h3>
+                    <ul class="linear-list">
+<li>
+<p>LLMs have a knowledge cutoff — they don't know about events, documents, or data created after training</p>
+</li>
+<li>
+<p>LLMs hallucinate confidently — they generate plausible-sounding text even when they don't have the facts</p>
+</li>
+<li>
+<p>Fine-tuning is expensive, slow, and requires retraining every time your data changes — not practical for live knowledge bases</p>
+</li>
+<li>
+<p>RAG lets the model access live, proprietary, or domain-specific knowledge without any model weight changes</p>
+</li>
+<li>
+<p>Every enterprise AI product that needs to answer questions from internal docs uses RAG — it is now a baseline engineering skill</p>
+</li>
+</ul>
+                </div>
+
+                <hr style="border: 0; border-top: 1px dashed var(--border); margin: 32px 0;">
+                
+    <div class="reveal reveal-scale">
+        <div class="comp-container">
+            <div class="comp-header comp-left-h">
+                <span>Comparative Analysis</span>
+                <span>RAG vs Fine-Tuning</span>
+            </div>
+            <div class="comp-body">
+                
+                <div class="two-col-grid" style="margin: 0; gap: 24px;">
+                    <div>
+                        <h4 style="color: var(--accent-3); margin-bottom: 8px;">RAG</h4>
+                        <ul class="linear-list" style="margin: 0; font-size: 0.9rem;">
+<li>
+<p>Knowledge is external — in a vector index.</p>
+</li>
+<li>
+<p>Update the index, not the model.</p>
+</li>
+<li>
+<p>Works with proprietary data without exposing it during training.</p>
+</li>
+<li>
+<p>Lower cost, faster iteration.</p>
+</li>
+<li>
+<p>Best for: factual Q&amp;A over a changing knowledge base, support chatbots, document search.</p>
+</li>
+</ul>
+                    </div>
+                    <div>
+                        <h4 style="color: var(--text); margin-bottom: 8px;">Fine-Tuning</h4>
+                        <ul class="linear-list" style="margin: 0; font-size: 0.9rem;">
+<li>
+<p>Knowledge is baked into model weights.</p>
+</li>
+<li>
+<p>Expensive GPU time per training run.</p>
+</li>
+<li>
+<p>Data used in training may raise privacy concerns.</p>
+</li>
+<li>
+<p>Best for: style transfer, domain-specific language patterns, consistent output format across thousands of calls.</p>
+</li>
+<li>
+<p>Not a substitute for RAG on factual tasks.</p>
+</li>
+</ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+                <hr style="border: 0; border-top: 1px dashed var(--border); margin: 32px 0;">
+                
+    <div class="reveal reveal-scale">
+        <div class="comp-container">
+            <div class="comp-header comp-left-h">
+                <span>Comparative Analysis</span>
+                <span>RAG vs Pure Prompting</span>
+            </div>
+            <div class="comp-body">
+                
+                <div class="two-col-grid" style="margin: 0; gap: 24px;">
+                    <div>
+                        <h4 style="color: var(--accent-3); margin-bottom: 8px;">Pure Prompting</h4>
+                        <ul class="linear-list" style="margin: 0; font-size: 0.9rem;">
+<li>
+<p>Paste all relevant context manually into the system prompt.</p>
+</li>
+<li>
+<p>Works for small, static knowledge bases.</p>
+</li>
+<li>
+<p>Breaks at scale — context window has limits.</p>
+</li>
+<li>
+<p>Every call sends the full context, raising cost.</p>
+</li>
+<li>
+<p>No dynamic retrieval — you decide what's relevant upfront.</p>
+</li>
+</ul>
+                    </div>
+                    <div>
+                        <h4 style="color: var(--text); margin-bottom: 8px;">RAG</h4>
+                        <ul class="linear-list" style="margin: 0; font-size: 0.9rem;">
+<li>
+<p>Retrieve only what is relevant to this specific query.</p>
+</li>
+<li>
+<p>Scales to millions of documents — only top-k chunks enter the context window.</p>
+</li>
+<li>
+<p>Cost-efficient — shorter prompts per call.</p>
+</li>
+<li>
+<p>Context is dynamic and query-driven.</p>
+</li>
+<li>
+<p>Requires engineering: embedding pipeline, vector index, retrieval evaluation.</p>
+</li>
+</ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Hallucination Reduction</h3>
+                    <ul class="linear-list">
+<li>
+<p>Hallucination = LLM generates confident text that is factually wrong, because it has no source to ground the answer</p>
+</li>
+<li>
+<p>RAG grounds every answer in retrieved text — the model reads before it generates, not just predicts from training weights</p>
+</li>
+<li>
+<p>Add an instruction: 'If the answer is not in the provided context, say you don't know' — this is grounding enforcement</p>
+</li>
+<li>
+<p>Hallucination still occurs in RAG if: retrieved chunks are wrong, irrelevant chunks are retrieved, or the model ignores the context</p>
+</li>
+<li>
+<p>Measure grounding rate: for each response, check whether every factual claim traces to a retrieved chunk. Automate this with an LLM-as-judge eval.</p>
+</li>
+</ul>
+                </div>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Retrieval Quality Problems</h3>
+                    <ul class="linear-list">
+<li>
+<p>Wrong retrieval is worse than no retrieval — a confidently wrong context chunk misleads the LLM into a confident wrong answer</p>
+</li>
+<li>
+<p>Retrieval failures: semantic drift (vague queries match unrelated chunks), chunk fragmentation (answer split across chunks), vocabulary gaps (query uses terms not in the corpus)</p>
+</li>
+<li>
+<p>Ranking failures: top-k returns technically similar but contextually irrelevant chunks — similarity score alone is a poor quality signal</p>
+</li>
+<li>
+<p>Retrieval evaluation is non-trivial: you need labelled query→document pairs to measure recall@k and precision@k</p>
+</li>
+<li>
+<p>Start simple: log queries and retrieved chunks in production, manually review 20 per week — this catches 80% of retrieval failures</p>
+</li>
+</ul>
+                </div>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Grounding Outputs</h3>
+                    <ul class="linear-list">
+<li>
+<p>Grounding = ensuring every LLM claim can be traced to a retrieved source document</p>
+</li>
+<li>
+<p>Implementation: include source metadata (document title, chunk ID, URL) alongside each retrieved chunk in the prompt</p>
+</li>
+<li>
+<p>Instruct the model to cite sources inline: 'According to [Help Article #42]: ...' — users can verify claims</p>
+</li>
+<li>
+<p>Grounding also enables auditability in regulated industries: financial advice, medical Q&amp;A, legal search all require traceable outputs</p>
+</li>
+<li>
+<p>Anti-pattern: letting the LLM synthesise across multiple chunks without attribution — the source of each claim becomes unclear</p>
+</li>
+</ul>
+                </div>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Multi-Step RAG</h3>
+                    <ol>
+<li>
+<p><strong>Step 1</strong> — Query Decomposition: Complex question: 'How does our cancellation policy differ for monthly vs annual plans?' → Decompose into 2 sub-queries: cancellation policy for monthly plans, cancellation policy for annual plans.</p>
+</li>
+<li>
+<p><strong>Step 2</strong> — Parallel Retrieval: Run both sub-queries against the vector index simultaneously. Retrieve top-k chunks for each. This ensures both aspects of the question are covered.</p>
+</li>
+<li>
+<p><strong>Step 3</strong> — Re-ranking: Merge retrieved chunks. Re-rank by relevance to the original complex question. Remove duplicates and low-quality chunks.</p>
+</li>
+<li>
+<p><strong>Step 4</strong> — Synthesise: LLM reads merged, re-ranked context. Generates a comparative answer that addresses both sub-questions. Cites sources for each claim.</p>
+</li>
+</ol>
+                </div>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Retrieval Orchestration</h3>
+                    <ul class="linear-list">
+<li>
+<p>Orchestration = deciding what to retrieve, when, and how to combine results before passing to the LLM</p>
+</li>
+<li>
+<p>LangChain provides RetrievalQA chain: wraps retriever + LLM + prompt template into one callable object</p>
+</li>
+<li>
+<p>LlamaIndex provides SubQuestionQueryEngine: automatically decomposes complex questions and routes sub-queries</p>
+</li>
+<li>
+<p>Router retrievers: detect query type (e.g. billing vs. technical vs. policy) and dispatch to specialised indexes</p>
+</li>
+<li>
+<p>Agentic RAG: LLM decides whether to retrieve and what to search for — retrieval becomes a tool call, not a fixed pipeline step</p>
+</li>
+</ul>
+                </div>
+
+                <hr style="border: 0; border-top: 1px dashed var(--border); margin: 32px 0;">
+                
+    <div class="reveal reveal-scale">
+        <div class="comp-container">
+            <div class="comp-header comp-left-h">
+                <span>Choose the Right Tool</span>
+                <span>LangChain vs LlamaIndex</span>
+            </div>
+            <div class="comp-body">
+                
+                <div class="two-col-grid" style="margin: 0; gap: 24px;">
+                    <div>
+                        <h4 style="color: var(--accent-3); margin-bottom: 8px;">LangChain</h4>
+                        <ul class="linear-list" style="margin: 0; font-size: 0.9rem;">
+<li>
+<p>Broad orchestration framework.</p>
+</li>
+<li>
+<p>Best for: custom RAG pipelines, chaining multiple steps, mixing retrievers with agents and tools.</p>
+</li>
+<li>
+<p>More code, more control.</p>
+</li>
+<li>
+<p>Use when you need flexibility across the full AI stack beyond just retrieval.</p>
+</li>
+</ul>
+                    </div>
+                    <div>
+                        <h4 style="color: var(--text); margin-bottom: 8px;">LlamaIndex</h4>
+                        <ul class="linear-list" style="margin: 0; font-size: 0.9rem;">
+<li>
+<p>Purpose-built for document ingestion and retrieval.</p>
+</li>
+<li>
+<p>Best for: indexing PDFs, tables, structured data, large document sets quickly.</p>
+</li>
+<li>
+<p>Less boilerplate for pure RAG.</p>
+</li>
+<li>
+<p>Use when your task is: load documents → index → query — and you do not need custom pipeline logic.</p>
+</li>
+</ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">LlamaIndex: Index Documents in 10 Lines</h3>
+                    
+    <div class="reveal reveal-left">
+        <p style="color: var(--text-2); margin-bottom: 20px;">LlamaIndex simplifies ingestion by wrapping the directory reading, chunk parsing, vector coordinate calculation, database indexing, and query generation into a unified, clean interface.</p>
+        <div class="timeline" style="margin-bottom: 24px;">
+            <div class="timeline-item" style="padding-bottom: 16px;">
+                <div class="timeline-date">Step 1</div>
+                <h4 class="timeline-title">Create Ingestion Source Folder</h4>
+                <p class="timeline-desc">Create a local <code>/docs</code> directory and drop multiple <code>.txt</code> files containing support questions or FAQs inside it.</p>
+            </div>
+            <div class="timeline-item" style="padding-bottom: 16px;">
+                <div class="timeline-date">Step 2</div>
+                <h4 class="timeline-title">Execute LlamaIndex pipeline</h4>
+                <p class="timeline-desc">Load raw files, calculate embed tokens, generate vector search boundaries, and verify response extraction.</p>
+                
+<div class="code-container">
+    <div class="code-header">
+        <span class="code-title">llamaindex_demo.py</span>
+        <button class="copy-btn">Copy</button>
+    </div>
+    <pre><code class="language-python"><span class="cmt"># llamaindex_demo.py</span>
+<span class="kw">from</span> llama_index.core <span class="kw">import</span> <span class="cls">VectorStoreIndex</span>, <span class="cls">SimpleDirectoryReader</span>
+
+<span class="cmt"># Load local knowledge documents from directory</span>
+documents = <span class="cls">SimpleDirectoryReader</span>(<span class="str">&#x27;docs&#x27;</span>).load_data()
+
+<span class="cmt"># Build in-memory semantic coordinate index</span>
+index = <span class="cls">VectorStoreIndex</span>.from_documents(documents)
+
+<span class="cmt"># Create a retrieval query engine</span>
+query_engine = index.as_query_engine()
+
+<span class="cmt"># Run query and output answer</span>
+response = query_engine.query(<span class="str">&#x27;What is your refund policy?&#x27;</span>)
+<span class="fn">print</span>(response)</code></pre>
+</div>
+
+            </div>
+            <div class="timeline-item" style="padding-bottom: 0;">
+                <div class="timeline-date">Step 3</div>
+                <h4 class="timeline-title">Verify Hallucination Bounds</h4>
+                <p class="timeline-desc">Run testing prompts. Query for items strictly omitted from the documents. Verify if the prompt structure successfully intercepts hallucination loops by stating it doesn't have the factual background.</p>
+            </div>
+        </div>
+    </div>
+    
+                </div>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Practical Design: Support Chatbot RAG Architecture</h3>
+                    <ul class="linear-list">
+<li>
+<p>Scenario: SaaS support chatbot. Source data: 500 help articles + 200-page policy document. Users ask natural-language questions and expect cited, grounded answers.</p>
+</li>
+<li>
+<p>Step 1 (5 min): Draw the RAG pipeline on paper — what gets embedded? How chunked? Where is the index stored? What happens on each query? Label every arrow.</p>
+</li>
+<li>
+<p>Step 2 (5 min): Implement the LangChain skeleton: from langchain_openai import OpenAIEmbeddings · from langchain_community.vectorstores import FAISS · from langchain.text_splitter import RecursiveCharacterTextSplitter · embeddings = OpenAIEmbeddings(model='text-embedding-3-small') · splitter = RecursiveCharacterTextSplitter(chunk_size=512, chunk_overlap=50)</p>
+</li>
+<li>
+<p>Step 3 (5 min): Identify your 3 biggest failure risks: What happens when a user asks something not in any article? What if two articles contradict each other? What if the retrieved chunk is too short to answer the question?</p>
+</li>
+<li>
+<p>Output: Architecture diagram + 3 failure risks documented in your GitHub repo</p>
+</li>
+</ul>
+                </div>
+
+            </section>
+
+            <hr class="accent-bar">
+
+            <!-- MOD3 -->
+            <section id="mod3">
+                <span class="section-label">04 · 3. Chunking & Retrieval</span>
+                <h2 class="slide-heading typewriter-target">Chunking & Retrieval Engineering</h2>
+                <p class="subtitle">Engineer optimal chunking strategies, semantic partitioning, and robust relevance indexing.</p>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Why Chunking Matters</h3>
+                    <ul class="linear-list">
+<li>
+<p>LLMs have context window limits — you cannot embed an entire 200-page document and retrieve it whole</p>
+</li>
+<li>
+<p>Chunking splits documents into smaller units that are independently embedded and stored as separate vectors</p>
+</li>
+<li>
+<p>Each chunk gets its own embedding — meaning its similarity score is computed independently against any query</p>
+</li>
+<li>
+<p>The chunk is the unit of retrieval: if the answer is split across two chunks, retrieval may fail even if both chunks are in the index</p>
+</li>
+<li>
+<p>Chunking strategy directly determines retrieval quality — it is one of the highest-leverage engineering decisions in a RAG system</p>
+</li>
+</ul>
+                </div>
+
+                <hr style="border: 0; border-top: 1px dashed var(--border); margin: 32px 0;">
+                
+    <div class="reveal reveal-scale">
+        <div class="comp-container">
+            <div class="comp-header comp-left-h">
+                <span>Comparative Analysis</span>
+                <span>Chunk Size Tradeoffs</span>
+            </div>
+            <div class="comp-body">
+                
+                <div class="two-col-grid" style="margin: 0; gap: 24px;">
+                    <div>
+                        <h4 style="color: var(--accent-3); margin-bottom: 8px;">Small Chunks (128–256 tokens)</h4>
+                        <ul class="linear-list" style="margin: 0; font-size: 0.9rem;">
+<li>
+<p>Pros: precise retrieval, low noise in context window, easy to attribute to a specific source sentence.</p>
+</li>
+<li>
+<p>Cons: answers that span multiple sentences get fragmented — retrieval returns incomplete information.</p>
+</li>
+<li>
+<p>Better for: precise fact lookup, Q&amp;A with short factual answers.</p>
+</li>
+</ul>
+                    </div>
+                    <div>
+                        <h4 style="color: var(--text); margin-bottom: 8px;">Large Chunks (512–1024 tokens)</h4>
+                        <ul class="linear-list" style="margin: 0; font-size: 0.9rem;">
+<li>
+<p>Pros: preserves full context around an answer, reduces fragmentation risk.</p>
+</li>
+<li>
+<p>Cons: retrieved chunks contain more irrelevant content, increasing LLM confusion and prompt cost.</p>
+</li>
+<li>
+<p>Better for: narrative explanation, complex multi-part answers, technical documentation with long reasoning chains.</p>
+</li>
+</ul>
+<p><em>Note: 256–512 tokens is the typical production sweet spot for RAG; 50–100 token overlap is standard.</em> [FIXED: added sweet-spot callout to match current best practice of 256–512 token chunks]</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Overlap Strategies</h3>
+                    <ul class="linear-list">
+<li>
+<p>Overlap = repeating N tokens at the end of one chunk at the start of the next, so boundary-spanning answers appear in both chunks</p>
+</li>
+<li>
+<p>RecursiveCharacterTextSplitter(chunk_size=512, chunk_overlap=50): 50 tokens of overlap between adjacent chunks</p>
+</li>
+<li>
+<p>Overlap increases total index size proportionally — 10% overlap → ~10% more vectors → ~10% more storage and embedding cost</p>
+</li>
+<li>
+<p>Too little overlap: answers that straddle a chunk boundary are split and neither chunk retrieves the full answer</p>
+</li>
+<li>
+<p>Too much overlap: redundant content floods the context window; re-ranking becomes harder because near-duplicate chunks score similarly</p>
+</li>
+</ul>
+                </div>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Metadata Design</h3>
+                    <ul class="linear-list">
+<li>
+<p>Every chunk should carry metadata: source document, section title, page number, last updated timestamp, author</p>
+</li>
+<li>
+<p>Metadata enables filtered retrieval: 'find similar chunks, but only from the billing category' — reduces noise dramatically</p>
+</li>
+<li>
+<p>LangChain Document objects carry a metadata dict alongside page_content — store whatever you'll need to filter on</p>
+</li>
+<li>
+<p>Source metadata enables citation: when the LLM answers, it can cite 'Help Article: Cancellation Policy, Section 3' rather than an opaque chunk ID</p>
+</li>
+<li>
+<p>Timestamp metadata enables freshness filtering: exclude chunks from documents last updated &gt;6 months ago for time-sensitive queries</p>
+</li>
+</ul>
+                </div>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Similarity Search</h3>
+                    <ul class="linear-list">
+<li>
+<p>Exact nearest neighbour: compare query vector to every vector in the index, return the closest k. O(n) per query — too slow for large indexes.</p>
+</li>
+<li>
+<p>Approximate Nearest Neighbour (ANN): HNSW, IVF, and ANNOY trade tiny accuracy loss for massive speed gains — O(log n) or sublinear</p>
+</li>
+<li>
+<p>FAISS (Facebook AI Similarity Search): fastest open-source ANN library, runs locally, used in production at Meta scale</p>
+</li>
+<li>
+<p>pgvector: adds vector similarity search to Postgres using IVF or HNSW indexes — query syntax: ORDER BY embedding &lt;-&gt; query_embedding LIMIT k</p>
+</li>
+<li>
+<p>Similarity threshold: FAISS returns L2 distance (lower = more similar). pgvector <code>&lt;-&gt;</code> operator = L2 distance, <code>&lt;=&gt;</code> = cosine distance [FIXED: corrected operator mapping — pgvector <code>&lt;-&gt;</code> is L2, <code>&lt;=&gt;</code> is cosine; original had the labels correct but worth making explicit]</p>
+</li>
+</ul>
+                </div>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Retrieval Ranking</h3>
+                    <ul class="linear-list">
+<li>
+<p>Pure similarity ranking has a problem: the most similar chunk may not be the most useful for the query</p>
+</li>
+<li>
+<p>Re-ranking: use a cross-encoder model to score each retrieved chunk against the query — more accurate but slower than bi-encoder similarity</p>
+</li>
+<li>
+<p>Cross-encoders process query+chunk together — they capture interaction between query and document that bi-encoder similarity misses</p>
+</li>
+<li>
+<p>LangChain CohereRerank and FlashrankRerank provide drop-in re-ranking after initial retrieval [FIXED: Cohere Rerank API is the correct product name; ColBERT and cross-encoder models are also standard rerankers]</p>
+</li>
+<li>
+<p>Practical approach: retrieve top-20 by similarity, re-rank, pass top-3 to the LLM — balances speed and accuracy</p>
+</li>
+</ul>
+                </div>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Top-k Retrieval</h3>
+                    <ul class="linear-list">
+<li>
+<p>k = number of chunks returned by the retriever and passed to the LLM as context</p>
+</li>
+<li>
+<p>Too small k (k=1): high precision, high miss rate — if the top result is wrong, there's no fallback</p>
+</li>
+<li>
+<p>Too large k (k=20): high recall, but context window fills with noise — LLM has more to ignore, cost rises, quality drops</p>
+</li>
+<li>
+<p>k=3–5 is the starting point for most RAG systems; measure and tune against your specific query distribution</p>
+</li>
+<li>
+<p>Adaptive k: retrieve more chunks for complex queries, fewer for simple factual lookups — LangChain supports this via custom retriever logic</p>
+</li>
+</ul>
+                </div>
+
+                <hr style="border: 0; border-top: 1px dashed var(--border); margin: 32px 0;">
+                
+    <div class="reveal reveal-scale">
+        <div class="comp-container">
+            <div class="comp-header comp-left-h">
+                <span>Comparative Analysis</span>
+                <span>Hybrid Search</span>
+            </div>
+            <div class="comp-body">
+                
+                <div class="two-col-grid" style="margin: 0; gap: 24px;">
+                    <div>
+                        <h4 style="color: var(--accent-3); margin-bottom: 8px;">Semantic Search (Embedding)</h4>
+                        <ul class="linear-list" style="margin: 0; font-size: 0.9rem;">
+<li>
+<p>Finds semantically similar content even with vocabulary mismatch.</p>
+</li>
+<li>
+<p>Handles paraphrases, synonyms, related concepts.</p>
+</li>
+<li>
+<p>Fails on: exact product codes, version numbers, error codes, named entities with unusual spelling.</p>
+</li>
+</ul>
+                    </div>
+                    <div>
+                        <h4 style="color: var(--text); margin-bottom: 8px;">Hybrid Search</h4>
+                        <ul class="linear-list" style="margin: 0; font-size: 0.9rem;">
+<li>
+<p>Run both BM25 (keyword) and embedding search.</p>
+</li>
+<li>
+<p>Merge results with Reciprocal Rank Fusion (RRF).</p>
+</li>
+<li>
+<p>Each result is re-ranked by its combined score.</p>
+</li>
+<li>
+<p>Best of both worlds: semantic coverage + exact term precision.</p>
+</li>
+<li>
+<p>LangChain EnsembleRetriever supports this natively.</p>
+</li>
+</ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Retrieval Failure Modes</h3>
+                    <ul class="linear-list">
+<li>
+<p>Semantic drift: vague or ambiguous queries match topically unrelated chunks — 'what's your policy?' matches too many documents</p>
+</li>
+<li>
+<p>Vocabulary gap: user uses jargon the corpus doesn't contain — embeddings encode from training data, not your specific glossary</p>
+</li>
+<li>
+<p>Chunk fragmentation: answer spans two adjacent chunks, neither alone is sufficient — overlap reduces but doesn't eliminate this</p>
+</li>
+<li>
+<p>Stale index: document updated in the source, but embedding index not rebuilt — retrieved chunks are outdated</p>
+</li>
+<li>
+<p>Adversarial queries: carefully crafted queries that exploit the embedding space to retrieve unintended content — a security concern for public-facing RAG</p>
+</li>
+</ul>
+                </div>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Semantic Drift in Retrieval</h3>
+                    <ul class="linear-list">
+<li>
+<p>Semantic drift: the retrieved documents shift topic relative to the original user intent, especially with short or vague queries</p>
+</li>
+<li>
+<p>Example: query 'tell me about plans' retrieves pricing plans, project plans, and exercise plans — all semantically adjacent to 'plans'</p>
+</li>
+<li>
+<p>Mitigation 1: query expansion — use the LLM to rewrite the query into a more specific retrieval query before embedding</p>
+</li>
+<li>
+<p>Mitigation 2: metadata filtering — restrict retrieval to a relevant document category before running similarity search</p>
+</li>
+<li>
+<p>Mitigation 3: intent classification — classify query intent first, then route to a specialised index for that intent</p>
+</li>
+</ul>
+                </div>
+
+                <hr style="border: 0; border-top: 1px dashed var(--border); margin: 32px 0;">
+                
+    <div class="reveal reveal-scale">
+        <div class="comp-container">
+            <div class="comp-header comp-left-h">
+                <span>Comparative Analysis</span>
+                <span>Over-Retrieval vs Under-Retrieval</span>
+            </div>
+            <div class="comp-body">
+                
+                <div class="two-col-grid" style="margin: 0; gap: 24px;">
+                    <div>
+                        <h4 style="color: var(--accent-3); margin-bottom: 8px;">Over-Retrieval (too many chunks)</h4>
+                        <ul class="linear-list" style="margin: 0; font-size: 0.9rem;">
+<li>
+<p>Context window fills with weakly related content.</p>
+</li>
+<li>
+<p>LLM gets confused — may ignore the actually relevant chunk buried in noise.</p>
+</li>
+<li>
+<p>Prompt cost rises.</p>
+</li>
+<li>
+<p>Quality drops.</p>
+</li>
+<li>
+<p>Fix: lower k, add similarity threshold filter, re-rank aggressively.</p>
+</li>
+</ul>
+                    </div>
+                    <div>
+                        <h4 style="color: var(--text); margin-bottom: 8px;">Under-Retrieval (too few chunks)</h4>
+                        <ul class="linear-list" style="margin: 0; font-size: 0.9rem;">
+<li>
+<p>Answer not present in retrieved context — LLM either says it doesn't know (good) or hallucinates (bad).</p>
+</li>
+<li>
+<p>Miss rate rises.</p>
+</li>
+<li>
+<p>Fix: increase k, use hybrid search, check chunk size (may be too large or fragmented).</p>
+</li>
+</ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Hands-on Lab: Chunk Size & Retrieval Accuracy</h3>
+                    
+    <div class="reveal reveal-left">
+        <p style="color: var(--text-2); margin-bottom: 20px;">Benchmark how token size decisions shape RAG retrieval fidelity. We build parallel indexes, run semantic queries, and construct an architectural decision log.</p>
+        <div class="timeline" style="margin-bottom: 24px;">
+            <div class="timeline-item">
+                <div class="timeline-date">Step 1</div>
+                <h4 class="timeline-title">Index Building Sprint</h4>
+                <p class="timeline-desc">Build 3 FAISS indexes from a 50-entry <code>product-faq.txt</code> using distinct splitters: small (128 chars), medium (512 chars), and large (1024 chars).</p>
+                
+<div class="code-container">
+    <div class="code-header">
+        <span class="code-title">chunking_benchmark.py</span>
+        <button class="copy-btn">Copy</button>
+    </div>
+    <pre><code class="language-python"><span class="cmt"># chunking_benchmark.py</span>
+<span class="kw">from</span> langchain_openai <span class="kw">import</span> <span class="cls">OpenAIEmbeddings</span>
+<span class="kw">from</span> langchain_community.vectorstores <span class="kw">import</span> <span class="cls">FAISS</span>
+<span class="kw">from</span> langchain.text_splitter <span class="kw">import</span> <span class="cls">RecursiveCharacterTextSplitter</span>
+
+<span class="cmt"># Load core FAQ content</span>
+<span class="kw">with</span> open(<span class="str">&quot;product-faq.txt&quot;</span>, <span class="str">&quot;r&quot;</span>) <span class="kw">as</span> f:
+    text = f.read()
+
+<span class="cmt"># Build 3 splitters representing distinct scale granularities</span>
+splitter_s = <span class="cls">RecursiveCharacterTextSplitter</span>(chunk_size=<span class="num">128</span>, chunk_overlap=<span class="num">20</span>)
+splitter_m = <span class="cls">RecursiveCharacterTextSplitter</span>(chunk_size=<span class="num">512</span>, chunk_overlap=<span class="num">50</span>)
+splitter_l = <span class="cls">RecursiveCharacterTextSplitter</span>(chunk_size=<span class="num">1024</span>, chunk_overlap=<span class="num">100</span>)
+
+<span class="cmt"># Build, index and benchmark each index...</span></code></pre>
+</div>
+
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-date">Step 2</div>
+                <h4 class="timeline-title">Execute Queries and Log Scores</h4>
+                <p class="timeline-desc">Run 5 testing queries against the indexes. Record coordinates and similarity scores returned by each candidate index:
+                <br><em>• "How do I cancel my subscription?" • "What happens to my data on cancel?" • "Do you support SSO login?" • "Can I export my data?" • "What are the rate limits?"</em></p>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-date">Step 3</div>
+                <h4 class="timeline-title">Fidelity Analysis</h4>
+                <p class="timeline-desc">Compare quality. Where did small tokens fail (useful sentences cut off)? Where did large tokens fail (retrieval contains unrelated noise, diluting the answer)?</p>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-date">Step 4</div>
+                <h4 class="timeline-title">Commit Decision Log</h4>
+                <p class="timeline-desc">Fill <code>chunking-decision.md</code> tracking: query, best chunk size, worst chunk size, and operational reason. Save to your repository.</p>
+            </div>
+        </div>
+    </div>
+    
+                </div>
+
+            </section>
+
+            <hr class="accent-bar">
+
+            <!-- MOD4 -->
+            <section id="mod4">
+                <span class="section-label">05 · 4. Vector Databases</span>
+                <h2 class="slide-heading typewriter-target">Vector Databases & pgvector Integration</h2>
+                <p class="subtitle">Deploy Postgres-native vector stores alongside self-managed and hosted databases.</p>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">pgvector Overview</h3>
+                    <ul class="linear-list">
+<li>
+<p>pgvector is a Postgres extension that adds a native vector data type and similarity search operators to standard SQL</p>
+</li>
+<li>
+<p>Install: CREATE EXTENSION IF NOT EXISTS vector; — available on Supabase, Neon, RDS, and most managed Postgres providers</p>
+</li>
+<li>
+<p>Store vectors: ALTER TABLE items ADD COLUMN embedding vector(1536); — dimensionality is a schema constraint</p>
+</li>
+<li>
+<p>Query: SELECT * FROM items ORDER BY embedding &lt;-&gt; query_embedding LIMIT 5; — <code>&lt;-&gt;</code> is L2 distance, <code>&lt;=&gt;</code> is cosine distance</p>
+</li>
+<li>
+<p>Index for performance: CREATE INDEX ON items USING hnsw (embedding vector_cosine_ops); — HNSW gives ANN performance inside Postgres</p>
+</li>
+</ul>
+                </div>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Why pgvector Is Product-Native</h3>
+                    <ul class="linear-list">
+<li>
+<p>If your product already runs on Postgres, pgvector adds vector search without introducing a second database system</p>
+</li>
+<li>
+<p>Single database = single transaction: INSERT a product row and its embedding in one ACID transaction — no sync job, no eventual consistency</p>
+</li>
+<li>
+<p>Join vectors with relational data: SELECT * FROM products JOIN embeddings ON products.id = embeddings.product_id WHERE products.category = 'billing' ORDER BY embedding &lt;-&gt; $1 LIMIT 5</p>
+</li>
+<li>
+<p>Operational simplicity: one backup strategy, one monitoring system, one access control model, one connection pool</p>
+</li>
+<li>
+<p>Supabase ships pgvector by default — enable with one SQL command, query from any Postgres client</p>
+</li>
+</ul>
+                </div>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">ACID Transactions & Vector Consistency</h3>
+                    <ul class="linear-list">
+<li>
+<p>ACID = Atomicity, Consistency, Isolation, Durability — the guarantees that make databases reliable for production systems</p>
+</li>
+<li>
+<p>With pgvector: INSERT INTO products (name, embedding) VALUES ($1, $2) — both the product row and its embedding commit or both roll back. Atomic by default.</p>
+</li>
+<li>
+<p>Without ACID across two systems: write to Postgres succeeds, write to Pinecone fails — now your relational data and vector index are out of sync</p>
+</li>
+<li>
+<p>Consistency guarantee: every search result in pgvector reflects the current state of the database — no stale reads from an async sync job</p>
+</li>
+<li>
+<p>This is not a theoretical concern: dual-write sync failures are a common production incident in systems that split vectors into a separate store</p>
+</li>
+</ul>
+                </div>
+
+                <hr style="border: 0; border-top: 1px dashed var(--border); margin: 32px 0;">
+                
+    <div class="reveal reveal-scale">
+        <div class="comp-container">
+            <div class="comp-header comp-left-h">
+                <span>Comparative Analysis</span>
+                <span>The Dual-Write Sync Problem</span>
+            </div>
+            <div class="comp-body">
+                
+                <div class="two-col-grid" style="margin: 0; gap: 24px;">
+                    <div>
+                        <h4 style="color: var(--accent-3); margin-bottom: 8px;">Pinecone + Postgres Pattern</h4>
+                        <ul class="linear-list" style="margin: 0; font-size: 0.9rem;">
+<li>
+<p>Write product data to Postgres.</p>
+</li>
+<li>
+<p>Then write embedding to Pinecone.</p>
+</li>
+<li>
+<p>If step 2 fails: product exists in Postgres, no vector in Pinecone — it's invisible to semantic search.</p>
+</li>
+<li>
+<p>Fix requires: a sync job, retry logic, a reconciliation queue, and monitoring for drift.</p>
+</li>
+<li>
+<p>This is a distributed systems problem you now own.</p>
+</li>
+</ul>
+                    </div>
+                    <div>
+                        <h4 style="color: var(--text); margin-bottom: 8px;">pgvector Pattern</h4>
+                        <ul class="linear-list" style="margin: 0; font-size: 0.9rem;">
+<li>
+<p>Write product data AND embedding to Postgres in one transaction.</p>
+</li>
+<li>
+<p>If the transaction fails: both roll back — database stays consistent.</p>
+</li>
+<li>
+<p>No sync job.</p>
+</li>
+<li>
+<p>No reconciliation.</p>
+</li>
+<li>
+<p>No distributed state.</p>
+</li>
+<li>
+<p>The embedding lives where the data lives.</p>
+</li>
+<li>
+<p>Operational complexity stays proportional to scale.</p>
+</li>
+</ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Why Pinecone + Postgres Creates Distributed State</h3>
+                    <ul class="linear-list">
+<li>
+<p>Two databases = two sources of truth = a distributed system with all its coordination problems</p>
+</li>
+<li>
+<p>Every write now requires agreement between two systems — network partition, API failure, or timeout breaks the contract</p>
+</li>
+<li>
+<p>Delete a product from Postgres: did you delete the vector from Pinecone? Out-of-sync deletes cause ghost results in search — items returned by semantic search that no longer exist</p>
+</li>
+<li>
+<p>Schema changes: add a column to Postgres, update the embedding model — now you need to coordinate migration across two systems simultaneously</p>
+</li>
+<li>
+<p>At small scale this is manageable. At 50,000 users with millions of records, the sync overhead becomes an engineering team tax.</p>
+</li>
+</ul>
+                </div>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Why pgvector Simplifies Architecture</h3>
+                    <ul class="linear-list">
+<li>
+<p>Single system of record: Postgres is the authoritative store for both relational data and vectors — no reconciliation needed</p>
+</li>
+<li>
+<p>SQL joins between vectors and metadata: filter by category, date, user_id in the same query as vector similarity search</p>
+</li>
+<li>
+<p>Familiar tooling: existing Postgres backups, monitoring, migrations, and ORM support all work unchanged</p>
+</li>
+<li>
+<p>pgvector HNSW index brings performance within range of dedicated vector databases for most SaaS-scale workloads (&lt;10M vectors)</p>
+</li>
+<li>
+<p>When does pgvector not scale? Very high query throughput (&gt;10k QPS) or very large indexes (&gt;100M vectors) — at that scale, dedicated vector infrastructure is warranted</p>
+</li>
+</ul>
+                </div>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Supabase Vector Workflows</h3>
+                    
+    <div class="reveal reveal-left">
+        <p style="color: var(--text-2); margin-bottom: 20px;">By using Supabase and PostgreSQL native <code>pgvector</code> columns, we completely avoid out-of-sync distributed states. Ingestion and queries run through standard transaction layers.</p>
+        <div class="timeline" style="margin-bottom: 24px;">
+            <div class="timeline-item">
+                <div class="timeline-date">01</div>
+                <h4 class="timeline-title">Initialize Tables and Columns</h4>
+                <p class="timeline-desc">Configure the Postgres runtime to enable high-dimensional indexing and set up standard schemas.</p>
+                
+<div class="code-container">
+    <div class="code-header">
+        <span class="code-title">Supabase SQL Editor</span>
+        <button class="copy-btn">Copy</button>
+    </div>
+    <pre><code class="language-sql"><span class="cmt">-- Supabase SQL Editor</span>
+<span class="cmt">-- Step 1: Enable the vector extension</span>
+<span class="kw">CREATE</span> <span class="kw">EXTENSION</span> IF NOT EXISTS <span class="kw">vector</span>;
+
+<span class="cmt">-- Step 2: Create a PostgreSQL table to house vector coordinates</span>
+<span class="kw">CREATE</span> <span class="kw">TABLE</span> faq_embeddings (
+    id serial <span class="kw">PRIMARY</span> <span class="kw">KEY</span>,
+    content text,
+    embedding <span class="kw">vector</span>(<span class="num">1536</span>)
+);</code></pre>
+</div>
+
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-date">02</div>
+                <h4 class="timeline-title">Atomic Python Data Ingestion</h4>
+                <p class="timeline-desc">Upload content and coordinate coordinates simultaneously. If one step breaks, the whole transaction rolls back, preserving integrity.</p>
+                
+<div class="code-container">
+    <div class="code-header">
+        <span class="code-title">supabase_upsert.py</span>
+        <button class="copy-btn">Copy</button>
+    </div>
+    <pre><code class="language-python"><span class="cmt"># supabase_upsert.py</span>
+<span class="cmt"># Step 3: Insert both relational content and vector coordinates in one transaction</span>
+<span class="kw">import</span> os
+<span class="kw">from</span> supabase <span class="kw">import</span> create_client
+
+supabase = create_client(os.environ[<span class="str">&quot;SUPABASE_URL&quot;</span>], os.environ[<span class="str">&quot;SUPABASE_KEY&quot;</span>])
+
+<span class="cmt"># Generate coordinate using text-embedding-3-small</span>
+embedding = client.embeddings.create(
+    model=<span class="str">&quot;text-embedding-3-small&quot;</span>, 
+    input=<span class="str">&quot;How do I reset my password?&quot;</span>
+).data[<span class="num">0</span>].embedding
+
+<span class="cmt"># Atomic write</span>
+data = supabase.table(<span class="str">&quot;faq_embeddings&quot;</span>).insert({
+    <span class="str">&quot;content&quot;</span>: <span class="str">&quot;To reset your password, click the &#x27;Forgot Password&#x27; link...&quot;</span>,
+    <span class="str">&quot;embedding&quot;</span>: embedding
+}).execute()</code></pre>
+</div>
+
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-date">03</div>
+                <h4 class="timeline-title">Direct SQL Query Search</h4>
+                <p class="timeline-desc">Run similarity order lookups inside the database. No external APIs or middleware required. Direct metadata joins are natively supported.</p>
+                
+<div class="code-container">
+    <div class="code-header">
+        <span class="code-title">query_search.sql</span>
+        <button class="copy-btn">Copy</button>
+    </div>
+    <pre><code class="language-sql"><span class="cmt">-- Step 4: Atomic semantic search order query inside SQL</span>
+<span class="kw">SELECT</span> content, <span class="num">1</span> - (embedding &lt;=&gt; $<span class="num">1</span>::<span class="kw">vector</span>) AS similarity_score
+FROM faq_embeddings
+<span class="kw">ORDER</span> <span class="kw">BY</span> embedding &lt;=&gt; $<span class="num">1</span>::<span class="kw">vector</span>
+<span class="kw">LIMIT</span> <span class="num">3</span>;</code></pre>
+</div>
+
+            </div>
+        </div>
+    </div>
+    
+                </div>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">FAISS Overview</h3>
+                    <ul class="linear-list">
+<li>
+<p>FAISS (Facebook AI Similarity Search) is an open-source library for efficient similarity search and clustering of dense vectors</p>
+</li>
+<li>
+<p>Runs entirely in-process — no server, no network, no API. Index lives in memory (or saved to disk as a file).</p>
+</li>
+<li>
+<p>faiss-cpu installs as a Python package: from langchain_community.vectorstores import FAISS — LangChain wraps FAISS natively</p>
+</li>
+<li>
+<p>Save and load: vectorstore.save_local('my_index') · FAISS.load_local('my_index', embeddings) — persist across runs</p>
+</li>
+<li>
+<p>Best for: local development, offline indexes, prototyping, CI/CD retrieval testing. Not for production multi-user systems — no concurrent write support.</p>
+</li>
+</ul>
+                </div>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Local Experimentation with FAISS</h3>
+                    
+    <div class="reveal reveal-left">
+        <p style="color: var(--text-2); margin-bottom: 20px;">FAISS operates entirely inside the system's memory boundary, saving to a local binary file. It is the ultimate library for local development, offline processing, and unit tests.</p>
+        
+<div class="code-container">
+    <div class="code-header">
+        <span class="code-title">faiss_dev.py</span>
+        <button class="copy-btn">Copy</button>
+    </div>
+    <pre><code class="language-python"><span class="cmt"># faiss_dev.py</span>
+<span class="kw">from</span> langchain_openai <span class="kw">import</span> <span class="cls">OpenAIEmbeddings</span>
+<span class="kw">from</span> langchain_community.vectorstores <span class="kw">import</span> <span class="cls">FAISS</span>
+
+embeddings = <span class="cls">OpenAIEmbeddings</span>(model=<span class="str">&#x27;text-embedding-3-small&#x27;</span>)
+
+<span class="cmt"># Build the FAISS index from document chunks in-memory</span>
+vectorstore = <span class="cls">FAISS</span>.from_documents(chunks, embeddings)
+
+<span class="cmt"># Run a similarity search query returning tuples of (Document, score)</span>
+results = vectorstore.similarity_search_with_score(<span class="str">&quot;cancellation policy&quot;</span>, k=<span class="num">3</span>)
+
+<span class="kw">for</span> doc, score <span class="kw">in</span> results:
+    <span class="fn">print</span>(f<span class="str">&quot;Relevance L2 distance: {score:.4f}&quot;</span>)
+    <span class="fn">print</span>(f<span class="str">&quot;Content snippet: {doc.page_content[:100]}...\n&quot;</span>)
+
+<span class="cmt"># Save index locally to disk</span>
+vectorstore.save_local(<span class="str">&quot;faq_index&quot;</span>)</code></pre>
+</div>
+
+    </div>
+    
+                </div>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Pinecone Overview</h3>
+                    <ul class="linear-list">
+<li>
+<p>Pinecone is a fully managed, cloud-hosted vector database — no infrastructure to provision or maintain</p>
+</li>
+<li>
+<p>API-first: upsert vectors, query by similarity, filter by metadata — all via REST or Python SDK</p>
+</li>
+<li>
+<p>Serverless tier: automatic scaling, pay-per-query pricing, no hard index size limit on serverless plans [FIXED: "no index size limits in theory" overstates; serverless has practical limits per plan tier]</p>
+</li>
+<li>
+<p>Best for: very high query throughput, teams without Postgres expertise, multi-tenant SaaS needing isolated namespaces per customer</p>
+</li>
+<li>
+<p>Operational cost: adds a separate system to manage, introduces the dual-write sync problem vs pgvector, requires API key management</p>
+</li>
+</ul>
+                </div>
+
+                <hr style="border: 0; border-top: 1px dashed var(--border); margin: 32px 0;">
+                
+    <div class="reveal reveal-scale">
+        <div class="comp-container">
+            <div class="comp-header comp-left-h">
+                <span>Comparative Analysis</span>
+                <span>Hosted vs Self-Managed Vectors</span>
+            </div>
+            <div class="comp-body">
+                
+                <div class="two-col-grid" style="margin: 0; gap: 24px;">
+                    <div>
+                        <h4 style="color: var(--accent-3); margin-bottom: 8px;">Hosted (Pinecone, Weaviate Cloud)</h4>
+                        <ul class="linear-list" style="margin: 0; font-size: 0.9rem;">
+<li>
+<p>No infrastructure ops.</p>
+</li>
+<li>
+<p>Auto-scaling.</p>
+</li>
+<li>
+<p>Managed ANN indexing.</p>
+</li>
+<li>
+<p>Higher per-query cost at scale.</p>
+</li>
+<li>
+<p>Vendor lock-in risk.</p>
+</li>
+<li>
+<p>Adds a second API dependency.</p>
+</li>
+<li>
+<p>Best when: team lacks Postgres/ops expertise, need &gt;10M vectors from day one, or product needs multi-region vector search.</p>
+</li>
+</ul>
+                    </div>
+                    <div>
+                        <h4 style="color: var(--text); margin-bottom: 8px;">Self-Managed (pgvector, FAISS)</h4>
+                        <ul class="linear-list" style="margin: 0; font-size: 0.9rem;">
+<li>
+<p>Full control.</p>
+</li>
+<li>
+<p>No per-query pricing.</p>
+</li>
+<li>
+<p>Integrates with existing Postgres stack.</p>
+</li>
+<li>
+<p>Requires your own ops for backup, scaling, monitoring.</p>
+</li>
+<li>
+<p>pgvector handles most SaaS workloads.</p>
+</li>
+<li>
+<p>FAISS for local/offline.</p>
+</li>
+<li>
+<p>Best when: already on Postgres, team has ops capacity, or data residency requirements.</p>
+</li>
+</ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Indexing Pipelines</h3>
+                    <ol>
+<li>
+<p><strong>Ingest</strong> — Load raw documents: PDFs, markdown files, CSVs, database rows, API responses. LlamaIndex SimpleDirectoryReader or LangChain DocumentLoaders handle most formats.</p>
+</li>
+<li>
+<p><strong>Chunk</strong> — Split into retrieval units: RecursiveCharacterTextSplitter with tuned chunk_size and chunk_overlap. Attach metadata: source, section, timestamp.</p>
+</li>
+<li>
+<p><strong>Embed</strong> — Generate vectors: OpenAI Embeddings API: one API call per chunk. Batch in groups of 100+ for cost efficiency. Cache embeddings to avoid re-embedding unchanged content.</p>
+</li>
+<li>
+<p><strong>Index</strong> — Store in vector database: FAISS.from_documents() for local. pgvector INSERT for Supabase. Pinecone upsert for hosted. Build HNSW index after bulk load for query performance.</p>
+</li>
+</ol>
+                </div>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Bridging the Model to the Database</h3>
+                    <ul class="linear-list">
+<li>
+<p>An embedding model is not interchangeable with any other — switching models requires rebuilding the entire index</p>
+</li>
+<li>
+<p>text-embedding-3-small produces 1536-dimensional vectors. text-embedding-3-large produces 3072. These are incompatible — you cannot mix them in one index.</p>
+</li>
+<li>
+<p>The dimensionality is a schema contract: CREATE TABLE items (embedding vector(1536)) — changing this requires ALTER TABLE and full re-indexing</p>
+</li>
+<li>
+<p>Every query must be embedded with the same model as the index — different model = different vector space = meaningless similarity scores</p>
+</li>
+<li>
+<p>Document this contract in your project: MODEL=text-embedding-3-small, DIMENSIONS=1536, INDEX=faq_hnsw. Treat a model change like a database migration.</p>
+</li>
+</ul>
+                </div>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Embedding Dimensionality as Schema Contract</h3>
+                    <ul class="linear-list">
+<li>
+<p><strong>1536</strong> — text-embedding-3-small: default choice for most RAG systems</p>
+</li>
+<li>
+<p><strong>3072</strong> — text-embedding-3-large: use only when 1536 is measured to be insufficient</p>
+</li>
+<li>
+<p><strong>0</strong> — Tolerance for dimension mismatch: pgvector and FAISS both reject mismatched dimensions immediately</p>
+</li>
+<li>
+<p><strong>100%</strong> — Index rebuild required on model change: no partial migration possible</p>
+</li>
+</ul>
+                </div>
+
+                <hr style="border: 0; border-top: 1px dashed var(--border); margin: 32px 0;">
+                
+    <div class="reveal reveal-scale">
+        <div class="comp-container">
+            <div class="comp-header comp-left-h">
+                <span>Comparative Analysis</span>
+                <span>1536 vs 3072 Dimensions</span>
+            </div>
+            <div class="comp-body">
+                
+                <div class="two-col-grid" style="margin: 0; gap: 24px;">
+                    <div>
+                        <h4 style="color: var(--accent-3); margin-bottom: 8px;">1536 Dimensions (small)</h4>
+                        <ul class="linear-list" style="margin: 0; font-size: 0.9rem;">
+<li>
+<p>6KB per vector at float32. [FIXED: 1536 dims × 4 bytes = 6,144 bytes ≈ 6KB, not 64KB; original said 64KB which is incorrect]</p>
+</li>
+<li>
+<p>1M vectors = ~6GB RAM for FAISS in-memory index.</p>
+</li>
+<li>
+<p>Supabase free tier handles ~100K vectors comfortably.</p>
+</li>
+<li>
+<p>Cosine search latency: &lt;10ms at 1M vectors with HNSW.</p>
+</li>
+<li>
+<p>The right default for 99% of SaaS RAG systems.</p>
+</li>
+</ul>
+                    </div>
+                    <div>
+                        <h4 style="color: var(--text); margin-bottom: 8px;">3072 Dimensions (large)</h4>
+                        <ul class="linear-list" style="margin: 0; font-size: 0.9rem;">
+<li>
+<p>12KB per vector at float32. [FIXED: 3072 dims × 4 bytes = 12,288 bytes ≈ 12KB, not 128KB; original said 128KB which is incorrect]</p>
+</li>
+<li>
+<p>1M vectors = ~12GB RAM — doubles storage and memory.</p>
+</li>
+<li>
+<p>Marginally better retrieval quality for code, multilingual, and fine-grained ranking.</p>
+</li>
+<li>
+<p>6.5× more expensive to generate.</p>
+</li>
+<li>
+<p>Only worth it when you've measured that 1536 isn't good enough.</p>
+</li>
+</ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Why Mismatched Dimensions Fail Instantly</h3>
+                    <ul class="linear-list">
+<li>
+<p>pgvector enforces dimensionality at the column level: vector(1536) rejects any INSERT with a vector of different length</p>
+</li>
+<li>
+<p>FAISS indexes are built with a fixed dimension — querying with a different-dimension vector throws an immediate exception</p>
+</li>
+<li>
+<p>This is by design: similarity search requires vectors in the same geometric space — different dimensions = different spaces, comparison is meaningless</p>
+</li>
+<li>
+<p>The failure is loud and immediate in development, which is good. The danger is subtle: indexing with model A, querying with model B — same dimension, different space, silently wrong results.</p>
+</li>
+<li>
+<p>Test your embedding pipeline with dimension assertions: assert len(embedding) == 1536, f'Expected 1536, got {len(embedding)}'</p>
+</li>
+</ul>
+                </div>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Model Migration Implications</h3>
+                    <ul class="linear-list">
+<li>
+<p>Switching embedding models (e.g. text-embedding-ada-002 → text-embedding-3-small) requires full re-embedding of every document in your corpus</p>
+</li>
+<li>
+<p>You cannot partially migrate: mixing embeddings from two models in one index produces meaningless similarity scores across the boundary</p>
+</li>
+<li>
+<p>Migration strategy: build the new index in parallel, validate retrieval quality on test queries, then cut over — never in-place</p>
+</li>
+<li>
+<p>Cost estimate: 10M tokens of corpus × $0.02/1M = $0.20 to re-embed with text-embedding-3-small. Usually trivial.</p>
+</li>
+<li>
+<p>Operational risk: if your production index and query pipeline are updated at different times, you have a split-brain embedding problem — queries return garbage until both sides are on the same model</p>
+</li>
+</ul>
+                </div>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Index Rebuild Requirements</h3>
+                    <ul class="linear-list">
+<li>
+<p>Index rebuild is required when: switching embedding models, changing vector dimensions, bulk-updating document content, correcting a systematic chunking error</p>
+</li>
+<li>
+<p>HNSW index rebuild in pgvector: DROP INDEX idx_name; CREATE INDEX ON table USING hnsw (embedding vector_cosine_ops); — takes minutes for &lt;1M vectors</p>
+</li>
+<li>
+<p>FAISS index rebuild: delete saved index files, re-run FAISS.from_documents() with new embeddings — straightforward but requires re-embedding all chunks</p>
+</li>
+<li>
+<p>Zero-downtime rebuild: write new index to a shadow table/collection, validate quality, then swap — keep old index live until new one is verified</p>
+</li>
+<li>
+<p>Automate rebuild triggers: CI pipeline detects model version change in config → triggers re-indexing job → notifies team on completion</p>
+</li>
+</ul>
+                </div>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Debate & Hands-on: Relational Vector Storage (pgvector)</h3>
+                    
+    <div class="activity-card reveal reveal-scale">
+        <div class="activity-title">Interactive Debate & pgvector Lab</div>
+        <div class="checklist" style="margin-bottom: 24px;">
+            <div class="checklist-row" onclick="toggleChecklist(this)">
+                <div class="checklist-checkbox"></div>
+                <span class="checklist-text"><strong>Round 1 (5 min) — Architecture Tradeoffs:</strong> Break into groups. List 3 critical operational advantages for a 50,000-user SaaS already hosting its relational tables inside Postgres.</span>
+            </div>
+            <div class="checklist-row" onclick="toggleChecklist(this)">
+                <div class="checklist-checkbox"></div>
+                <span class="checklist-text"><strong>Round 2 (5 min) — Breaking Scenarios:</strong> Identify critical workloads where pgvector or Pinecone is highly likely to fail. Be transparent about performance, scaling boundaries, and synchronization overheads.</span>
+            </div>
+            <div class="checklist-row" onclick="toggleChecklist(this)">
+                <div class="checklist-checkbox"></div>
+                <span class="checklist-text"><strong>Round 3 (5 min) — SQL Execution:</strong> Open your Supabase SQL window and execute pgvector commands to index and query vector bounds natively.</span>
+            </div>
+        </div>
+        
+        <h4 style="color: var(--accent-3); margin-bottom: 12px; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem;">Supabase pgvector SQL Sandbox:</h4>
+        
+<div class="code-container">
+    <div class="code-header">
+        <span class="code-title">Supabase SQL Sandbox</span>
+        <button class="copy-btn">Copy</button>
+    </div>
+    <pre><code class="language-sql"><span class="cmt">-- Supabase SQL Editor</span>
+<span class="cmt">-- Atomic insert with pgvector array coercion</span>
+<span class="kw">INSERT</span> <span class="kw">INTO</span> faq_embeddings (content, embedding) 
+<span class="kw">VALUES</span> (<span class="str">&#x27;test content&#x27;</span>, array_fill(<span class="num">0.1</span>, ARRAY[<span class="num">1536</span>])::<span class="kw">vector</span>);
+
+<span class="cmt">-- Query the table ordering by cosine distance (&lt;=&gt;)</span>
+<span class="kw">SELECT</span> content 
+FROM faq_embeddings 
+<span class="kw">ORDER</span> <span class="kw">BY</span> embedding &lt;=&gt; array_fill(<span class="num">0.1</span>, ARRAY[<span class="num">1536</span>])::<span class="kw">vector</span> 
+<span class="kw">LIMIT</span> <span class="num">3</span>;</code></pre>
+</div>
+
+        
+        <p style="font-size: 0.9rem; color: var(--text-2); line-height: 1.6; border-left: 2px solid var(--accent); padding-left: 12px; margin-top: 16px; margin-bottom: 0;">
+            <strong>Observe:</strong> Real-time cosine searches execute directly in SQL. No complex multi-DB sync wrappers are necessary, and relational schemas are fully respected.
+        </p>
+    </div>
+    
+                </div>
+
+            </section>
+
+            <hr class="accent-bar">
+
+            <!-- MOD5 -->
+            <section id="mod5">
+                <span class="section-label">06 · 5. App Architecture</span>
+                <h2 class="slide-heading typewriter-target">Semantic Search Application Architecture</h2>
+                <p class="subtitle">Construct a complete end-to-end FastAPI FAQ search endpoint wired into a debounced React UI client.</p>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Embedding Generation Pipeline</h3>
+                    <ol>
+<li>
+<p><strong>Input</strong> — Raw text arrives: User query, document chunk, product description, support ticket — any text that needs a vector representation.</p>
+</li>
+<li>
+<p><strong>Preprocess</strong> — Clean and normalise: Strip HTML, normalize whitespace, truncate to model token limit (8191 tokens for text-embedding-3-small). Log token counts for cost tracking.</p>
+</li>
+<li>
+<p><strong>Embed</strong> — Call OpenAI Embeddings API: client.embeddings.create(model='text-embedding-3-small', input=text). Returns embedding list. Cache result keyed by hash(text) to avoid re-embedding identical content.</p>
+</li>
+<li>
+<p><strong>Store</strong> — Persist to vector index: INSERT into pgvector table or FAISS index. Include metadata. Confirm write before returning success to caller.</p>
+</li>
+</ol>
+                </div>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Query Embedding Flow</h3>
+                    <ul class="linear-list">
+<li>
+<p>At query time: user types a question → embed the question with the same model used to index documents → retrieve nearest neighbours</p>
+</li>
+<li>
+<p>Query embedding is a real-time operation — it must complete in &lt;100ms to meet typical UI latency budgets</p>
+</li>
+<li>
+<p>text-embedding-3-small embedding latency: ~50ms per call including network — acceptable for synchronous search endpoints</p>
+</li>
+<li>
+<p>Never cache query embeddings by query string — users rarely type identical queries and caching adds complexity for minimal gain</p>
+</li>
+<li>
+<p>Query preprocessing: lowercase, strip special characters, handle empty string edge case before sending to embedding API</p>
+</li>
+</ul>
+                </div>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Retrieval Lifecycle</h3>
+                    <ol>
+<li>
+<p><strong>Query arrives</strong> — Validate and embed: Validate input length. Embed with text-embedding-3-small. Log query + embedding hash for observability.</p>
+</li>
+<li>
+<p><strong>Search</strong> — ANN lookup in vector index: pgvector HNSW or FAISS IVF returns top-k candidates with similarity scores. Apply metadata filters if needed (category, date range).</p>
+</li>
+<li>
+<p><strong>Re-rank</strong> — Optional cross-encoder scoring: If using re-ranking: score top-20 candidates with cross-encoder, return top-3 after re-ranking. Adds ~100ms latency.</p>
+</li>
+<li>
+<p><strong>Augment</strong> — Build LLM context: Format retrieved chunks with source metadata into prompt context. Enforce context length limit — truncate if needed.</p>
+</li>
+<li>
+<p><strong>Generate</strong> — LLM produces grounded response: LLM reads context and generates answer with citations. Log: retrieved chunks, similarity scores, prompt, response, latency.</p>
+</li>
+</ol>
+                </div>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">React Semantic Search UX</h3>
+                    <ul class="linear-list">
+<li>
+<p>Search input → debounced hook (300ms) → API call on stable value → display results with scores</p>
+</li>
+<li>
+<p>Show similarity as a percentage: Math.round((1 - score) * 100) + '% match' — FAISS L2 score needs conversion, pgvector cosine distance maps directly via (1 - distance) [FIXED: clarified that pgvector cosine distance converts to similarity via 1 - distance, not "maps directly"]</p>
+</li>
+<li>
+<p>Display top-3 results as cards: content snippet, source label, relevance percentage — not a ranked list, a retrieval explanation</p>
+</li>
+<li>
+<p>Loading state: show skeleton cards during embedding + retrieval (~200ms total) — never block the UI on a pending search</p>
+</li>
+<li>
+<p>Empty state: 'No results found' with a suggestion to rephrase — don't hide the failure, help the user adjust their query</p>
+</li>
+</ul>
+                </div>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Debounced Input</h3>
+                    <ul class="linear-list">
+<li>
+<p>Without debounce: every keystroke triggers an embedding API call — 5 keystrokes = 5 API calls, 5 OpenAI charges, 5 in-flight requests</p>
+</li>
+<li>
+<p>useDebounce hook: delay the search trigger until the user stops typing for N milliseconds — typically 300ms for search</p>
+</li>
+<li>
+<p>Implementation: const debouncedQuery = useDebounce(query, 300) · useEffect(() =&gt; { if (debouncedQuery) fetchResults(debouncedQuery) }, [debouncedQuery])</p>
+</li>
+<li>
+<p>300ms feels instant to users but eliminates ~80% of API calls compared to per-keystroke search</p>
+</li>
+<li>
+<p>Cancel in-flight requests: use AbortController to cancel the previous fetch when a new debounced query fires — prevents stale results appearing after a fast typer</p>
+</li>
+</ul>
+                </div>
+
+                <hr style="border: 0; border-top: 1px dashed var(--border); margin: 32px 0;">
+                
+    <div class="reveal reveal-scale">
+        <div class="comp-container">
+            <div class="comp-header comp-left-h">
+                <span>Comparative Analysis</span>
+                <span>Re-ranking Concepts</span>
+            </div>
+            <div class="comp-body">
+                
+                <div class="two-col-grid" style="margin: 0; gap: 24px;">
+                    <div>
+                        <h4 style="color: var(--accent-3); margin-bottom: 8px;">Bi-encoder (Embedding Similarity)</h4>
+                        <ul class="linear-list" style="margin: 0; font-size: 0.9rem;">
+<li>
+<p>Embed query once.</p>
+</li>
+<li>
+<p>Embed each document once at index time.</p>
+</li>
+<li>
+<p>Compare vectors at query time.</p>
+</li>
+<li>
+<p>Fast — O(log n) with ANN index.</p>
+</li>
+<li>
+<p>But: query and document are encoded independently, so cross-term interaction is lost.</p>
+</li>
+</ul>
+                    </div>
+                    <div>
+                        <h4 style="color: var(--text); margin-bottom: 8px;">Cross-encoder (Re-ranking)</h4>
+                        <ul class="linear-list" style="margin: 0; font-size: 0.9rem;">
+<li>
+<p>Encode query + candidate document together.</p>
+</li>
+<li>
+<p>Model sees both simultaneously — captures interaction.</p>
+</li>
+<li>
+<p>Much more accurate ranking.</p>
+</li>
+<li>
+<p>Slow — O(k) inference per query, where k is number of candidates.</p>
+</li>
+<li>
+<p>Pattern: retrieve top-20 with bi-encoder, re-rank with cross-encoder, pass top-3 to LLM.</p>
+</li>
+</ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Similarity Score Interpretation</h3>
+                    <ul class="linear-list">
+<li>
+<p>pgvector cosine distance: 0 = identical, 2 = opposite. Convert to similarity: 1 - cosine_distance. 0.9+ = strong match.</p>
+</li>
+<li>
+<p>FAISS L2 distance: 0 = identical, increases with distance. Lower is better. No natural upper bound — scale depends on vector norms.</p>
+</li>
+<li>
+<p>Display to users: convert to a 0–100% relevance scale and show it — users understand 'this result is 92% relevant'</p>
+</li>
+<li>
+<p>Use scores as a filter, not just a rank: discard results below a threshold (e.g. similarity &lt; 0.7) rather than always showing top-k regardless of quality</p>
+</li>
+<li>
+<p>Never trust score alone for quality: a 0.95 similarity to a well-written but wrong chunk is more dangerous than a 0.75 to the correct chunk</p>
+</li>
+</ul>
+                </div>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Search Quality Evaluation</h3>
+                    <ul class="linear-list">
+<li>
+<p>Recall@k: of all relevant documents for a query, what fraction appear in the top-k results? Measures coverage.</p>
+</li>
+<li>
+<p>Precision@k: of the k returned results, what fraction are actually relevant? Measures noise.</p>
+</li>
+<li>
+<p>MRR (Mean Reciprocal Rank): average of 1/rank of the first relevant result — measures whether the best result appears near the top</p>
+</li>
+<li>
+<p>Build an evaluation set: 50–100 test query → expected document pairs. Run retrieval pipeline. Compute recall@3 and precision@3.</p>
+</li>
+<li>
+<p>RAGAS framework: automated RAG evaluation using LLM-as-judge for faithfulness, relevance, and context precision — run in CI</p>
+</li>
+</ul>
+                </div>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Retrieval Observability</h3>
+                    <ul class="linear-list">
+<li>
+<p>Log every retrieval event: query, retrieved chunk IDs, similarity scores, latency, whether the user found the result useful</p>
+</li>
+<li>
+<p>Track query miss rate: queries where top-1 similarity score falls below your threshold — these are retrieval failures</p>
+</li>
+<li>
+<p>Monitor embedding API latency and error rate separately from retrieval latency — they fail in different ways</p>
+</li>
+<li>
+<p>Weekly manual review: sample 20 query+result pairs from logs. Identify systematic failures. Adjust chunking or retrieval strategy.</p>
+</li>
+<li>
+<p>LangSmith (LangChain's observability platform): traces every retrieval step, logs prompts, measures token usage — free tier available</p>
+</li>
+</ul>
+                </div>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Grounded Response Generation</h3>
+                    <ul class="linear-list">
+<li>
+<p>Prompt template: 'Answer the question using ONLY the context below. If the answer is not in the context, say you don't know. Context: {retrieved_chunks}. Question: {query}'</p>
+</li>
+<li>
+<p>Include source metadata in context: 'Source: Help Article #42, Section: Cancellation Policy' — the LLM will include it in citations</p>
+</li>
+<li>
+<p>Temperature = 0 for grounded Q&amp;A: deterministic responses reduce hallucination risk. No need for creativity when the answer is in the context.</p>
+</li>
+<li>
+<p>Post-generation validation: use an LLM-as-judge to check whether every claim in the response is supported by a retrieved chunk</p>
+</li>
+<li>
+<p>Streaming responses: use OpenAI streaming API to show the response as it generates — users perceive lower latency even if total time is the same</p>
+</li>
+</ul>
+                </div>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Technical Lab: Build a Semantic Search Endpoint</h3>
+                    
+    <div class="reveal reveal-left">
+        <p style="color: var(--text-2); margin-bottom: 24px;">Build a fully functioning FAQ semantic search interface. We split our document catalog, build a local index, spin up an async FastAPI endpoint, and wire it to a debounced React search input.</p>
+        
+        <div class="timeline" style="margin-bottom: 32px;">
+            <div class="timeline-item">
+                <div class="timeline-date">Step 1</div>
+                <h4 class="timeline-title">Build Ingestion and Indexing Pipeline (8 min)</h4>
+                <p class="timeline-desc">Generate document splits and build your FAISS index locally. Put your questions in a file named <code>product-faq.txt</code> first.</p>
+                
+<div class="code-container">
+    <div class="code-header">
+        <span class="code-title">build_index.py</span>
+        <button class="copy-btn">Copy</button>
+    </div>
+    <pre><code class="language-python"><span class="cmt"># build_index.py</span>
+<span class="kw">from</span> langchain_openai <span class="kw">import</span> <span class="cls">OpenAIEmbeddings</span>
+<span class="kw">from</span> langchain_community.vectorstores <span class="kw">import</span> <span class="cls">FAISS</span>
+<span class="kw">from</span> langchain.text_splitter <span class="kw">import</span> <span class="cls">RecursiveCharacterTextSplitter</span>
+
+<span class="cmt"># 1. Load the FAQ raw catalog</span>
+<span class="kw">with</span> open(<span class="str">&quot;product-faq.txt&quot;</span>, <span class="str">&quot;r&quot;</span>, encoding=<span class="str">&quot;utf-8&quot;</span>) <span class="kw">as</span> f:
+    faq_content = f.read()
+
+<span class="cmt"># 2. Divide documents into clean retrieval chunks</span>
+splitter = <span class="cls">RecursiveCharacterTextSplitter</span>(chunk_size=<span class="num">512</span>, chunk_overlap=<span class="num">50</span>)
+docs = splitter.create_documents([faq_content])
+
+<span class="cmt"># 3. Create OpenAI Embeddings and index into FAISS</span>
+embeddings = <span class="cls">OpenAIEmbeddings</span>(model=<span class="str">&quot;text-embedding-3-small&quot;</span>)
+vectorstore = <span class="cls">FAISS</span>.from_documents(docs, embeddings)
+
+<span class="cmt"># 4. Save compiled binary files locally</span>
+vectorstore.save_local(<span class="str">&quot;faq_index&quot;</span>)
+<span class="fn">print</span>(<span class="str">&quot;Successfully generated faq_index locally!&quot;</span>)</code></pre>
+</div>
+
+            </div>
+            
+            <div class="timeline-item">
+                <div class="timeline-date">Step 2 & 3</div>
+                <h4 class="timeline-title">Deploy FastAPI Backend & React Search Interface (13 min)</h4>
+                <p class="timeline-desc">Construct an async FastAPI service that maps natural language queries to indices. Connect the React search input with active debounce limits to prevent rate limit exceptions.</p>
+                
+                <!-- Interactive Tabs for FastAPI & React -->
+                <div class="tab-container" style="margin-top: 20px;">
+                    <div class="tab-headers">
+                        <button class="tab-header active" onclick="switchTab(this, 'backendTab')">FastAPI Backend (main.py)</button>
+                        <button class="tab-header" onclick="switchTab(this, 'frontendTab')">React UI Client (App.tsx)</button>
+                    </div>
+                    <div class="tab-panels">
+                        <div id="backendTab" class="tab-panel active">
+                            
+<div class="code-container">
+    <div class="code-header">
+        <span class="code-title">main.py</span>
+        <button class="copy-btn">Copy</button>
+    </div>
+    <pre><code class="language-python"><span class="cmt"># main.py</span>
+<span class="kw">import</span> os
+<span class="kw">from</span> fastapi <span class="kw">import</span> <span class="cls">FastAPI</span>
+<span class="kw">from</span> fastapi.middleware.cors <span class="kw">import</span> <span class="cls">CORSMiddleware</span>
+<span class="kw">from</span> langchain_openai <span class="kw">import</span> <span class="cls">OpenAIEmbeddings</span>
+<span class="kw">from</span> langchain_community.vectorstores <span class="kw">import</span> <span class="cls">FAISS</span>
+
+app = <span class="cls">FastAPI</span>()
+
+<span class="cmt"># Enable CORS for React frontend connections</span>
+app.<span class="fn">add_middleware</span>(
+    <span class="cls">CORSMiddleware</span>,
+    allow_origins=[<span class="str">&quot;*&quot;</span>],
+    allow_credentials=<span class="kw">True</span>,
+    allow_methods=[<span class="str">&quot;*&quot;</span>],
+    allow_headers=[<span class="str">&quot;*&quot;</span>],
+)
+
+<span class="cmt"># Initialize embeddings with strict production-model definition</span>
+embeddings = <span class="cls">OpenAIEmbeddings</span>(model=<span class="str">&quot;text-embedding-3-small&quot;</span>)
+
+@app.get(<span class="str">&quot;/search&quot;</span>)
+<span class="kw">async</span> <span class="kw">def</span> search(q: <span class="fn">str</span>):
+    <span class="cmt"># Load the local FAISS index (allow_dangerous_deserialization is required for local pkl)</span>
+    vectorstore = <span class="cls">FAISS</span>.load_local(
+        <span class="str">&quot;faq_index&quot;</span>, 
+        embeddings, 
+        allow_dangerous_deserialization=<span class="kw">True</span>
+    )
+    
+    <span class="cmt"># Retrieve top-3 nearest candidate documents with distance scores</span>
+    results = vectorstore.similarity_search_with_score(q, k=<span class="num">3</span>)
+    
+    <span class="cmt"># Format results. For FAISS L2 score, smaller values represent closer semantic proximity</span>
+    <span class="kw">return</span> [
+        {
+            <span class="str">&quot;content&quot;</span>: doc.page_content,
+            <span class="str">&quot;metadata&quot;</span>: doc.metadata,
+            <span class="str">&quot;score&quot;</span>: <span class="fn">round</span>(<span class="fn">float</span>(score), <span class="num">4</span>)
+        }
+        <span class="kw">for</span> doc, score <span class="kw">in</span> results
+    ]</code></pre>
+</div>
+
+                        </div>
+                        <div id="frontendTab" class="tab-panel">
+                            
+<div class="code-container">
+    <div class="code-header">
+        <span class="code-title">App.tsx</span>
+        <button class="copy-btn">Copy</button>
+    </div>
+    <pre><code class="language-tsx"><span class="cmt">// App.tsx</span>
+<span class="kw">import</span> React, { <span class="fn">useState</span>, <span class="fn">useEffect</span> } <span class="kw">from</span> <span class="str">&#x27;react&#x27;</span>;
+
+<span class="cmt">// Custom debounce hook to minimize API rate-limit hits</span>
+<span class="kw">function</span> <span class="fn">useDebounce</span>&lt;T&gt;(value: T, delay: number): T {
+  <span class="kw">const</span> [debouncedValue, setDebouncedValue] = <span class="fn">useState</span>&lt;T&gt;(value);
+
+  <span class="fn">useEffect</span>(() =&gt; {
+    <span class="kw">const</span> handler = setTimeout(() =&gt; setDebouncedValue(value), delay);
+    <span class="kw">return</span> () =&gt; clearTimeout(handler);
+  }, [value, delay]);
+
+  <span class="kw">return</span> debouncedValue;
+}
+
+interface SearchResult {
+  content: string;
+  score: number;
+}
+
+<span class="kw">export</span> <span class="kw">default</span> <span class="kw">function</span> SemanticSearch() {
+  <span class="kw">const</span> [query, setQuery] = <span class="fn">useState</span>(<span class="str">&#x27;&#x27;</span>);
+  <span class="kw">const</span> [results, setResults] = <span class="fn">useState</span>&lt;SearchResult[]&gt;([]);
+  <span class="kw">const</span> [loading, setLoading] = <span class="fn">useState</span>(false);
+  <span class="kw">const</span> debouncedQuery = <span class="fn">useDebounce</span>(query, <span class="num">300</span>);
+
+  <span class="fn">useEffect</span>(() =&gt; {
+    <span class="kw">if</span> (!debouncedQuery) {
+      setResults([]);
+      <span class="kw">return</span>;
+    }
+
+    setLoading(true);
+    <span class="fn">fetch</span>(`http:<span class="cmt">//localhost:8000/search?q=${encodeURIComponent(debouncedQuery)}`)</span>
+      .then((res) =&gt; res.json())
+      .then((data) =&gt; {
+        setResults(data);
+        setLoading(false);
+      })
+      .<span class="kw">catch</span>((err) =&gt; {
+        console.error(<span class="str">&quot;Search error:&quot;</span>, err);
+        setLoading(false);
+      });
+  }, [debouncedQuery]);
+
+  <span class="kw">return</span> (
+    &lt;div className=<span class="str">&quot;search-container&quot;</span> style={{ maxWidth: <span class="str">&#x27;640px&#x27;</span>, margin: <span class="str">&#x27;32px auto&#x27;</span>, padding: <span class="str">&#x27;0 16px&#x27;</span> }}&gt;
+      &lt;input
+        type=<span class="str">&quot;text&quot;</span>
+        placeholder=<span class="str">&quot;Type a natural language query...&quot;</span>
+        value={query}
+        onChange={(e) =&gt; setQuery(e.target.value)}
+        className=<span class="str">&quot;search-input&quot;</span>
+        style={{
+          width: <span class="str">&#x27;100%&#x27;</span>,
+          padding: <span class="str">&#x27;14px 20px&#x27;</span>,
+          fontSize: <span class="str">&#x27;1rem&#x27;</span>,
+          borderRadius: <span class="str">&#x27;8px&#x27;</span>,
+          border: <span class="str">&#x27;1px solid var(--border)&#x27;</span>,
+          background: <span class="str">&#x27;var(--surface-2)&#x27;</span>,
+          color: <span class="str">&#x27;var(--text)&#x27;</span>,
+          outline: <span class="str">&#x27;none&#x27;</span>,
+          boxShadow: <span class="str">&#x27;var(--shadow)&#x27;</span>,
+          fontFamily: <span class="str">&#x27;inherit&#x27;</span>
+        }}
+      /&gt;
+
+      {loading &amp;&amp; &lt;div style={{ marginTop: <span class="str">&#x27;16px&#x27;</span>, color: <span class="str">&#x27;var(--text-2)&#x27;</span>, fontSize: <span class="str">&#x27;0.9rem&#x27;</span>, fontFamily: <span class="str">&#x27;monospace&#x27;</span> }}&gt;Searching coordinate system...&lt;/div&gt;}
+
+      &lt;div className=<span class="str">&quot;results-list&quot;</span> style={{ marginTop: <span class="str">&#x27;24px&#x27;</span> }}&gt;
+        {results.map((res, index) =&gt; {
+          <span class="cmt">// Convert FAISS L2 score to user-friendly relevance percentage bounds</span>
+          <span class="kw">const</span> relevance = Math.max(<span class="num">0</span>, Math.min(<span class="num">100</span>, Math.<span class="fn">round</span>((<span class="num">1</span> - res.score) * <span class="num">100</span>)));
+          <span class="kw">return</span> (
+            &lt;div key={index} className=<span class="str">&quot;result-card&quot;</span> style={{
+              padding: <span class="str">&#x27;20px&#x27;</span>,
+              background: <span class="str">&#x27;var(--card-bg)&#x27;</span>,
+              border: <span class="str">&#x27;1px solid var(--border)&#x27;</span>,
+              borderRadius: <span class="str">&#x27;8px&#x27;</span>,
+              marginBottom: <span class="str">&#x27;16px&#x27;</span>,
+              boxShadow: <span class="str">&#x27;var(--shadow)&#x27;</span>
+            }}&gt;
+              &lt;div style={{ display: <span class="str">&#x27;flex&#x27;</span>, justifyContent: <span class="str">&#x27;space-between&#x27;</span>, marginBottom: <span class="str">&#x27;12px&#x27;</span> }}&gt;
+                &lt;span className=<span class="str">&quot;source-label&quot;</span> style={{ color: <span class="str">&#x27;var(--text-3)&#x27;</span>, fontSize: <span class="str">&#x27;0.8rem&#x27;</span>, fontFamily: <span class="str">&#x27;monospace&#x27;</span> }}&gt;RETRIEVED FAQ CANDIDATE <span class="cmt">#{index + 1}&lt;/span&gt;</span>
+                &lt;span className=<span class="str">&quot;relevance-score&quot;</span> style={{
+                  color: relevance &gt; <span class="num">80</span> ? <span class="str">&#x27;var(--accent-2)&#x27;</span> : <span class="str">&#x27;var(--text-2)&#x27;</span>,
+                  fontWeight: <span class="str">&#x27;600&#x27;</span>,
+                  fontSize: <span class="str">&#x27;0.9rem&#x27;</span>
+                }}&gt;{relevance}% Match&lt;/span&gt;
+              &lt;/div&gt;
+              &lt;p className=<span class="str">&quot;content&quot;</span> style={{ color: <span class="str">&#x27;var(--text-2)&#x27;</span>, margin: <span class="num">0</span>, fontSize: <span class="str">&#x27;0.95rem&#x27;</span>, lineHeight: <span class="str">&#x27;1.6&#x27;</span> }}&gt;{res.content}&lt;/p&gt;
+            &lt;/div&gt;
+          );
+        })}
+        {!loading &amp;&amp; query &amp;&amp; results.length === <span class="num">0</span> &amp;&amp; (
+          &lt;div style={{ color: <span class="str">&#x27;var(--text-3)&#x27;</span>, fontSize: <span class="str">&#x27;0.9rem&#x27;</span>, textAlign: <span class="str">&#x27;center&#x27;</span>, marginTop: <span class="str">&#x27;32px&#x27;</span> }}&gt;No matches found above similarity thresholds. Rephrase your query.&lt;/div&gt;
+        )}
+      &lt;/div&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+</div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="timeline-item" style="padding-bottom: 0;">
+                <div class="timeline-date">Step 4</div>
+                <h4 class="timeline-title">Run Retrieval Evaluations (4 min)</h4>
+                <p class="timeline-desc">Test your pipeline with exact wording, paraphrases, and unrelated inputs. Document one retrieval success and one failure case inside <code>retrieval-evaluation.md</code> and commit to GitHub.</p>
+            </div>
+        </div>
+    </div>
+    
+                </div>
+
+            </section>
+
+            <hr class="accent-bar">
+
+            <!-- MOD6 -->
+            <section id="mod6">
+                <span class="section-label">07 · 6. Enterprise Use Cases</span>
+                <h2 class="slide-heading typewriter-target">Enterprise Product Use Cases</h2>
+                <p class="subtitle">Analyze real-world architectures, compliance limits, and permissioned internal search frameworks.</p>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Support Q&A</h3>
+                    <ul class="linear-list">
+<li>
+<p>Index your help articles, policy documents, and product documentation into a vector store</p>
+</li>
+<li>
+<p>User asks a natural-language question → retrieve most relevant articles → LLM synthesises a grounded answer with citations</p>
+</li>
+<li>
+<p>Deflection rate: measure what % of support tickets are fully resolved by the RAG system without human escalation — typical target: 40–60%</p>
+</li>
+<li>
+<p>Confidence gating: if top retrieved chunk similarity is below threshold, escalate to human agent rather than risk a low-quality answer</p>
+</li>
+<li>
+<p>Key metric: customer satisfaction score for RAG-answered tickets vs human-answered — validate that deflection doesn't hurt CSAT</p>
+</li>
+</ul>
+                </div>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Docs Search</h3>
+                    <ul class="linear-list">
+<li>
+<p>Developers search for: how to use a specific API, what a config option does, why an error occurs — natural language, not keyword lookup</p>
+</li>
+<li>
+<p>Index all SDK docs, API references, changelog, and tutorials as separate document types with metadata</p>
+</li>
+<li>
+<p>Query routing: detect if the query is about an API endpoint (route to API reference index) vs a conceptual question (route to tutorials)</p>
+</li>
+<li>
+<p>Version awareness: tag chunks with version metadata — search results can be filtered to the version the user is on</p>
+</li>
+<li>
+<p>GitHub Copilot's docs Q&amp;A, Stripe's AI search, and Vercel's AI assistant all use this pattern</p>
+</li>
+</ul>
+                </div>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Knowledge Assistants</h3>
+                    <ul class="linear-list">
+<li>
+<p>Internal knowledge base: index Confluence, Notion, Slack threads, internal wikis, meeting transcripts, runbooks</p>
+</li>
+<li>
+<p>Query: 'What's our policy on expense reimbursement?' retrieves the HR policy chunk and generates a grounded answer</p>
+</li>
+<li>
+<p>Freshness critical: internal knowledge changes fast — rebuild index on document update, not on a weekly schedule</p>
+</li>
+<li>
+<p>Access control: different employees should only retrieve documents they have permission to access — metadata-based ACL filtering at query time</p>
+</li>
+<li>
+<p>High-value starting point: index your engineering runbooks and onboarding docs — new engineers get instant, cited answers to setup questions</p>
+</li>
+</ul>
+                </div>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Personalization</h3>
+                    <ul class="linear-list">
+<li>
+<p>Build a user interest vector: average embeddings of articles/products the user engaged with — this is their semantic profile</p>
+</li>
+<li>
+<p>At recommendation time: retrieve content whose embeddings are closest to the user vector — no explicit category tags needed</p>
+</li>
+<li>
+<p>Combine with collaborative filtering: weight the user vector toward content similar users also engaged with</p>
+</li>
+<li>
+<p>Cold start: new users have no history → use embedding of their onboarding responses or stated interests as a starting user vector</p>
+</li>
+<li>
+<p>Privacy: user vectors are sensitive — they encode preferences and interests in computable form. Encrypt, scope access, and provide opt-out.</p>
+</li>
+</ul>
+                </div>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Recommendation Systems</h3>
+                    <ul class="linear-list">
+<li>
+<p>'More like this': embed the current item, retrieve nearest neighbours from the product/content catalog — instant recommendations</p>
+</li>
+<li>
+<p>Cross-domain recommendations: embed both products and blog articles in the same space — recommend articles related to what a user bought</p>
+</li>
+<li>
+<p>Real-time personalisation: recompute user vector on each session by averaging the last N interactions — no daily batch job needed</p>
+</li>
+<li>
+<p>Diversity: nearest-neighbour retrieval can create filter bubbles — add diversity penalty to push recommendations slightly outside the cluster centroid</p>
+</li>
+<li>
+<p>A/B test: compare embedding-based recommendations vs rule-based 'customers also bought' — measure click-through rate and conversion</p>
+</li>
+</ul>
+                </div>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Enterprise Search</h3>
+                    <ul class="linear-list">
+<li>
+<p>Enterprise data lives in silos: Salesforce, Jira, Confluence, email, Slack, Google Drive — keyword search across all fails</p>
+</li>
+<li>
+<p>Unified embedding index: crawl all sources, chunk, embed with consistent model, store in one vector index with source metadata</p>
+</li>
+<li>
+<p>Permission-aware retrieval: filter vectors at query time by document ACL — return only content the querying user can access</p>
+</li>
+<li>
+<p>Query understanding: 'Q3 revenue forecast from the finance team' → needs entity detection (Q3, finance team) + semantic retrieval</p>
+</li>
+<li>
+<p>Production challenge: keeping the index fresh when source data changes across 10 different systems — event-driven ingestion &gt; polling</p>
+</li>
+</ul>
+                </div>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Privacy Considerations</h3>
+                    <ul class="linear-list">
+<li>
+<p>PII in the corpus: if your index contains customer names, emails, or medical records, retrieval may expose this data to other users — scope access with ACL filtering</p>
+</li>
+<li>
+<p>Embedding model data retention: OpenAI does not train on API inputs by default, but check your data processing agreement for your compliance jurisdiction</p>
+</li>
+<li>
+<p>User vectors as PII: a user's interest embedding encodes their preferences in computable form — treat it as PII under GDPR and CCPA</p>
+</li>
+<li>
+<p>Data residency: some regulated industries (healthcare, finance, EU GDPR) require data to stay in specific regions — check your vector store's data residency options</p>
+</li>
+<li>
+<p>Audit trail: log what was retrieved in response to what query by which user — required for compliance in regulated RAG deployments</p>
+</li>
+</ul>
+                </div>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Discussion: Highest-Value Internal RAG Opportunities</h3>
+                    <ul class="linear-list">
+<li>
+<p>Prompt: Think about the last time you or a colleague spent &gt;30 minutes searching for internal information. What were you looking for?</p>
+</li>
+<li>
+<p>Prompt: What knowledge exists in your company only in one person's head, or buried in a Slack thread no one can find?</p>
+</li>
+<li>
+<p>Prompt: What support questions do you answer repeatedly that could be deflected with an accurate, grounded RAG system?</p>
+</li>
+<li>
+<p>Prompt: Where in your product do users currently get zero AI assistance that could benefit from semantic retrieval?</p>
+</li>
+<li>
+<p>Share your highest-value opportunity with the group — we'll vote on which to prototype in Week 2</p>
+</li>
+</ul>
+                </div>
+
+            </section>
+
+            <hr class="accent-bar">
+
+            <!-- RECAP -->
+            <section id="recap">
+                <span class="section-label">08 · Week 1 Review</span>
+                <h2 class="slide-heading typewriter-target">Week 1 Review & Consolidation</h2>
+                <p class="subtitle">Review key mental models, prompting methods, and integration patterns from the entire Week 1 foundation track.</p>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Week 1 Recap</h3>
+                    <p><strong>◈ Foundation:</strong> AI capabilities and limits. Token economics. Context window management. Model selection. Prompt anatomy. You know what LLMs can and cannot do — and why.</p>
+<p><strong>◉ Prompting:</strong> Zero-shot, few-shot, chain-of-thought. System prompts. Structured output. Evaluation. You can reliably extract structured data and control LLM behaviour through prompt design.</p>
+<p><strong>◇ Integration:</strong> OpenAI API, streaming, function calling. RAG pipelines. Embeddings and semantic search. Vector databases. You can wire AI into a real product, not just a demo.</p>
+                </div>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Mental Model Review</h3>
+                    <ul class="linear-list">
+<li>
+<p>LLMs are next-token predictors trained on human-generated text — they complete patterns, they do not reason from first principles</p>
+</li>
+<li>
+<p>The context window is the model's working memory — everything the model knows during a generation comes from what's in the window</p>
+</li>
+<li>
+<p>Temperature controls creativity: 0 = deterministic, 1 = creative, &gt;1 = incoherent. For factual tasks, use 0.</p>
+</li>
+<li>
+<p>Token cost is not just price — longer contexts mean slower responses. Compress context before scaling.</p>
+</li>
+<li>
+<p>LLMs have no persistent memory between API calls — every call starts fresh unless you explicitly include conversation history in the prompt</p>
+</li>
+</ul>
+                </div>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Prompting Review</h3>
+                    <ul class="linear-list">
+<li>
+<p>Zero-shot: just describe the task clearly. Works for simple classification, summarisation, formatting, and translation.</p>
+</li>
+<li>
+<p>Few-shot: provide 2–5 examples of input→output pairs before the task. Dramatically improves structured output accuracy.</p>
+</li>
+<li>
+<p>Chain-of-thought: 'Think step by step' or explicit reasoning steps. Improves accuracy on multi-step reasoning tasks.</p>
+</li>
+<li>
+<p>System prompt separation: put instructions, constraints, and persona in the system prompt. Put data and user query in the user turn.</p>
+</li>
+<li>
+<p>Structured output: ask for JSON with a specific schema, validate with Pydantic. Never parse LLM prose with regex — use structured output.</p>
+</li>
+</ul>
+                </div>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">APIs Review</h3>
+                    <ul class="linear-list">
+<li>
+<p>Chat Completions: client.chat.completions.create(model, messages) — the core API. Every AI feature starts here.</p>
+</li>
+<li>
+<p>Streaming: stream=True returns tokens as they generate — use for any UI that shows a response being written</p>
+</li>
+<li>
+<p>Function calling: define tools as JSON schemas, the model returns structured tool call arguments — the right way to extract structured data</p>
+</li>
+<li>
+<p>Embeddings: client.embeddings.create(model, input) — returns a vector. Use for semantic search, classification, and similarity scoring.</p>
+</li>
+<li>
+<p>Rate limits and retries: implement exponential backoff on 429 errors, log all API errors, set per-user request quotas to prevent cost spikes</p>
+</li>
+</ul>
+                </div>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Coding Assistants Review</h3>
+                    <ul class="linear-list">
+<li>
+<p>GitHub Copilot: inline suggestions and tab-complete. Best for: boilerplate, well-known patterns, test generation. Weakest on novel architecture.</p>
+</li>
+<li>
+<p>Claude/ChatGPT for architecture: describe the problem, constraints, and tech stack — ask for multiple approaches with tradeoffs, then choose</p>
+</li>
+<li>
+<p>Context matters: paste the relevant function/file alongside the question. Assistants with no context give generic answers.</p>
+</li>
+<li>
+<p>Verify generated code: LLMs produce plausible-looking but incorrect code. Test it. Read it. Especially check error handling, edge cases, and security.</p>
+</li>
+<li>
+<p>Commit habit: generate code → test → read and understand → then commit. 'I don't know why it works' is a liability.</p>
+</li>
+</ul>
+                </div>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">RAG Review</h3>
+                    <ul class="linear-list">
+<li>
+<p>Retrieve: embed the query, find top-k nearest chunks in a vector index, return with similarity scores</p>
+</li>
+<li>
+<p>Augment: insert retrieved chunks into the LLM prompt as grounding context alongside the user query</p>
+</li>
+<li>
+<p>Generate: LLM reads context and produces a grounded, cited answer — not a hallucinated one from training weights</p>
+</li>
+<li>
+<p>Chunking: 512 tokens with 50-token overlap is a strong default. Measure retrieval quality before and after changing chunk size.</p>
+</li>
+<li>
+<p>Vector stores: pgvector for Postgres-native apps (ACID, SQL joins), FAISS for local development, Pinecone for hosted scale. Choose based on operational complexity tolerance, not hype.</p>
+</li>
+</ul>
+                </div>
+
+            </section>
+
+            <hr class="accent-bar">
+
+            <!-- RETRO -->
+            <section id="retro">
+                <span class="section-label">09 · Assessment & Retro</span>
+                <h2 class="slide-heading typewriter-target">Assessment, Retrospective & Next Steps</h2>
+                <p class="subtitle">Assess your understanding through the Week 1 Quiz, participate in the group retrospective, and view next steps for Week 2.</p>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Week 1 Quiz</h3>
+                    <p><em>[Quiz questions delivered separately — slide intentionally minimal for projection during assessment.]</em></p>
+                </div>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Group Retrospective</h3>
+                    <ul class="linear-list">
+<li>
+<p>Round 1 — What clicked: Each person shares one concept from Week 1 that suddenly made sense — the 'aha moment'. 30 seconds each.</p>
+</li>
+<li>
+<p>Round 2 — What's still fuzzy: Each person shares one thing they can describe but couldn't implement from memory yet.</p>
+</li>
+<li>
+<p>Round 3 — What surprised you: What was different from your expectations coming into this training? What was harder than expected? What was easier?</p>
+</li>
+<li>
+<p>Round 4 — What you'd do differently: If you were starting Week 1 again, what would you do differently in your first day of practice?</p>
+</li>
+<li>
+<p>Facilitator captures: record themes on a whiteboard. These become Week 2 pacing inputs — if 80% of the group is unclear on something, we address it Monday morning.</p>
+</li>
+</ul>
+                </div>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Biggest Engineering Insight</h3>
+                    <ul class="linear-list">
+<li>
+<p>Prompt: What is the one engineering insight from this week that you will carry into every AI feature you build from now on?</p>
+</li>
+<li>
+<p>Examples from past cohorts: 'LLMs don't know what they don't know — grounding is not optional' · 'Token cost compounds — context compression is architecture, not optimization' · 'Chunking strategy determines retrieval quality more than model choice'</p>
+</li>
+<li>
+<p>Share in pairs first (2 min), then each pair shares with the group (30 sec each)</p>
+</li>
+<li>
+<p>Facilitator theme: the best insights tend to be constraints — things you now know NOT to do — not capabilities</p>
+</li>
+<li>
+<p>Record your insight in your GitHub repo's learnings.md — you'll revisit it at the end of Week 3</p>
+</li>
+</ul>
+                </div>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Biggest Remaining Confusion</h3>
+                    <ul class="linear-list">
+<li>
+<p>Prompt: What concept from Week 1 do you understand conceptually but could not implement in a real system without help?</p>
+</li>
+<li>
+<p>No judgment — this is the most valuable feedback the facilitators receive. Silence about confusion costs the whole cohort.</p>
+</li>
+<li>
+<p>Write it on a sticky note first (1 min), then share. Anonymous option: fold the note and hand to facilitator.</p>
+</li>
+<li>
+<p>Common themes from past cohorts: 'When to use streaming vs. non-streaming' · 'How to evaluate RAG quality in production' · 'How chunking interacts with multi-document retrieval'</p>
+</li>
+<li>
+<p>These become the Week 2 opening context — we design Monday's warm-up exercises to address the top 3 themes</p>
+</li>
+</ul>
+                </div>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Action Items for Week 2</h3>
+                    <ul class="linear-list">
+<li>
+<p>Complete today's lab: FAQ embedding pipeline + FAISS index + FastAPI /search + React UI + similarity scores — commit to GitHub by Sunday</p>
+</li>
+<li>
+<p>Review your quiz answers once the answer key is distributed — find the questions you missed and understand why</p>
+</li>
+<li>
+<p>Read: OpenAI Evals documentation (30 min) — Week 2 starts with evaluation infrastructure</p>
+</li>
+<li>
+<p>Optional: deploy your Day 5 semantic search prototype to Fly.io or Render — Week 2 assumes a live endpoint to evaluate</p>
+</li>
+<li>
+<p>Come ready to answer: 'What retrieval failure did you observe in your own prototype?' — have a real example from your own code</p>
+</li>
+</ul>
+                </div>
+
+                <div class="reveal reveal-left" style="margin-top: 48px;">
+                    <h3 style="margin-bottom: 16px;">Week 2: Production AI Systems</h3>
+                    <blockquote>
+<p>Week 1 built your foundation. Week 2 takes it to production — RAG pipelines, agents, and evaluation infrastructure.</p>
+</blockquote>
+                </div>
+
+            </section>
+
+        </main>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════
+       INTERACTIVE JAVASCRIPT & ANIME MODULES
+       ═══════════════════════════════════════════════════ -->
+    <script>
+    /* ═══════════════════════════════════════════════════
+       THEME TOGGLE
+       ═══════════════════════════════════════════════════ */
+    var theme = 'dark';
+    var htmlEl = document.documentElement;
+    var themeBtn = document.getElementById('themeBtn');
+
+    themeBtn.addEventListener('click', function() {
+        theme = theme === 'dark' ? 'light' : 'dark';
+        htmlEl.setAttribute('data-theme', theme);
+        themeBtn.textContent = theme === 'dark' ? '☀️' : '🌙';
+    });
+
+    /* ═══════════════════════════════════════════════════
+       MOUSE SPOTLIGHT DETECTOR
+       ═══════════════════════════════════════════════════ */
+    document.addEventListener('mousemove', function(e) {
+        var s = document.getElementById('spotlight');
+        s.style.background = 'radial-gradient(540px circle at ' + e.clientX + 'px ' + e.clientY + 'px, var(--glow), transparent 45%)';
+    });
+
+    /* ═══════════════════════════════════════════════════
+       INTERACTIVE TABS
+       ═══════════════════════════════════════════════════ */
+    function switchTab(btn, targetId) {
+        var container = btn.closest('.tab-container');
+        container.querySelectorAll('.tab-header').forEach(h => h.classList.remove('active'));
+        container.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        
+        btn.classList.add('active');
+        document.getElementById(targetId).classList.add('active');
+    }
+
+    /* ═══════════════════════════════════════════════════
+       CHECKLIST ROW TOGGLE
+       ═══════════════════════════════════════════════════ */
+    function toggleChecklist(row) {
+        row.classList.toggle('checked');
+    }
+
+    /* ═══════════════════════════════════════════════════
+       INTERACTION OBSERVER FOR THE ANIMATION TRANSITIONS
+       ═══════════════════════════════════════════════════ */
+    var SPRING = 'cubic-bezier(0.16, 1.1, 0.3, 1)';
+    
+    var observerOptions = {
+        root: null,
+        rootMargin: '0px',
+        threshold: 0.15
+    };
+
+    var revealObserver = new IntersectionObserver(function(entries, observer) {
+        entries.forEach(function(entry) {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                
+                // Trigger typewriter headings
+                if (entry.target.classList.contains('typewriter-target')) {
+                    typewriteHeading(entry.target);
+                }
+                
+                // Once observed and animated, unobserve
+                revealObserver.unobserve(entry.target);
+            }
+        });
+    }, observerOptions);
+
+    // Track elements that demand scroll animation entrance
+    document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale, .reveal-blur, .reveal-pop, .typewriter-target').forEach(function(el) {
+        revealObserver.observe(el);
+    });
+
+    /* ═══════════════════════════════════════════════════
+       ACTIVE LINK HIGHLIGHTER
+       ═══════════════════════════════════════════════════ */
+    var sections = document.querySelectorAll('section');
+    var navItems = document.querySelectorAll('.nav-item');
+
+    window.addEventListener('scroll', function() {
+        var currentSectionId = '';
+        sections.forEach(function(section) {
+            var sectionTop = section.offsetTop;
+            var sectionHeight = section.offsetHeight;
+            if (pageYOffset >= (sectionTop - 150)) {
+                currentSectionId = section.getAttribute('id');
+            }
+        });
+
+        navItems.forEach(function(item) {
+            item.classList.remove('active');
+            var link = item.querySelector('a');
+            if (link.getAttribute('href') === '#' + currentSectionId) {
+                item.classList.add('active');
+            }
+        });
+    });
+
+    /* ═══════════════════════════════════════════════════
+       CODE TERMINAL COPY BUTTON
+       ═══════════════════════════════════════════════════ */
+    document.querySelectorAll('.copy-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var codeContainer = btn.closest('.code-container');
+            var codeText = codeContainer.querySelector('code').innerText;
+            navigator.clipboard.writeText(codeText).then(function() {
+                var origText = btn.textContent;
+                btn.textContent = 'Copied!';
+                btn.style.color = 'var(--accent-2)';
+                setTimeout(function() {
+                    btn.textContent = origText;
+                    btn.style.color = '';
+                }, 1500);
+            });
+        });
+    });
+
+    /* ═══════════════════════════════════════════════════
+       TYPEWRITER ENGINE — multiline safe
+       ═══════════════════════════════════════════════════ */
+    function typewriteHeading(el) {
+        var fullText = el.dataset.originalText || el.textContent.trim();
+        if (!el.dataset.originalText) el.dataset.originalText = fullText;
+
+        el.classList.remove('typewriter-done');
+        el.classList.add('typewriter-active');
+
+        var textNode = document.createTextNode('');
+        var cursor   = document.createElement('span');
+        cursor.className = 'tw-cursor';
+        cursor.setAttribute('aria-hidden', 'true');
+        cursor.textContent = '|';
+
+        while (el.firstChild) el.removeChild(el.firstChild);
+        el.appendChild(textNode);
+        el.appendChild(cursor);
+
+        var speed = Math.min(36, 1560 / Math.max(fullText.length, 1));
+        var i = 0;
+
+        function tick() {
+            textNode.textContent = fullText.slice(0, ++i);
+            if (i < fullText.length) {
+                setTimeout(tick, speed);
+            } else {
+                el.classList.remove('typewriter-active');
+                el.classList.add('typewriter-done');
+                cursor.style.transition = 'opacity 0.4s ease 0.15s';
+                cursor.style.opacity    = '0';
+                setTimeout(function() { if (cursor.parentNode === el) el.removeChild(cursor); }, 700);
+            }
+        }
+        setTimeout(tick, 200);
+    }
+    </script>
+</body>
+</html>
