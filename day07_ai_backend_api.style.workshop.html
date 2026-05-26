@@ -1,0 +1,1834 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 7: AI-Assisted Backend &amp; API Development — Workshop</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+
+:root,[data-theme="dark"]{
+  --bg:#0e0e10;--bg-deep:#080809;--surface:#18181b;--surface-2:#212124;
+  --border:rgba(255,255,255,.07);--border-hover:rgba(139,92,246,.3);
+  --text:#f4f4f5;--text-2:#a1a1aa;--text-3:#52525b;
+  --accent:#8b5cf6;--accent-2:#a78bfa;--accent-3:#c4b5fd;
+  --tag-bg:rgba(139,92,246,.12);--tag-border:rgba(139,92,246,.22);--tag-text:#a78bfa;
+  --card-bg:rgba(255,255,255,.03);--card-bg-h:rgba(255,255,255,.055);
+  --grid-line:rgba(255,255,255,.016);--accent-line:rgba(139,92,246,.55);
+  --nav-bg:rgba(18,18,20,.92);--shadow:0 0 0 1px rgba(255,255,255,.07);
+  --noise-op:.025;--glow:rgba(139,92,246,.13);--glow-strong:rgba(139,92,246,.22);
+  --stat-grad:linear-gradient(135deg,#f4f4f5 30%,#8b5cf6);
+  --bar-track:rgba(255,255,255,.06);--bar-fill:linear-gradient(90deg,#7c3aed,#a78bfa);
+  --code-bg:#121214;--spring:cubic-bezier(0.16,1.1,0.3,1);
+}
+[data-theme="light"]{
+  --bg:#fafafa;--bg-deep:#f3f3f6;--surface:#fff;--surface-2:#f5f5f7;
+  --border:rgba(0,0,0,.08);--border-hover:rgba(109,40,217,.35);
+  --text:#111113;--text-2:#6b6b74;--text-3:#b0b0b8;
+  --accent:#7c3aed;--accent-2:#6d28d9;--accent-3:#5b21b6;
+  --tag-bg:rgba(124,58,237,.08);--tag-border:rgba(124,58,237,.18);--tag-text:#6d28d9;
+  --card-bg:rgba(0,0,0,.025);--card-bg-h:rgba(0,0,0,.04);
+  --grid-line:rgba(0,0,0,.04);--accent-line:rgba(124,58,237,.45);
+  --nav-bg:rgba(250,250,250,.94);--shadow:0 1px 3px rgba(0,0,0,.08),0 0 0 1px rgba(0,0,0,.06);
+  --noise-op:.015;--glow:rgba(124,58,237,.07);--glow-strong:rgba(124,58,237,.13);
+  --stat-grad:linear-gradient(135deg,#111113 30%,#7c3aed);
+  --bar-track:rgba(0,0,0,.07);--bar-fill:linear-gradient(90deg,#6d28d9,#8b5cf6);
+  --code-bg:#f5f5f7;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);font-family:Inter,-apple-system,BlinkMacSystemFont,sans-serif;color:var(--text);-webkit-font-smoothing:antialiased;transition:background .3s,color .3s}
+a{color:var(--accent-2);text-decoration:none}
+a:hover{text-decoration:underline}
+code,pre{font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace}
+.section-label{display:inline-flex;margin-bottom:.7rem;color:var(--accent);font-size:.78rem;font-weight:800;letter-spacing:.13em;text-transform:uppercase}
+.slide-heading{font-size:clamp(2.4rem,4vw,4.8rem);font-weight:850;letter-spacing:-.025em;line-height:1.08;margin:0 0 1.5rem;color:var(--text)}
+.subtitle{font-size:clamp(1.1rem,1.5vw,1.45rem);line-height:1.65;color:var(--text-2);max-width:780px}
+.linear-list{list-style:none;padding:0;margin:1rem 0;display:flex;flex-direction:column;gap:4px}
+.linear-list li{display:flex;gap:14px;align-items:flex-start;padding:12px 16px;border-radius:8px;font-size:.98rem;color:var(--text-2);line-height:1.6;transition:background .2s,color .2s}
+.linear-list li:hover{background:var(--card-bg-h);color:var(--text)}
+.linear-list li::before{content:"";flex-shrink:0;width:6px;height:6px;border-radius:50%;background:var(--accent);margin-top:9px;transition:background .3s}
+p{color:var(--text-2);font-size:1.05rem;line-height:1.75;margin:0 0 1.1rem}
+blockquote{border-left:3px solid var(--accent);background:var(--card-bg);padding:18px 22px;margin:1.2rem 0;color:var(--text-2);box-shadow:var(--shadow)}
+.code-container{margin:1.25rem 0;border:1px solid var(--border);border-radius:12px;background:var(--code-bg);overflow:hidden;box-shadow:var(--shadow)}
+.code-header{background:var(--bg-deep);padding:12px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.code-title{font-family:"JetBrains Mono",monospace;font-size:.74rem;color:var(--text-2);display:flex;align-items:center;gap:8px}
+.code-title::before{content:"";display:block;width:8px;height:8px;border-radius:50%;background:var(--accent)}
+.copy-btn{background:transparent;border:none;color:var(--text-3);cursor:pointer;font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;padding:4px 8px;border-radius:4px;transition:color .2s,background-color .2s;font-family:inherit}
+.copy-btn:hover{color:var(--text-2);background:var(--card-bg-h)}
+.code-container pre{padding:20px 24px;overflow-x:auto;margin:0}
+.code-container code{font-family:"JetBrains Mono","Fira Code",ui-monospace,monospace;font-size:.85rem;line-height:1.6;color:var(--text-2)}
+pre{padding:18px 20px;overflow:auto;color:var(--text);font-size:.88rem;line-height:1.65}
+.table-wrap{overflow:auto;margin:1.2rem 0;border:1px solid var(--border);border-radius:8px;box-shadow:var(--shadow)}
+table{width:100%;border-collapse:collapse;background:var(--card-bg)}
+th,td{padding:13px 14px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top;color:var(--text-2);line-height:1.5}
+th{color:var(--text);font-size:.82rem;text-transform:uppercase;letter-spacing:.08em;background:var(--surface)}
+.card{background:var(--card-bg);border:1px solid var(--border);border-radius:12px;padding:28px;position:relative;transition:background .25s,border-color .25s,transform .25s,box-shadow .25s;box-shadow:var(--shadow)}
+.card:hover{background:var(--card-bg-h);border-color:var(--border-hover);transform:translateY(-4px)}
+.card-icon{font-size:24px;margin-bottom:18px;display:inline-block;color:var(--accent)}
+.card h3{font-size:1.15rem;font-weight:700;margin-bottom:12px;color:var(--text)}
+.card p{font-size:.94rem;color:var(--text-2);line-height:1.6}
+.card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;margin-top:32px}
+.comp-container{border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--surface);margin:1.2rem 0}
+.comp-header{padding:16px 24px;font-weight:700;border-bottom:1px solid var(--border)}
+.comp-left-h{background:rgba(139,92,246,.06);color:var(--accent-2)}
+.comp-right-h{background:rgba(255,255,255,.02);color:var(--text-2)}
+.comp-body{padding:24px;font-size:.94rem;line-height:1.6;color:var(--text-2)}
+.two-col-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin:16px 0}
+@media(max-width:768px){.two-col-grid{grid-template-columns:1fr}}
+.timeline{position:relative;padding-left:32px;margin:32px 0}
+.timeline::before{content:"";position:absolute;left:8px;top:8px;bottom:8px;width:2px;background:linear-gradient(to bottom,var(--accent),rgba(139,92,246,.1))}
+.timeline-item{position:relative;padding-bottom:32px}
+.timeline-item:last-child{padding-bottom:0}
+.timeline-item::before{content:"";position:absolute;left:-29px;top:6px;width:10px;height:10px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px var(--tag-bg);transition:background .3s,transform .2s}
+.timeline-item:hover::before{transform:scale(1.3)}
+.timeline-date{font-family:"JetBrains Mono",monospace;font-size:.72rem;font-weight:600;text-transform:uppercase;color:var(--accent-2);margin-bottom:4px;letter-spacing:.05em}
+.timeline-title{font-size:1.05rem;font-weight:700;margin-bottom:8px;color:var(--text)}
+.timeline-desc{font-size:.94rem;color:var(--text-2);line-height:1.6}
+.workflow-container{display:flex;align-items:stretch;gap:16px;margin:32px 0;flex-wrap:wrap}
+.workflow-step{background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:20px 24px;flex:1;min-width:200px;transition:background .2s,border-color .2s,transform .2s;display:flex;flex-direction:column;justify-content:center}
+.workflow-step:hover{background:var(--card-bg-h);border-color:var(--border-hover);transform:translateY(-2px)}
+.workflow-num{font-family:"JetBrains Mono",monospace;font-size:.68rem;font-weight:700;color:var(--accent);margin-bottom:6px}
+.workflow-title{font-size:.96rem;font-weight:700;color:var(--text);margin-bottom:4px}
+.workflow-desc{font-size:.84rem;color:var(--text-2);line-height:1.5}
+.workflow-arrow{color:var(--accent);font-size:1.4rem;display:flex;align-items:center;justify-content:center;user-select:none}
+@media(max-width:768px){.workflow-arrow{transform:rotate(90deg);padding:8px 0}.workflow-container{flex-direction:column}}
+.tab-container{margin:28px 0}
+.tab-headers{display:flex;gap:8px;border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:20px;flex-wrap:wrap}
+.tab-header{background:transparent;border:none;color:var(--text-3);padding:8px 16px;cursor:pointer;font-size:.88rem;font-weight:600;border-radius:6px;transition:background-color .2s,color .2s;font-family:inherit}
+.tab-header:hover{color:var(--text-2);background:var(--card-bg-h)}
+.tab-header.active{color:var(--accent-2);background:var(--tag-bg)}
+.tab-panel{display:none}.tab-panel.active{display:block}
+.stat-num{background:var(--stat-grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hbar-track{background:var(--bar-track);border-radius:4px;height:8px;overflow:hidden}
+.hbar-fill{height:100%;border-radius:4px;background:var(--bar-fill);width:0%;transition:width .975s cubic-bezier(.16,1,.3,1)}
+@keyframes cursor-blink{0%,100%{opacity:1}50%{opacity:0}}
+.tw-cursor{display:inline;color:var(--accent);animation:cursor-blink .65s step-end infinite;margin-left:2px;font-weight:300;line-height:1}
+.reveal{opacity:0;transform:translateY(18px)}
+.reveal-left{opacity:0;transform:translateX(-28px)}
+.reveal-right{opacity:0;transform:translateX(28px)}
+.reveal-scale{opacity:0;transform:scale(.92) translateY(10px)}
+.reveal-blur{opacity:0;transform:translateY(14px);filter:blur(6px)}
+.reveal-pop{opacity:0;transform:scale(.72)}
+.reveal.visible,.reveal-left.visible,.reveal-right.visible,.reveal-scale.visible,.reveal-blur.visible,.reveal-pop.visible{opacity:1;transform:translate(0) scale(1);filter:blur(0);transition:opacity .65s var(--spring),transform .65s var(--spring),filter .5s ease}
+.visible-delay-1{transition-delay:.08s!important}
+.visible-delay-2{transition-delay:.16s!important}
+.visible-delay-3{transition-delay:.24s!important}
+.visible-delay-4{transition-delay:.32s!important}
+
+
+html{scroll-behavior:smooth}
+body{min-height:100vh;overflow-x:hidden}
+.grid-overlay{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(var(--grid-line) 1px,transparent 1px),linear-gradient(90deg,var(--grid-line) 1px,transparent 1px);background-size:56px 56px}
+.noise-layer{position:fixed;inset:0;z-index:1;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");background-size:256px;opacity:var(--noise-op);mix-blend-mode:overlay}
+#spotlight{position:fixed;inset:0;z-index:2;pointer-events:none}
+.top-header{position:fixed;top:0;left:0;right:0;height:64px;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 32px;background:var(--nav-bg);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);transition:background .3s,border-color .3s}
+.header-left{display:flex;align-items:center;gap:14px}
+.header-actions{display:flex;align-items:center;gap:10px}
+.brand{display:flex;align-items:center;gap:12px;font-size:1.05rem;font-weight:850;letter-spacing:-.02em}
+.brand-mark{color:var(--accent)}
+.theme-toggle{width:38px;height:38px;background:var(--surface);border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.05rem;box-shadow:var(--shadow);transition:background .3s,border-color .3s,transform .15s;color:var(--text);font-family:inherit}
+.theme-toggle:hover{transform:scale(1.06);background:var(--card-bg-h)}
+.sidebar-toggle{width:38px;height:38px;background:var(--surface);border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.15rem;box-shadow:var(--shadow);transition:background .3s,border-color .3s,transform .15s;color:var(--text);font-family:inherit}
+.sidebar-toggle:hover{transform:scale(1.06);background:var(--card-bg-h)}
+.sidebar{position:fixed;top:64px;left:0;bottom:0;width:280px;z-index:90;padding:24px 16px;background:var(--bg-deep);border-right:1px solid var(--border);overflow:auto;transition:transform .34s cubic-bezier(.16,1,.3,1),background .3s,border-color .3s}
+.sidebar.collapsed{transform:translateX(-100%)}
+.sidebar::-webkit-scrollbar{width:4px}
+.sidebar::-webkit-scrollbar-thumb{background:var(--border-hover);border-radius:99px}
+.sidebar-label{font-size:.65rem;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:var(--text-3);margin-bottom:12px;padding-left:12px}
+.nav-item{display:flex;gap:10px;align-items:flex-start;padding:10px 14px;border-radius:8px;color:var(--text-2);font-size:.84rem;font-weight:500;text-decoration:none;border-left:2px solid transparent;transition:background .2s,color .2s,border-left-color .2s;margin-bottom:2px}
+.nav-item:hover{background:var(--card-bg-h);color:var(--text)}
+.nav-item span{font-family:"JetBrains Mono",monospace;font-size:.68rem;color:var(--text-3);width:18px;flex-shrink:0;margin-top:2px}
+.nav-item.active{background:var(--tag-bg);color:var(--text);font-weight:600;border-left-color:var(--accent)}
+.nav-item.active span{color:var(--accent)}
+.workshop-main{position:relative;z-index:3;margin-left:280px;padding:104px clamp(28px,5vw,80px) 80px;max-width:1180px;transition:margin-left .34s cubic-bezier(.16,1,.3,1)}
+.sidebar.collapsed~.main-content .workshop-main,.sidebar-collapsed .workshop-main{margin-left:0}
+body.sidebar-collapsed .sidebar{transform:translateX(-100%)}
+body.sidebar-collapsed .workshop-main{margin-left:0}
+.hero-section{min-height:52vh;display:flex;flex-direction:column;justify-content:center;border-bottom:1px solid var(--border);margin-bottom:56px;scroll-margin-top:92px}
+.hero-title{font-size:clamp(3.3rem,7vw,7rem);font-weight:900;letter-spacing:-.045em;line-height:1.03;margin:0 0 1.4rem}
+.content-section{scroll-margin-top:92px;margin:0 0 64px;padding-bottom:28px;border-bottom:1px solid var(--border)}
+.content-section .content-section{margin:44px 0 0 0;padding:28px 0 0 24px;border-bottom:0;border-left:1px solid var(--border)}
+.section-body{max-width:860px}
+.reveal-left{opacity:0;transform:translateY(16px);transition:opacity .55s cubic-bezier(.16,1,.3,1),transform .55s cubic-bezier(.16,1,.3,1)}
+.reveal-left.visible{opacity:1;transform:translateY(0)}
+.activity-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:32px;box-shadow:var(--shadow);margin:16px 0 32px}
+.activity-title{font-size:1.1rem;font-weight:700;margin-bottom:20px;display:flex;align-items:center;gap:10px;color:var(--text)}
+.activity-title::before{content:"\2699\FE0F";font-size:1.2rem}
+.checklist{display:flex;flex-direction:column;gap:12px;margin-top:16px}
+.checklist-row{display:flex;align-items:flex-start;gap:14px;padding:12px 16px;border-radius:8px;border:1px solid var(--border);background:var(--card-bg);cursor:pointer;transition:background .2s,border-color .2s}
+.checklist-row:hover{background:var(--card-bg-h);border-color:var(--border-hover)}
+.checklist-checkbox{flex-shrink:0;width:20px;height:20px;border:2px solid var(--accent);border-radius:5px;margin-top:2px;display:flex;align-items:center;justify-content:center;transition:background .2s,border-color .2s;position:relative}
+.checklist-checkbox::after{content:"\2713";font-size:12px;font-weight:700;color:#fff;opacity:0;transform:scale(.6);transition:opacity .15s,transform .15s var(--spring)}
+.checklist-text{font-size:.96rem;color:var(--text-2);line-height:1.55;transition:color .2s}
+.checklist-row.checked{border-color:rgba(139,92,246,.2);background:rgba(139,92,246,.03)}
+.checklist-row.checked .checklist-checkbox{background:var(--accent);border-color:var(--accent)}
+.checklist-row.checked .checklist-checkbox::after{opacity:1;transform:scale(1)}
+.checklist-row.checked .checklist-text{color:var(--text-3);text-decoration:line-through}
+.accent-bar{height:1px;background:linear-gradient(90deg,transparent,var(--accent-line),transparent);margin:64px 0;border:none}
+@media(max-width:900px){.sidebar{display:none}.workshop-main{margin-left:0;padding:92px 20px 64px}.top-header{padding:0 18px}.hero-section{min-height:44vh}.hero-title{font-size:3.2rem}.slide-heading{font-size:2.35rem}.content-section .content-section{padding-left:16px}}
+
+    </style>
+</head>
+<body>
+    <div id="spotlight"></div>
+    <div class="grid-overlay"></div>
+    <div class="noise-layer"></div>
+
+    <header class="top-header">
+        <div class="header-left">
+            <button class="sidebar-toggle" id="sidebarBtn" aria-label="Toggle navigation" title="Toggle sidebar">&#9776;</button>
+            <div class="brand">
+                <span class="brand-accent">◇</span>
+                <span>Training Guide</span>
+            </div>
+        </div>
+        <div class="header-actions">
+            <button class="theme-toggle" id="themeBtn" aria-label="Toggle theme">&#9680;</button>
+        </div>
+    </header>
+
+    <aside class="sidebar" id="workshopSidebar" aria-label="Workshop navigation">
+        <div class="sidebar-label">Contents</div>
+        <ul class="nav-list">
+            <li><a class="nav-item" href="#day-7-ai-assisted-backend-api-development"><span>01</span>Day 7: AI-Assisted Backend &amp; API Development</a></li><li><a class="nav-item" href="#day-7-ai-assisted-backend-api-development-week-2-genai-applied-to-pe-development-track-1-pe-productivity"><span>02</span>Week 2 — GenAI Applied to PE Development | Track 1: PE Productivity</a></li><li><a class="nav-item" href="#day-7-ai-assisted-backend-api-development-learning-objectives"><span>03</span>Learning Objectives</a></li><li><a class="nav-item" href="#day-7-ai-assisted-backend-api-development-may-2026-reality-check-ai-augmented-backend-engineering"><span>04</span>May 2026 Reality Check: AI-Augmented Backend Engineering</a></li><li><a class="nav-item" href="#day-7-ai-assisted-backend-api-development-6-5-hour-workshop-plan"><span>05</span>6.5-Hour Workshop Plan</a></li><li><a class="nav-item" href="#day-7-ai-assisted-backend-api-development-0-ai-native-backend-engineering-mental-model"><span>06</span>0. AI-Native Backend Engineering Mental Model</a></li><li><a class="nav-item" href="#day-7-ai-assisted-backend-api-development-0a-claude-code-capabilities-and-failure-modes"><span>07</span>0a. Claude Code Capabilities and Failure Modes</a></li><li><a class="nav-item" href="#day-7-ai-assisted-backend-api-development-0b-the-four-prompting-patterns-for-backend-work"><span>08</span>0b. The Four Prompting Patterns for Backend Work</a></li><li><a class="nav-item" href="#day-7-ai-assisted-backend-api-development-1-fastapi-scaffolding-with-claude-code"><span>09</span>1. FastAPI Scaffolding with Claude Code</a></li><li><a class="nav-item" href="#day-7-ai-assisted-backend-api-development-2-database-schema-design-with-ai"><span>10</span>2. Database Schema Design with AI</a></li><li><a class="nav-item" href="#day-7-ai-assisted-backend-api-development-3-request-validation-and-error-handling-with-pydantic-v2"><span>11</span>3. Request Validation and Error Handling with Pydantic v2</a></li><li><a class="nav-item" href="#day-7-ai-assisted-backend-api-development-4-openapi-swagger-spec-generation"><span>12</span>4. OpenAPI / Swagger Spec Generation</a></li><li><a class="nav-item" href="#day-7-ai-assisted-backend-api-development-4a-api-versioning-strategies"><span>13</span>4a. API Versioning Strategies</a></li><li><a class="nav-item" href="#day-7-ai-assisted-backend-api-development-5-authentication-and-authorization-patterns"><span>14</span>5. Authentication and Authorization Patterns</a></li><li><a class="nav-item" href="#day-7-ai-assisted-backend-api-development-6-sql-query-generation-and-optimization"><span>15</span>6. SQL Query Generation and Optimization</a></li><li><a class="nav-item" href="#day-7-ai-assisted-backend-api-development-6a-rate-limiting-and-throttling"><span>16</span>6a. Rate Limiting and Throttling</a></li><li><a class="nav-item" href="#day-7-ai-assisted-backend-api-development-6b-structured-logging-and-observability"><span>17</span>6b. Structured Logging and Observability</a></li><li><a class="nav-item" href="#day-7-ai-assisted-backend-api-development-7-the-ai-pair-programming-rhythm-for-backend"><span>18</span>7. The AI Pair-Programming Rhythm for Backend</a></li><li><a class="nav-item" href="#day-7-ai-assisted-backend-api-development-8-latest-trends-emerging-patterns-may-2026"><span>19</span>8. Latest Trends &amp; Emerging Patterns (May 2026)</a></li><li><a class="nav-item" href="#day-7-ai-assisted-backend-api-development-hands-on-lab-build-a-full-crud-feedback-api-in-45-minutes"><span>20</span>Hands-On Lab: Build a Full CRUD Feedback API in 45 Minutes</a></li><li><a class="nav-item" href="#day-7-ai-assisted-backend-api-development-key-takeaways"><span>21</span>Key Takeaways</a></li><li><a class="nav-item" href="#day-7-ai-assisted-backend-api-development-self-assessment-checklist"><span>22</span>Self-Assessment Checklist</a></li><li><a class="nav-item" href="#day-7-ai-assisted-backend-api-development-references-further-reading"><span>23</span>References &amp; Further Reading</a></li>
+        </ul>
+    </aside>
+
+    <main class="main-content">
+        <section class="hero-section" id="top" style="min-height:40vh;display:flex;flex-direction:column;justify-content:center;margin-bottom:64px;padding-bottom:48px;border-bottom:1px solid var(--border)">
+            <div class="tag">Training Guide</div>
+            <h1 class="slide-heading" style="font-size:clamp(2.8rem,5vw,5rem)">Day 7: AI-Assisted Backend &amp; API Development</h1>
+            
+        </section>
+        <section id="day-7-ai-assisted-backend-api-development" class="content-section visible">
+    <span class="section-label">1 &middot; Day 7: AI-Assisted Backend &amp; API Development</span>
+    <h2 class="slide-heading">Day 7: AI-Assisted Backend &amp; API Development</h2>
+    <div class="section-body"></div>
+    <section id="day-7-ai-assisted-backend-api-development-week-2-genai-applied-to-pe-development-track-1-pe-productivity" class="content-section reveal-left">
+    <span class="section-label">1.1 &middot; Week 2 — GenAI Applied to PE Development | Track 1: PE Productivity</span>
+    <h2 class="slide-heading">Week 2 — GenAI Applied to PE Development | Track 1: PE Productivity</h2>
+    <div class="section-body"><blockquote><strong>Duration:</strong> 6.5 hours total. Teaching, demos, and guided practice for 5 hours 45 minutes, then a 45-minute capstone lab. <strong>Prerequisites:</strong> Week 1 complete (LLM basics, prompt engineering, API fundamentals, AI coding assistants intro) <strong>Tools you&#39;ll need installed:</strong></blockquote>
+<ul class="linear-list"><li>Claude Code — <code>npm install -g @anthropic-ai/claude-code</code> (requires Node 18+). Verify: <code>claude --version</code></li><li>Cursor IDE — Download from https://cursor.com/. Import your VS Code settings if you have them.</li><li>Python 3.11+ — <code>python3 --version</code>. Use <code>pyenv</code> if you need to manage versions.</li><li>uv (Python package manager) — <code>curl -LsSf https://astral.sh/uv/install.sh | sh</code>. Faster than pip/poetry for dependency management.</li><li>PostgreSQL — <code>brew install postgresql@16 &amp;&amp; brew services start postgresql@16</code> (macOS) or use Docker: <code>docker run -d -p 5432:5432 -e POSTGRES_PASSWORD=devpass postgres:16</code></li><li>FastAPI + SQLAlchemy + Pydantic + Alembic — installed inside the lab project through <code>uv</code>.</li><li>Postman or HTTPie — use Postman for visual API exploration, HTTPie for terminal-first verification.</li></ul></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-learning-objectives" class="content-section reveal-left">
+    <span class="section-label">1.2 &middot; Learning Objectives</span>
+    <h2 class="slide-heading">Learning Objectives</h2>
+    <div class="section-body"><p>By the end of today, you will be able to:</p>
+<ol class="linear-list"><li>Scaffold a complete FastAPI project structure — routes, models, database config, middleware — from a single natural-language prompt in Claude Code.</li><li>Design normalized database schemas with AI assistance, generate SQLAlchemy 2.0 ORM models, and produce Alembic migration scripts that you have reviewed and understood.</li><li>Build Pydantic v2 request/response models with proper validation, structured error responses, and separation from ORM models.</li><li>Generate and customize OpenAPI specifications from FastAPI routes, and understand how those specs feed downstream tools (client SDKs, Postman collections, MCP servers).</li><li>Scaffold JWT and OAuth-style authorization flows with AI, then review them for token, secret, expiry, and permission failures.</li><li>Use AI to generate SQLAlchemy product queries, then review them for pagination, indexes, async correctness, and over-fetching.</li><li>Use an AI pair-programming rhythm — spec, scaffold, test, refine, ship — to build a production-quality CRUD API in under 60 minutes.</li></ol></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-may-2026-reality-check-ai-augmented-backend-engineering" class="content-section reveal-left">
+    <span class="section-label">1.3 &middot; May 2026 Reality Check: AI-Augmented Backend Engineering</span>
+    <h2 class="slide-heading">May 2026 Reality Check: AI-Augmented Backend Engineering</h2>
+    <div class="section-body"><p>The goal today is not to prove that AI can type backend code. By May 2026, every serious coding assistant can scaffold a basic CRUD API. The valuable skill is knowing how to turn that speed into a reliable backend without accepting fragile architecture, unsafe migrations, inconsistent errors, or insecure auth code.</p>
+<p>The useful mental model is:</p>
+<ul class="linear-list"><li>AI accelerates implementation: boilerplate, route files, schema conversions, migration drafts, test drafts, OpenAPI annotations, refactors across multiple files.</li><li>Humans own engineering judgment: architecture boundaries, data model correctness, authorization rules, transaction safety, performance tradeoffs, and production readiness.</li><li>The bottleneck has shifted: syntax is no longer the slowest part. Context quality, constraints, verification discipline, and refinement loops are now the hard parts.</li></ul>
+<p>Today&#39;s repeated pattern is:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>spec -&gt; plan -&gt; scaffold -&gt; inspect -&gt; test -&gt; refine -&gt; verify -&gt; ship</code></pre></div>
+<p>If learners remember only one principle, make it this: <strong>AI-generated backend code is a fast first draft, not an engineering decision.</strong></p></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-6-5-hour-workshop-plan" class="content-section reveal-left">
+    <span class="section-label">1.4 &middot; 6.5-Hour Workshop Plan</span>
+    <h2 class="slide-heading">6.5-Hour Workshop Plan</h2>
+    <div class="section-body"><div class="table-wrap"><table><thead><tr><th>Time</th><th>Segment</th><th>Outcome</th></tr></thead><tbody><tr><td>0:00-0:20</td><td>AI-native backend mental model</td><td>Understand what AI is strong and weak at for backend work in 2026</td></tr><tr><td>0:20-1:10</td><td>FastAPI scaffolding with Claude Code</td><td>Generate a multi-file backend plan, review it, then scaffold routes, config, middleware, and app structure</td></tr><tr><td>1:10-2:05</td><td>Database schema design with AI</td><td>Derive tables, constraints, indexes, and Alembic migration review criteria from product access patterns</td></tr><tr><td>2:05-2:45</td><td>Request validation and error handling</td><td>Create Pydantic v2 schemas, structured errors, and validation review prompts</td></tr><tr><td>2:45-3:05</td><td>Break</td><td>Reset</td></tr><tr><td>3:05-3:35</td><td>OpenAPI / Swagger contract generation</td><td>Make FastAPI auto-docs accurate enough for Postman, SDK generation, and AI agents</td></tr><tr><td>3:35-4:20</td><td>Authentication and authorization</td><td>Scaffold JWT/OAuth-style flows with AI and review security-critical code</td></tr><tr><td>4:20-5:00</td><td>SQL query generation and optimization</td><td>Generate product queries, inspect indexes, avoid N+1, and fix pagination counts</td></tr><tr><td>5:00-5:45</td><td>AI pair-programming rhythm live demo</td><td>Run the complete spec -&gt; scaffold -&gt; test -&gt; refine -&gt; ship loop before the lab</td></tr><tr><td>5:45-6:30</td><td>Capstone lab</td><td>Build and commit a full CRUD user feedback API using AI prompts</td></tr></tbody></table></div></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-0-ai-native-backend-engineering-mental-model" class="content-section reveal-left">
+    <span class="section-label">1.5 &middot; 0. AI-Native Backend Engineering Mental Model</span>
+    <h2 class="slide-heading">0. AI-Native Backend Engineering Mental Model</h2>
+    <div class="section-body"></div>
+    <section id="day-7-ai-assisted-backend-api-development-0-ai-native-backend-engineering-mental-model-traditional-vs-ai-native-backend-flow" class="content-section reveal-left">
+    <span class="section-label">1.5.1 &middot; Traditional vs AI-Native Backend Flow</span>
+    <h3 class="slide-heading">Traditional vs AI-Native Backend Flow</h3>
+    <div class="section-body"><p>Most engineers learn a traditional flow that looks like this:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>Traditional:
+Requirements → API contract → Schema design → Models → Routes → Validation → Tests → Deploy
+(Everything typed manually, architecture decided upfront)</code></pre></div>
+<p>The AI-native flow in 2026 is meaningfully different:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>AI-Native:
+Spec first → AI scaffolds structure → Human constrains architecture
+→ AI iteratively fills implementation → Human verifies contracts/security/performance
+→ AI assists testing/refactoring/docs → Ship</code></pre></div>
+<p>The difference is not &quot;AI does it for you.&quot; The difference is that implementation speed is no longer the bottleneck. Context quality, architectural judgment, and verification discipline are now the hard parts.</p></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-0-ai-native-backend-engineering-mental-model-what-ai-is-strong-at-for-backend-work" class="content-section reveal-left">
+    <span class="section-label">1.5.2 &middot; What AI Is Strong At for Backend Work</span>
+    <h3 class="slide-heading">What AI Is Strong At for Backend Work</h3>
+    <div class="section-body"><ul class="linear-list"><li>CRUD scaffolding and repetitive boilerplate</li><li>Route generation from specs</li><li>Schema-to-model conversion</li><li>OpenAPI annotation and documentation</li><li>Test generation for happy paths</li><li>Alembic migration drafts</li><li>Refactors across multiple files simultaneously</li><li>Architectural consistency within a single session</li></ul></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-0-ai-native-backend-engineering-mental-model-what-ai-is-weak-at-for-backend-work" class="content-section reveal-left">
+    <span class="section-label">1.5.3 &middot; What AI Is Weak At for Backend Work</span>
+    <h3 class="slide-heading">What AI Is Weak At for Backend Work</h3>
+    <div class="section-body"><ul class="linear-list"><li>Business logic that is ambiguous or domain-specific</li><li>Transactional correctness across multiple tables</li><li>Concurrency edge cases and race conditions</li><li>Auth security nuances (issuer/audience validation, token rotation)</li><li>Indexing tradeoffs without runtime telemetry</li><li>Migration safety when data exists in production</li><li>Production scalability decisions (connection pooling, caching strategy)</li></ul></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-0-ai-native-backend-engineering-mental-model-the-real-2026-skill-constraint-engineering" class="content-section reveal-left">
+    <span class="section-label">1.5.4 &middot; The Real 2026 Skill: Constraint Engineering</span>
+    <h3 class="slide-heading">The Real 2026 Skill: Constraint Engineering</h3>
+    <div class="section-body"><p>Bad prompt:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>Create a backend API.</code></pre></div>
+<p>Good prompt:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>Create a FastAPI CRUD service for user feedback with:
+- layered architecture (routes, services, repositories, schemas, models)
+- async SQLAlchemy 2.0 with Mapped[T] annotations
+- PostgreSQL 16 with Alembic migrations
+- Pydantic v2 for request/response schemas
+- structured JSON error responses
+- OpenAPI tags and response model annotations
+- no hardcoded secrets, env-based config via pydantic-settings
+Plan files first. Do not write code until I approve the plan.</code></pre></div>
+<p>The second prompt is constraint engineering. It tells the AI your architecture, your versions, your patterns, your review process, and what &quot;done&quot; means. That is the real skill.</p></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-0-ai-native-backend-engineering-mental-model-mini-exercise-bad-vs-good-prompts-5-minutes" class="content-section reveal-left">
+    <span class="section-label">1.5.5 &middot; Mini Exercise: Bad vs Good Prompts (5 minutes)</span>
+    <div class="activity-card">
+      <div class="activity-title">Mini Exercise: Bad vs Good Prompts (5 minutes)</div>
+      <div class="section-body"><p>Show learners two prompts. Ask what each will produce. The answer: the first generates a single-file synchronous app with no separation, no validation, and no migration. The second generates a layered, testable, maintainable backend.</p></div>
+      
+      
+    </div>
+    
+  </section>
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-0a-claude-code-capabilities-and-failure-modes" class="content-section reveal-left">
+    <span class="section-label">1.6 &middot; 0a. Claude Code Capabilities and Failure Modes</span>
+    <h2 class="slide-heading">0a. Claude Code Capabilities and Failure Modes</h2>
+    <div class="section-body"></div>
+    <section id="day-7-ai-assisted-backend-api-development-0a-claude-code-capabilities-and-failure-modes-what-claude-code-excels-at" class="content-section reveal-left">
+    <span class="section-label">1.6.1 &middot; What Claude Code Excels At</span>
+    <h3 class="slide-heading">What Claude Code Excels At</h3>
+    <div class="section-body"><p>Claude Code is strongest when the task has high surface area — many files, many changes, or terminal verification. Specifically:</p>
+<ul class="linear-list"><li>Multi-file generation: creates entire project structures (routes, schemas, models, services, config) in one session</li><li>Repo-aware edits: reads your existing files before making changes, so it matches your naming and import patterns</li><li>Architectural consistency: if your CLAUDE.md specifies SQLAlchemy 2.0 and async sessions, it applies that consistently across all generated files</li><li>Refactors across files: rename a service method and it finds every call site</li><li>Migration assistance: generates Alembic migrations, runs them, and verifies the app still starts</li><li>Test-fix loops: generates pytest tests, runs them, reads failure output, and fixes the code</li></ul></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-0a-claude-code-capabilities-and-failure-modes-failure-modes-you-will-see" class="content-section reveal-left">
+    <span class="section-label">1.6.2 &middot; Failure Modes You Will See</span>
+    <h3 class="slide-heading">Failure Modes You Will See</h3>
+    <div class="section-body"><p>These failures appear reliably in AI-generated backend code. Knowing them in advance lets you review instead of debug:</p>
+<div class="table-wrap"><table><thead><tr><th>Failure</th><th>Symptom</th><th>Detection</th></tr></thead><tbody><tr><td>Circular imports</td><td><code>ImportError: cannot import name</code> at startup</td><td>Ask Claude Code to draw the import graph before editing</td></tr><tr><td>Hallucinated package versions</td><td><code>ModuleNotFoundError</code> or incompatible API</td><td>Pin versions in CLAUDE.md; verify requirements file</td></tr><tr><td>Broken async handling</td><td><code>RuntimeError: no running event loop</code> or un-awaited coroutines</td><td>Search for <code>Session(</code> (sync) in async routes; audit every <code>await</code></td></tr><tr><td>Duplicate models</td><td>Two SQLAlchemy models for the same table</td><td>Ask for a file-by-file plan before scaffolding</td></tr><tr><td>Incorrect dependency injection</td><td>Route gets <code>None</code> instead of a session</td><td>Verify <code>Depends(get_db)</code> is on every database route</td></tr><tr><td>Insecure defaults</td><td><code>SECRET_KEY = &quot;your-secret-key-here&quot;</code> in source</td><td>Hardcoded secret check is step one of every auth review</td></tr><tr><td>Pydantic v1 syntax</td><td><code>class Config:</code> inside model body</td><td>Specify &quot;Pydantic v2&quot; in prompt and CLAUDE.md</td></tr><tr><td>Missing downgrade in migration</td><td>Rollback leaves orphan tables or enum types</td><td>Read <code>downgrade()</code> before running <code>upgrade()</code></td></tr></tbody></table></div></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-0a-claude-code-capabilities-and-failure-modes-critical-practice" class="content-section reveal-left">
+    <span class="section-label">1.6.3 &middot; Critical Practice</span>
+    <h3 class="slide-heading">Critical Practice</h3>
+    <div class="section-body"><p>After Claude Code generates any module, ask it to critique its own output:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>Identify architectural weaknesses in this scaffold.
+Look for circular imports, async/sync mixing, hardcoded values, missing error handling,
+and places where the service layer leaks database details to routes.
+Return findings before proposing fixes.</code></pre></div>
+<p>This &quot;generate then critique&quot; pattern is one of the highest-leverage habits in AI-assisted development.</p></div>
+    
+  </section>
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-0b-the-four-prompting-patterns-for-backend-work" class="content-section reveal-left">
+    <span class="section-label">1.7 &middot; 0b. The Four Prompting Patterns for Backend Work</span>
+    <h2 class="slide-heading">0b. The Four Prompting Patterns for Backend Work</h2>
+    <div class="section-body"><p>Every backend feature built with AI follows one of four prompt types. Knowing which one to use at each stage eliminates wasted turns.</p></div>
+    <section id="day-7-ai-assisted-backend-api-development-0b-the-four-prompting-patterns-for-backend-work-pattern-1-the-spec-prompt" class="content-section reveal-left">
+    <span class="section-label">1.7.1 &middot; Pattern 1: The Spec Prompt</span>
+    <h3 class="slide-heading">Pattern 1: The Spec Prompt</h3>
+    <div class="section-body"><p>Use this before any code is written. Define entities, endpoints, architecture, and constraints.</p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>Design a FastAPI feedback API.
+Entities: Feedback (id, user_email, category, title, description, priority, status, timestamps)
+Endpoints: POST /api/v1/feedback, GET /api/v1/feedback, GET /api/v1/feedback/{id}, PUT, DELETE
+Architecture: layered (routes → services → repository → models)
+Constraints: async SQLAlchemy 2.0, Pydantic v2, PostgreSQL 16, no inline SQL
+Show me a file-by-file plan. Do not write code yet.</code></pre></div></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-0b-the-four-prompting-patterns-for-backend-work-pattern-2-the-scaffold-prompt" class="content-section reveal-left">
+    <span class="section-label">1.7.2 &middot; Pattern 2: The Scaffold Prompt</span>
+    <h3 class="slide-heading">Pattern 2: The Scaffold Prompt</h3>
+    <div class="section-body"><p>Use this after approving the plan. Generate the full structure.</p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>Execute the plan. Create all files following CLAUDE.md conventions.
+After creating them, install dependencies with uv and start the application.
+Verify the health check endpoint returns 200 before stopping.</code></pre></div></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-0b-the-four-prompting-patterns-for-backend-work-pattern-3-the-refine-prompt" class="content-section reveal-left">
+    <span class="section-label">1.7.3 &middot; Pattern 3: The Refine Prompt</span>
+    <h3 class="slide-heading">Pattern 3: The Refine Prompt</h3>
+    <div class="section-body"><p>Use this after the scaffold exists. Add pagination, filtering, middleware, or fix a specific behavior.</p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>The feedback list endpoint returns all records. Add:
+- optional query params: status, category, priority, user_email
+- pagination with page and page_size (max 100)
+- total count using a separate database query, not Python len()
+- ORDER BY created_at DESC by default
+Explain which existing indexes support the new filters.</code></pre></div></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-0b-the-four-prompting-patterns-for-backend-work-pattern-4-the-hardening-prompt" class="content-section reveal-left">
+    <span class="section-label">1.7.4 &middot; Pattern 4: The Hardening Prompt</span>
+    <h3 class="slide-heading">Pattern 4: The Hardening Prompt</h3>
+    <div class="section-body"><p>Use this after the feature works. Add tests, logging, error handling.</p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>Harden the feedback module:
+1. Write pytest integration tests covering all 5 endpoints, all validation errors, and 404 cases
+2. Add structured logging to every service method (entering, returning, and exception paths)
+3. Verify every exception returns a structured JSON error, never a stack trace
+4. Confirm async/await is correct throughout
+Run the tests and fix any failures.</code></pre></div>
+<p>Using these four patterns in order guarantees a reviewable, testable feature at each checkpoint.</p></div>
+    
+  </section>
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-1-fastapi-scaffolding-with-claude-code" class="content-section reveal-left">
+    <span class="section-label">1.8 &middot; 1. FastAPI Scaffolding with Claude Code</span>
+    <h2 class="slide-heading">1. FastAPI Scaffolding with Claude Code</h2>
+    <div class="section-body"></div>
+    <section id="day-7-ai-assisted-backend-api-development-1-fastapi-scaffolding-with-claude-code-what-it-is" class="content-section reveal-left">
+    <span class="section-label">1.8.1 &middot; What It Is</span>
+    <h3 class="slide-heading">What It Is</h3>
+    <div class="section-body"><p>FastAPI scaffolding means generating the initial project structure — directory layout, main application file, route files, database configuration, dependency injection setup, middleware, and configuration management — from a description of what you want to build. Claude Code does this at the project level: it reads your entire directory, plans changes across multiple files, creates them, and can immediately run tests to verify the result.</p></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-1-fastapi-scaffolding-with-claude-code-why-it-matters-for-product-engineers" class="content-section reveal-left">
+    <span class="section-label">1.8.2 &middot; Why It Matters for Product Engineers</span>
+    <h3 class="slide-heading">Why It Matters for Product Engineers</h3>
+    <div class="section-body"><p>Backend scaffolding is the most time-consuming part of starting a new feature. You know the pattern — it is the same every time — but typing out the boilerplate takes 30–60 minutes and a small wiring mistake (missing dependency injection, import path typo, incorrect async session setup) costs an hour of debugging later. AI scaffolding eliminates the typo category of bugs and lets you focus on business logic.</p></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-1-fastapi-scaffolding-with-claude-code-what-learners-must-understand-in-depth" class="content-section reveal-left">
+    <span class="section-label">1.8.3 &middot; What Learners Must Understand in Depth</span>
+    <h3 class="slide-heading">What Learners Must Understand in Depth</h3>
+    <div class="section-body"><p>FastAPI scaffolding is not just creating <code>main.py</code>. A useful backend scaffold has explicit layers:</p>
+<ul class="linear-list"><li>Routes define HTTP contracts: paths, methods, status codes, dependencies, response models, and OpenAPI metadata.</li><li>Schemas define API input/output contracts with Pydantic. These are not the same as database models.</li><li>Models define persistent data with SQLAlchemy. These should be typed, constrained, and migration-friendly.</li><li>Services hold business logic. Routes should stay thin so they are easy to test and document.</li><li>Repositories or data-access helpers isolate database queries when the project grows beyond one resource.</li><li>Dependencies provide database sessions, auth context, configuration, and reusable request-scoped objects.</li><li>Middleware handles cross-cutting behavior like CORS, request IDs, logging, and timing.</li><li>Core configuration centralizes environment variables, secrets, app metadata, and database URLs.</li></ul>
+<p>AI tools are very good at producing this shape if you name the layers. If you only ask for &quot;a FastAPI backend,&quot; the assistant may generate a single large file, sync database sessions inside async routes, duplicated enums, or route functions that contain validation, business logic, and database writes all together.</p></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-1-fastapi-scaffolding-with-claude-code-mini-exercise-prompt-diagnosis-10-minutes" class="content-section reveal-left">
+    <span class="section-label">1.8.4 &middot; Mini Exercise: Prompt Diagnosis (10 minutes)</span>
+    <div class="activity-card">
+      <div class="activity-title">Mini Exercise: Prompt Diagnosis (10 minutes)</div>
+      <div class="section-body"><p>Show learners two prompts and ask what each will produce.</p>
+<p>Bad prompt:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>Create a FastAPI API for feedback.</code></pre></div>
+<p>Better prompt:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>Create a FastAPI feedback API using a layered architecture:
+- app/main.py registers routers and middleware only
+- app/routes/feedback.py defines HTTP endpoints
+- app/schemas/feedback.py defines Pydantic v2 request/response models
+- app/models/feedback.py defines SQLAlchemy 2.0 ORM models
+- app/services/feedback.py owns business logic and database operations
+- app/core/database.py owns async engine/session setup
+- app/core/exceptions.py owns structured API errors
+
+Use async SQLAlchemy, Pydantic v2, Alembic, typed functions, and OpenAPI metadata.
+Plan files first. Do not write code until I approve the plan.</code></pre></div>
+<p>Checklist:</p></div>
+      
+      <ul class="linear-list"><li>[ ] Does the prompt specify architecture?</li><li>[ ] Does it specify async vs sync database access?</li><li>[ ] Does it specify Pydantic v2 and SQLAlchemy 2.0?</li><li>[ ] Does it force a plan before code edits?</li><li>[ ] Does it define what &quot;done&quot; means?</li></ul>
+    </div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-1-fastapi-scaffolding-with-claude-code-how-to-do-it" class="content-section reveal-left">
+    <span class="section-label">1.8.5 &middot; How to Do It</span>
+    <h3 class="slide-heading">How to Do It</h3>
+    <div class="section-body"><p><strong>Step 1: Create a CLAUDE.md file.</strong> This is the single most important thing you can do before prompting Claude Code for backend work. Without it, you get generic boilerplate. With it, you get code that matches your team&#39;s conventions.</p>
+<p>Create a <code>CLAUDE.md</code> in your project root:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">markdown</span><button class="copy-btn" type="button">Copy</button></div><pre><code># Project: User Feedback Service
+
+## Stack
+- Python 3.12, FastAPI 0.115+, SQLAlchemy 2.0 (async), Pydantic v2
+- PostgreSQL 16, Alembic for migrations
+- uv for package management
+
+## Conventions
+- Use `Mapped[T]` type annotations for all SQLAlchemy models
+- Separate Pydantic schemas from SQLAlchemy models (schemas/ vs models/ directories)
+- Use async sessions everywhere — `AsyncSession` + `create_async_engine`
+- Service layer pattern: routes call services, services call repositories
+- All routes return structured JSON error responses, never raw exceptions
+- Use `Field()` for Pydantic validation with descriptions
+- Snake_case for Python, camelCase only in JSON responses (use Pydantic `alias_generator`)
+
+## Directory Structure
+app/
+  main.py
+  core/
+    config.py      # Settings via pydantic-settings
+    database.py    # Engine, session factory, Base
+    security.py    # JWT utilities
+  models/          # SQLAlchemy ORM models
+  schemas/         # Pydantic request/response models
+  routes/          # FastAPI routers
+  services/        # Business logic
+  middleware/      # Custom middleware
+
+## Error Handling
+- Use custom exception classes inheriting from a base AppException
+- Global exception handler returns {detail: str, error_code: str, status_code: int}
+- Never expose stack traces in non-debug mode</code></pre></div>
+<p><strong>Step 2: Run Claude Code in your project directory.</strong> Open your terminal in the project root (where CLAUDE.md lives) and start Claude Code:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">bash</span><button class="copy-btn" type="button">Copy</button></div><pre><code>claude</code></pre></div>
+<p><strong>Step 3: Use Plan Mode first.</strong> For a multi-file scaffold, always start in plan mode. Press Shift+Tab twice or type <code>/plan</code> to enter read-only mode. Then type your prompt:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>Plan a FastAPI project scaffold for a user feedback service. The service needs:
+- CRUD endpoints for feedback items (POST, GET, GET by ID, PUT, DELETE)
+- Each feedback item has: id (UUID), user_email, category (bug/feature/improvement), title, description, priority (1-5), status (open/in_progress/resolved/closed), created_at, updated_at
+- PostgreSQL with async SQLAlchemy
+- Alembic for migrations
+- Pydantic v2 schemas for request/response
+- Health check endpoint
+- CORS middleware configured for local development
+
+List every file you will create and what each contains. Do not write code yet.</code></pre></div>
+<p>Claude Code will read your <code>CLAUDE.md</code>, understand your conventions, and produce a file-by-file plan. Review it. If it proposes something you disagree with — maybe it puts schemas inside the models directory, or it skips the service layer — tell it to adjust the plan before writing code.</p>
+<p><strong>Step 4: Execute the plan.</strong> Once the plan looks right, exit plan mode (Shift+Tab) and tell Claude Code to proceed:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>Execute the plan. Create all files. After creating them, run the health check endpoint 
+to verify the app starts. Use uv for dependency management.</code></pre></div>
+<p>Claude Code will create files, install dependencies, and start the application. If anything fails, it reads the error, diagnoses the problem, and fixes it — often in the same turn.</p></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-1-fastapi-scaffolding-with-claude-code-what-can-go-wrong" class="content-section reveal-left">
+    <span class="section-label">1.8.6 &middot; What Can Go Wrong</span>
+    <h3 class="slide-heading">What Can Go Wrong</h3>
+    <div class="section-body"><p><strong>Generic boilerplate without CLAUDE.md.</strong> Without it, Claude Code produces functional but generic code — synchronous SQLAlchemy, no service layer, everything in one file. CLAUDE.md communicates your team&#39;s standards.</p>
+<p><strong>Outdated patterns.</strong> Without specifying SQLAlchemy 2.0 explicitly, you might get 1.4 patterns (<code>Column()</code> instead of <code>Mapped[T]</code>). Be explicit about versions in CLAUDE.md.</p>
+<p><strong>Over-engineering on the first pass.</strong> Claude Code might add caching, rate limiting, and monitoring. Constrain your prompt: &quot;Create the minimum viable scaffold. No caching, no background tasks. We will add those later.&quot;</p>
+<p><strong>Not reviewing the generated code.</strong> The scaffold will compile and health checks will pass, but you must read every file. You are the engineer. The AI is the typist.</p>
+<p><strong>Circular imports.</strong> AI frequently wires <code>models</code>, <code>schemas</code>, <code>services</code>, and <code>routes</code> in a way that imports the app back into itself. If the server fails at startup with import loops, ask Claude Code to explain the dependency graph before it edits.</p>
+<p><strong>Async/sync mixing.</strong> In 2026 this is still a common generated-code bug: an <code>async def</code> route calls a synchronous SQLAlchemy <code>Session</code>, or a sync function returns an un-awaited coroutine. Search for <code>Session(</code> and <code>await</code> during review.</p>
+<p><strong>Package drift.</strong> AI may invent old or non-existent package names. Verify the generated dependency file and pin only packages the app actually imports.</p></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-1-fastapi-scaffolding-with-claude-code-tool-comparison-claude-code-vs-cursor-for-scaffolding" class="content-section reveal-left">
+    <span class="section-label">1.8.7 &middot; Tool Comparison: Claude Code vs Cursor for Scaffolding</span>
+    <h3 class="slide-heading">Tool Comparison: Claude Code vs Cursor for Scaffolding</h3>
+    <div class="section-body"><div class="table-wrap"><table><thead><tr><th>Aspect</th><th>Claude Code</th><th>Cursor IDE</th></tr></thead><tbody><tr><td>Interaction model</td><td>Terminal CLI — you describe the full project, it creates everything</td><td>IDE — you work file-by-file in Composer, or use Agent mode for multi-file</td></tr><tr><td>Best for scaffolding</td><td>New projects from scratch, multi-file creation</td><td>Adding features to existing projects, refactoring</td></tr><tr><td>Context</td><td>Reads your full project directory automatically</td><td>Indexes your project; use <code>@filename</code> to add specific files to context</td></tr><tr><td>Plan mode</td><td>Built-in <code>/plan</code> command, shows all files before writing</td><td>Agent mode proposes diffs per file</td></tr><tr><td>Verification</td><td>Can run tests and iterate on failures in the same session</td><td>You run tests yourself in the terminal</td></tr></tbody></table></div>
+<p>Use Claude Code for the initial scaffold. Switch to Cursor for iterating on individual files once the structure exists.</p></div>
+    
+  </section>
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-2-database-schema-design-with-ai" class="content-section reveal-left">
+    <span class="section-label">1.9 &middot; 2. Database Schema Design with AI</span>
+    <h2 class="slide-heading">2. Database Schema Design with AI</h2>
+    <div class="section-body"></div>
+    <section id="day-7-ai-assisted-backend-api-development-2-database-schema-design-with-ai-what-it-is" class="content-section reveal-left">
+    <span class="section-label">1.9.1 &middot; What It Is</span>
+    <h3 class="slide-heading">What It Is</h3>
+    <div class="section-body"><p>Database schema design is the process of defining your tables, columns, types, relationships, indexes, and constraints. AI assistance here means describing your data domain in plain language and getting back a normalized schema with appropriate indexes, foreign keys, and migration scripts.</p></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-2-database-schema-design-with-ai-why-it-matters" class="content-section reveal-left">
+    <span class="section-label">1.9.2 &middot; Why It Matters</span>
+    <h3 class="slide-heading">Why It Matters</h3>
+    <div class="section-body"><p>A bad schema is the most expensive technical debt in a product. You can refactor code in a day. Refactoring a schema with millions of rows and active queries takes weeks and carries production risk. Getting the schema right early saves enormous pain later.</p></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-2-database-schema-design-with-ai-what-learners-must-understand-in-depth" class="content-section reveal-left">
+    <span class="section-label">1.9.3 &middot; What Learners Must Understand in Depth</span>
+    <h3 class="slide-heading">What Learners Must Understand in Depth</h3>
+    <div class="section-body"><p>AI can draft a schema, but it cannot infer the real product workload unless you tell it. Schema design starts from business rules and access patterns:</p>
+<ul class="linear-list"><li>Entities: feedback item, submitter, product area, comments, attachments, status history.</li><li>Relationships: one user can submit many items; one feedback item can have many comments; one item belongs to one product area.</li><li>Constraints: required fields, allowed statuses, priority range, uniqueness rules, foreign keys, soft-delete behavior.</li><li>Read patterns: list by status, category, priority, date range, product area, user email, and search term.</li><li>Write patterns: create feedback, update status, edit user-owned feedback, delete or soft-delete feedback.</li><li>Scale assumptions: 100K rows behaves differently from 100M rows; read-heavy workloads need different indexes from write-heavy workloads.</li></ul></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-2-database-schema-design-with-ai-normalization-principles-and-practical-tradeoffs" class="content-section reveal-left">
+    <span class="section-label">1.9.4 &middot; Normalization: Principles and Practical Tradeoffs</span>
+    <h3 class="slide-heading">Normalization: Principles and Practical Tradeoffs</h3>
+    <div class="section-body"><p>Teach normalization as a spectrum, not a binary rule:</p>
+<ul class="linear-list"><li>1NF (First Normal Form): one atomic value per column. Avoid comma-separated categories or JSON blobs for fields you filter often. If <code>tags</code> is a JSON array and you query <code>WHERE &#39;bug&#39; = ANY(tags)</code>, you lose index support.</li><li>2NF (Second Normal Form): every non-key attribute depends on the entire primary key. This matters most when composite primary keys appear. A <code>feedback_category</code> table where <code>category_name</code> depends only on <code>category_id</code>, not on <code>feedback_id</code>, is 2NF compliant.</li><li>3NF (Third Normal Form): avoid transitive dependencies — storing <code>product_area_name</code> in the feedback row when you already have <code>product_area_id</code> that joins to the name. Update the name once, not across millions of rows.</li><li>Intentional denormalization: acceptable when a read path is hot and the duplicated value has a clear update strategy. Storing <code>user_email</code> directly on <code>Feedback</code> rather than a foreign key to a <code>Users</code> table is a deliberate choice for a read-heavy, user-email-keyed access pattern.</li></ul>
+<p>In May 2026, the most common AI schema failures are:</p>
+<ul class="linear-list"><li>Over-normalizing into too many tables (7 tables where 3 suffice)</li><li>Using JSON columns for fields you filter on</li><li>Missing indexes for filtered list endpoints</li><li>Omitting foreign key behavior (<code>ON DELETE CASCADE</code> vs <code>RESTRICT</code>)</li><li>Generating migrations that work forward but fail backward</li></ul></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-2-database-schema-design-with-ai-how-to-do-it" class="content-section reveal-left">
+    <span class="section-label">1.9.5 &middot; How to Do It</span>
+    <h3 class="slide-heading">How to Do It</h3>
+    <div class="section-body"><p><strong>Designing the schema with Claude Code:</strong></p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>Design a PostgreSQL schema for user feedback. Requirements:
+- Users submit feedback about product features
+- Each feedback item belongs to one user (identified by email) and one product area
+- Feedback has a lifecycle: open → in_progress → resolved → closed
+- We need to query by: status, category, priority, date range, and user email
+- We will have ~100K feedback items in the first year
+- Priority is an integer 1-5 where 1 is critical
+
+Generate SQLAlchemy 2.0 models using Mapped[T] annotations and async patterns. 
+Include appropriate indexes for the query patterns listed above.
+Explain your indexing decisions.</code></pre></div>
+<p>Notice the prompt includes expected data volume and query patterns. Without this, the AI will over-index (slowing writes) or under-index (missing composites your queries need).</p>
+<p><strong>Access-pattern-first prompt for better results:</strong></p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>Before writing models, ask me clarifying questions about access patterns.
+Then design a schema for a user feedback API.
+
+Known access patterns:
+- Product managers list open feedback by priority, newest first.
+- Support agents filter by user email.
+- Engineers list bugs by product area and status.
+- The UI shows counts by status on every page load.
+- Users can edit their own feedback but cannot edit someone else&#39;s.
+
+For each index you propose, explain which query it supports.
+For each table, explain why it should or should not be normalized.</code></pre></div>
+<p><strong>The SQLAlchemy 2.0 model Claude Code should produce:</strong></p>
+<p>The model should use <code>Mapped[T]</code> annotations — this is the SQLAlchemy 2.0 pattern that gives you full IDE type-checking support. It should look something like this structure:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">python</span><button class="copy-btn" type="button">Copy</button></div><pre><code>from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy import String, Integer, DateTime, func, Index
+from uuid import UUID, uuid4
+from datetime import datetime
+from enum import Enum as PyEnum
+
+class Base(DeclarativeBase):
+    pass
+
+class FeedbackStatus(str, PyEnum):
+    OPEN = &quot;open&quot;
+    IN_PROGRESS = &quot;in_progress&quot;
+    RESOLVED = &quot;resolved&quot;
+    CLOSED = &quot;closed&quot;
+
+class FeedbackCategory(str, PyEnum):
+    BUG = &quot;bug&quot;
+    FEATURE = &quot;feature&quot;
+    IMPROVEMENT = &quot;improvement&quot;
+
+class Feedback(Base):
+    __tablename__ = &quot;feedback&quot;
+
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
+    user_email: Mapped[str] = mapped_column(String(255), index=True)
+    category: Mapped[FeedbackCategory]
+    title: Mapped[str] = mapped_column(String(500))
+    description: Mapped[str]
+    priority: Mapped[int] = mapped_column(Integer, default=3)
+    status: Mapped[FeedbackStatus] = mapped_column(default=FeedbackStatus.OPEN)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
+    )
+
+    __table_args__ = (
+        Index(&quot;ix_feedback_status_priority&quot;, &quot;status&quot;, &quot;priority&quot;),
+        Index(&quot;ix_feedback_category_created&quot;, &quot;category&quot;, &quot;created_at&quot;),
+    )</code></pre></div>
+<p>Key decisions to verify in the generated schema:</p>
+<ul class="linear-list"><li>UUID primary keys instead of auto-increment integers. UUIDs do not leak information about table size and work better in distributed systems.</li><li>Composite indexes matching your query patterns. If you always filter by <code>status AND priority</code>, a composite index is significantly faster than two single-column indexes.</li><li><code>timezone=True</code> on DateTime columns. Always store timestamps with timezone. This is nearly impossible to fix retroactively.</li><li>String length limits. <code>String(255)</code> for emails, <code>String(500)</code> for titles — not unlimited <code>Text</code> everywhere.</li><li>Check constraints for values like priority 1-5. Pydantic validates the request, but the database should still protect itself.</li><li>Server-side defaults for timestamps and status where appropriate, so non-API writes do not create invalid rows.</li><li>Soft delete decision. If you include <code>deleted_at</code>, every list query must filter it; if you hard delete, audit and recovery are harder.</li></ul></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-2-database-schema-design-with-ai-indexing-decisions-learners-should-be-able-to-explain" class="content-section reveal-left">
+    <span class="section-label">1.9.6 &middot; Indexing Decisions Learners Should Be Able to Explain</span>
+    <h3 class="slide-heading">Indexing Decisions Learners Should Be Able to Explain</h3>
+    <div class="section-body"><p>An index is not &quot;make this faster&quot; magic. It is a tradeoff: faster reads for matching queries, slower writes, extra storage, and more migration complexity.</p>
+<p>For the lab API:</p>
+<div class="table-wrap"><table><thead><tr><th>Query</th><th>Useful Index</th><th>Reason</th></tr></thead><tbody><tr><td><code>WHERE status = &#39;open&#39; ORDER BY priority, created_at</code></td><td><code>(status, priority, created_at)</code></td><td>Matches common triage list</td></tr><tr><td><code>WHERE user_email = ? ORDER BY created_at DESC</code></td><td><code>(user_email, created_at)</code></td><td>Supports user history</td></tr><tr><td><code>WHERE category = ? AND created_at &gt;= ?</code></td><td><code>(category, created_at)</code></td><td>Supports category/date filters</td></tr><tr><td><code>WHERE id = ?</code></td><td>primary key</td><td>Already indexed</td></tr></tbody></table></div>
+<p>Ask AI to explain index order. If it cannot connect the index to a real query, remove or revisit that index.</p></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-2-database-schema-design-with-ai-mini-exercise-review-an-ai-schema-15-minutes" class="content-section reveal-left">
+    <span class="section-label">1.9.7 &middot; Mini Exercise: Review an AI Schema (15 minutes)</span>
+    <div class="activity-card">
+      <div class="activity-title">Mini Exercise: Review an AI Schema (15 minutes)</div>
+      <div class="section-body"><p>Give learners this prompt:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>Review this generated feedback schema as if it were a pull request.
+Find issues in normalization, constraints, indexes, enum handling, nullable fields,
+timestamp handling, soft delete behavior, and future migration risk.
+Return findings by severity before proposing code.</code></pre></div>
+<p>Expected findings to look for:</p>
+<p><strong>Generating Alembic migrations:</strong></p>
+<p>After creating the SQLAlchemy models, ask Claude Code to set up Alembic:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>Set up Alembic for this project:
+1. Initialize alembic with async support
+2. Configure env.py to use our async engine from app/core/database.py
+3. Generate the initial migration from our models
+4. Show me how to run the migration
+
+Use the CLAUDE.md conventions for directory structure.</code></pre></div>
+<p>The generated migration file will live in <code>alembic/versions/</code> and contain <code>upgrade()</code> and <code>downgrade()</code> functions. <strong>Always read the generated migration before running it.</strong> Check that:</p></div>
+      
+      <ul class="linear-list"><li>[ ] Queryable fields placed inside JSON</li><li>[ ] Missing check constraint for priority</li><li>[ ] Missing composite index for the primary list endpoint</li><li>[ ] Nullable columns that should be required</li><li>[ ] Enum definitions duplicated in multiple files</li><li>[ ] Timestamps without timezone</li><li>[ ] Soft-delete column added without list-query filtering</li></ul>
+    </div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-2-database-schema-design-with-ai-what-can-go-wrong" class="content-section reveal-left">
+    <span class="section-label">1.9.8 &middot; What Can Go Wrong</span>
+    <h3 class="slide-heading">What Can Go Wrong</h3>
+    <div class="section-body"><p><strong>Missing downgrade logic.</strong> AI-generated migrations often have thorough <code>upgrade()</code> but <code>downgrade()</code> that just calls <code>op.drop_table()</code> without dropping indexes or enum types first. This fails on rollback.</p>
+<p><strong>Enum handling.</strong> PostgreSQL enums are database-level types. If <code>upgrade()</code> adds an enum type, <code>downgrade()</code> must drop it explicitly. Many AI-generated migrations miss this.</p>
+<p><strong>Over-normalization.</strong> The AI might produce 8 tables where 3 suffice. Challenge every join table: &quot;Will I actually query this independently?&quot;</p>
+<p><strong>Index bloat.</strong> Each index slows INSERT/UPDATE. For 100K rows, negligible. For 10M rows on a frequently-written table, measurable.</p></div>
+    
+  </section>
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-3-request-validation-and-error-handling-with-pydantic-v2" class="content-section reveal-left">
+    <span class="section-label">1.10 &middot; 3. Request Validation and Error Handling with Pydantic v2</span>
+    <h2 class="slide-heading">3. Request Validation and Error Handling with Pydantic v2</h2>
+    <div class="section-body"></div>
+    <section id="day-7-ai-assisted-backend-api-development-3-request-validation-and-error-handling-with-pydantic-v2-what-it-is" class="content-section reveal-left">
+    <span class="section-label">1.10.1 &middot; What It Is</span>
+    <h3 class="slide-heading">What It Is</h3>
+    <div class="section-body"><p>Pydantic v2 is the validation layer between the outside world and your application logic. You define schemas — Python classes with type annotations and validation rules — and Pydantic guarantees that any data reaching your service layer has already been validated, coerced, and structured correctly.</p></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-3-request-validation-and-error-handling-with-pydantic-v2-why-it-matters" class="content-section reveal-left">
+    <span class="section-label">1.10.2 &middot; Why It Matters</span>
+    <h3 class="slide-heading">Why It Matters</h3>
+    <div class="section-body"><p>Every production incident caused by bad input data is one that Pydantic could have prevented. When a frontend sends <code>priority: &quot;high&quot;</code> instead of <code>priority: 3</code>, you want a clear 422 response — not a 500 from deep inside your database layer. Pydantic v2 is significantly faster than v1 and has better error messages out of the box.</p></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-3-request-validation-and-error-handling-with-pydantic-v2-what-learners-must-understand-in-depth" class="content-section reveal-left">
+    <span class="section-label">1.10.3 &middot; What Learners Must Understand in Depth</span>
+    <h3 class="slide-heading">What Learners Must Understand in Depth</h3>
+    <div class="section-body"><p>Validation has three layers:</p>
+<ul class="linear-list"><li>API validation: Pydantic rejects malformed external input before it reaches business logic.</li><li>Domain validation: services enforce business rules like allowed status transitions and ownership.</li><li>Database validation: constraints protect the data even if a future script or admin tool bypasses the API.</li></ul>
+<p>AI-generated backends often blur these layers. A common failure is putting all validation in Pydantic and assuming the database no longer needs constraints. Another common failure is using database exceptions as user-facing API responses. The production pattern is layered: reject bad requests early, raise domain-specific exceptions in services, and keep database errors from leaking implementation details.</p>
+<p>For this workshop, learners should distinguish:</p>
+<ul class="linear-list"><li>Request schema: what clients may send, usually strict and minimal.</li><li>Update schema: what clients may patch or replace, often optional fields with at least-one-field validation.</li><li>Response schema: what the API promises to return, never every database column.</li><li>Internal model: how data is stored, including internal fields that may never leave the backend.</li><li>Error schema: the stable shape clients can handle for failures.</li></ul></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-3-request-validation-and-error-handling-with-pydantic-v2-how-to-do-it" class="content-section reveal-left">
+    <span class="section-label">1.10.4 &middot; How to Do It</span>
+    <h3 class="slide-heading">How to Do It</h3>
+    <div class="section-body"><p><strong>Generating Pydantic schemas with Claude Code:</strong></p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>Create Pydantic v2 schemas for the feedback CRUD API. Requirements:
+- Separate schemas: FeedbackCreate (for POST), FeedbackUpdate (for PUT, all fields optional), 
+  FeedbackResponse (for GET responses), FeedbackListResponse (paginated list)
+- Use Field() with description for every field (this feeds into OpenAPI docs)
+- Validate: email format, priority 1-5, title max 500 chars, description max 5000 chars
+- FeedbackResponse should include id, created_at, updated_at
+- Use model_config for camelCase JSON aliases
+- Keep schemas in app/schemas/feedback.py, separate from SQLAlchemy models in app/models/feedback.py</code></pre></div>
+<p>The critical principle: <strong>Pydantic schemas and SQLAlchemy models are separate things.</strong> Beginners (and sometimes AI) collapse them into one class, creating tight coupling between your API contract and database schema. When you add a column that should not be exposed in the API (like <code>is_deleted</code>), the separation saves you.</p>
+<p>The generated schemas should look something like:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">python</span><button class="copy-btn" type="button">Copy</button></div><pre><code>from pydantic import BaseModel, Field, EmailStr, ConfigDict
+from uuid import UUID
+from datetime import datetime
+from enum import Enum
+
+class FeedbackCategory(str, Enum):
+    BUG = &quot;bug&quot;
+    FEATURE = &quot;feature&quot;
+    IMPROVEMENT = &quot;improvement&quot;
+
+class FeedbackCreate(BaseModel):
+    model_config = ConfigDict(
+        populate_by_name=True,
+        alias_generator=lambda s: &quot;&quot;.join(
+            w.capitalize() if i else w for i, w in enumerate(s.split(&quot;_&quot;))
+        ),
+    )
+
+    user_email: EmailStr = Field(
+        ..., description=&quot;Email of the user submitting feedback&quot;
+    )
+    category: FeedbackCategory = Field(
+        ..., description=&quot;Type of feedback&quot;
+    )
+    title: str = Field(
+        ..., max_length=500, description=&quot;Short summary of the feedback&quot;
+    )
+    description: str = Field(
+        ..., max_length=5000, description=&quot;Detailed feedback description&quot;
+    )
+    priority: int = Field(
+        default=3, ge=1, le=5, description=&quot;Priority from 1 (critical) to 5 (nice-to-have)&quot;
+    )</code></pre></div>
+<p><strong>Update schema review prompt:</strong></p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>Review FeedbackUpdate for partial-update correctness.
+It should allow clients to update only one field, reject an empty request body,
+preserve validation constraints for any provided field, and not allow id,
+created_at, updated_at, or user_email ownership changes unless explicitly allowed.</code></pre></div>
+<p><strong>Error response schema learners should aim for:</strong></p>
+<div class="code-container"><div class="code-header"><span class="code-title">json</span><button class="copy-btn" type="button">Copy</button></div><pre><code>{
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;FEEDBACK_NOT_FOUND&quot;,
+    &quot;message&quot;: &quot;Feedback item was not found&quot;,
+    &quot;details&quot;: {
+      &quot;feedback_id&quot;: &quot;2df2fd66-8d8b-4f05-8c44-2e1d4c4429c3&quot;
+    },
+    &quot;request_id&quot;: &quot;req_01HX...&quot;
+  }
+}</code></pre></div>
+<p>This structure is easier for frontends, QA automation, and AI agents to consume than a bare <code>{&quot;detail&quot;: &quot;Not found&quot;}</code> string.</p>
+<p><strong>Structured error responses:</strong></p>
+<p>Ask Claude Code to create a global error handler:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>Create a custom exception hierarchy and global exception handler for FastAPI:
+- Base AppException with status_code, error_code, and detail
+- NotFoundException (404), ValidationException (422), ConflictException (409)
+- Global handler that catches AppException and returns consistent JSON:
+  {&quot;error&quot;: {&quot;code&quot;: &quot;FEEDBACK_NOT_FOUND&quot;, &quot;message&quot;: &quot;...&quot;, &quot;details&quot;: {}, &quot;request_id&quot;: &quot;...&quot;}}
+- Also catch generic exceptions and return 500 without exposing internals
+- Add a request_id middleware and include request_id in every error response</code></pre></div></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-3-request-validation-and-error-handling-with-pydantic-v2-mini-exercise-error-contract-design-10-minutes" class="content-section reveal-left">
+    <span class="section-label">1.10.5 &middot; Mini Exercise: Error Contract Design (10 minutes)</span>
+    <div class="activity-card">
+      <div class="activity-title">Mini Exercise: Error Contract Design (10 minutes)</div>
+      <div class="section-body"><p>Ask learners to define error codes before implementation:</p>
+<div class="table-wrap"><table><thead><tr><th>Scenario</th><th>Status</th><th>Error code</th></tr></thead><tbody><tr><td>Feedback item does not exist</td><td>404</td><td><code>FEEDBACK_NOT_FOUND</code></td></tr><tr><td>Invalid category</td><td>422</td><td><code>VALIDATION_ERROR</code></td></tr><tr><td>User edits someone else&#39;s feedback</td><td>403</td><td><code>FORBIDDEN_FEEDBACK_OWNER</code></td></tr><tr><td>Duplicate feedback title for same user</td><td>409</td><td><code>FEEDBACK_CONFLICT</code></td></tr><tr><td>Database unavailable</td><td>503</td><td><code>SERVICE_UNAVAILABLE</code></td></tr></tbody></table></div>
+<p>Then ask Claude Code:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>Implement these error codes as typed exceptions and global FastAPI handlers.
+Add tests that assert the exact response shape and status code for each error.
+Do not expose raw exception messages or stack traces.</code></pre></div></div>
+      
+      
+    </div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-3-request-validation-and-error-handling-with-pydantic-v2-what-can-go-wrong" class="content-section reveal-left">
+    <span class="section-label">1.10.6 &middot; What Can Go Wrong</span>
+    <h3 class="slide-heading">What Can Go Wrong</h3>
+    <div class="section-body"><p><strong>Pydantic v1 syntax.</strong> If the AI generates <code>class Config:</code> inside the model instead of <code>model_config = ConfigDict(...)</code>, you are looking at Pydantic v1 syntax. Specify &quot;Pydantic v2&quot; explicitly in your prompts and in CLAUDE.md.</p>
+<p><strong>Missing <code>EmailStr</code> import.</strong> <code>EmailStr</code> requires the <code>email-validator</code> package. If the AI uses it but does not add the dependency, you get an import error at runtime. Check your requirements.</p>
+<p><strong>Over-validation on updates.</strong> All fields should be optional in <code>FeedbackUpdate</code>. If the AI makes fields required, a client updating only <code>status</code> must send every other field too. Common AI-generated bug.</p>
+<p><strong>Enum duplication.</strong> You may end up with enums defined independently in both SQLAlchemy models and Pydantic schemas with slightly different values. Put shared enums in <code>app/core/enums.py</code> and import from there.</p>
+<p><strong>Inconsistent error shapes.</strong> One route returns <code>{&quot;detail&quot;: &quot;not found&quot;}</code>, another returns <code>{&quot;message&quot;: &quot;not found&quot;}</code>, and validation returns FastAPI&#39;s default list. Decide whether to wrap all errors or document where FastAPI defaults remain.</p>
+<p><strong>Leaking internals.</strong> Generic exception handlers must log the real exception server-side but return a generic client message. AI sometimes returns <code>str(exc)</code>, which can expose table names, SQL, secrets, or file paths.</p></div>
+    
+  </section>
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-4-openapi-swagger-spec-generation" class="content-section reveal-left">
+    <span class="section-label">1.11 &middot; 4. OpenAPI / Swagger Spec Generation</span>
+    <h2 class="slide-heading">4. OpenAPI / Swagger Spec Generation</h2>
+    <div class="section-body"></div>
+    <section id="day-7-ai-assisted-backend-api-development-4-openapi-swagger-spec-generation-what-it-is" class="content-section reveal-left">
+    <span class="section-label">1.11.1 &middot; What It Is</span>
+    <h3 class="slide-heading">What It Is</h3>
+    <div class="section-body"><p>FastAPI automatically generates OpenAPI 3.1 specifications from your route definitions, type annotations, and Pydantic models. This means every endpoint, request body, response schema, query parameter, and error response is documented in a machine-readable format — and FastAPI serves interactive documentation at <code>/docs</code> (Swagger UI) and <code>/redoc</code> (ReDoc) with zero additional configuration.</p></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-4-openapi-swagger-spec-generation-why-it-matters" class="content-section reveal-left">
+    <span class="section-label">1.11.2 &middot; Why It Matters</span>
+    <h3 class="slide-heading">Why It Matters</h3>
+    <div class="section-body"><p>The OpenAPI spec is not just documentation. It is a contract between your backend and every consumer: frontend team, mobile developers, QA automation, and increasingly, AI agents. A notable 2025-2026 trend is converting OpenAPI specs into MCP servers, allowing AI agents to discover and call your APIs programmatically. Accurate specs make downstream tools work. Vague specs break everything built on top of them.</p></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-4-openapi-swagger-spec-generation-what-learners-must-understand-in-depth" class="content-section reveal-left">
+    <span class="section-label">1.11.3 &middot; What Learners Must Understand in Depth</span>
+    <h3 class="slide-heading">What Learners Must Understand in Depth</h3>
+    <div class="section-body"><p>FastAPI generates OpenAPI from code, but only from the information you provide. The framework can infer paths and basic schemas, yet it cannot invent useful examples, ownership rules, domain-specific error codes, or deprecation notes. A generated spec is accurate only when routes, Pydantic models, response models, status codes, and documented error responses are accurate.</p>
+<p>In 2026, OpenAPI is used for more than Swagger UI:</p>
+<ul class="linear-list"><li>Frontend SDK generation: typed clients reduce hand-written API mistakes.</li><li>Postman collections: testers can import the live contract.</li><li>Contract tests: CI can detect breaking route or schema changes.</li><li>AI tool contracts: agents can inspect endpoints, parameters, auth requirements, and response schemas.</li><li>MCP-style integrations: OpenAPI can become the bridge between internal APIs and AI workflows.</li></ul>
+<p>The teaching point: OpenAPI quality is backend quality made visible.</p></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-4-openapi-swagger-spec-generation-how-to-do-it" class="content-section reveal-left">
+    <span class="section-label">1.11.4 &middot; How to Do It</span>
+    <h3 class="slide-heading">How to Do It</h3>
+    <div class="section-body"><p><strong>Ensuring your routes produce good specs:</strong></p>
+<p>The quality of your auto-generated OpenAPI spec depends entirely on how well you annotate your routes. Ask Claude Code to generate routes with full annotations:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>Create the CRUD route handlers for feedback in app/routes/feedback.py. Requirements:
+- Use APIRouter with prefix=&quot;/api/v1/feedback&quot; and tags=[&quot;feedback&quot;]
+- Every endpoint needs: summary, description, response_model, status_code
+- GET list endpoint: support query params for status, category, priority, page, page_size
+- Return 201 for POST, 200 for GET/PUT, 204 for DELETE
+- Document error responses with responses={404: {&quot;model&quot;: ErrorResponse}}
+- Use Depends() for database session injection</code></pre></div>
+<p>A well-annotated route looks like:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">python</span><button class="copy-btn" type="button">Copy</button></div><pre><code>@router.post(
+    &quot;/&quot;,
+    response_model=FeedbackResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary=&quot;Create feedback&quot;,
+    description=&quot;Submit a new feedback item. Requires user email and category.&quot;,
+    responses={
+        422: {&quot;model&quot;: ErrorResponse, &quot;description&quot;: &quot;Validation error&quot;},
+    },
+)
+async def create_feedback(
+    feedback: FeedbackCreate,
+    db: AsyncSession = Depends(get_db),
+) -&gt; FeedbackResponse:
+    ...</code></pre></div>
+<p><strong>Spec quality prompt:</strong></p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>Review the generated OpenAPI spec as a contract.
+Find endpoints missing response_model, explicit status_code, request examples,
+error response documentation, tags, auth requirements, or useful descriptions.
+Fix the route/schema annotations so /openapi.json improves without hand-editing
+the JSON output directly.</code></pre></div>
+<p><strong>Exporting and using the spec:</strong></p>
+<p>Once your app runs, the spec is available at <code>http://localhost:8000/openapi.json</code>. You can use it to:</p>
+<ol class="linear-list"><li>Generate TypeScript client SDKs so the frontend team never hand-writes API calls:</li></ol>
+<p>``<code>bash npx @hey-api/openapi-ts -i http://localhost:8000/openapi.json -o ./src/api </code>``</p>
+<ol class="linear-list"><li>Import into Postman or HTTPie for manual testing:</li></ol>
+<p>``<code>bash # Fetch the spec http GET localhost:8000/openapi.json &gt; openapi.json </code>``</p>
+<ol class="linear-list"><li>Set up CI validation to catch spec drift. A GitHub Action can auto-generate <code>openapi.yaml</code> on every push and fail the build if the spec changed but the version did not increment.</li></ol>
+<p><strong>Enhancing the spec with Claude Code:</strong></p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>Review our current OpenAPI spec at /openapi.json. Add:
+- Detailed field descriptions for every schema property
+- Example values for request bodies
+- Proper error response documentation for 400, 404, 422, 500
+- API version info and contact details in the spec metadata</code></pre></div></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-4-openapi-swagger-spec-generation-mini-exercise-postman-or-httpie-contract-check-10-minutes" class="content-section reveal-left">
+    <span class="section-label">1.11.5 &middot; Mini Exercise: Postman or HTTPie Contract Check (10 minutes)</span>
+    <div class="activity-card">
+      <div class="activity-title">Mini Exercise: Postman or HTTPie Contract Check (10 minutes)</div>
+      <div class="section-body"><p>Run the app and verify:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">bash</span><button class="copy-btn" type="button">Copy</button></div><pre><code>http GET localhost:8000/openapi.json
+http GET localhost:8000/health
+http POST localhost:8000/api/v1/feedback \
+  userEmail=&quot;intern@example.com&quot; \
+  category=&quot;bug&quot; \
+  title=&quot;Mobile login button does not respond&quot; \
+  description=&quot;On iOS Safari the login button does not respond to taps.&quot; \
+  priority:=1</code></pre></div>
+<p>Then ask:</p></div>
+      
+      <ul class="linear-list"><li>[ ] Does <code>/docs</code> show every endpoint under the right tag?</li><li>[ ] Does the POST body show useful examples?</li><li>[ ] Does the PUT/PATCH schema allow partial updates?</li><li>[ ] Do error responses appear in the docs?</li><li>[ ] Does the OpenAPI spec hide internal fields?</li></ul>
+    </div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-4-openapi-swagger-spec-generation-what-can-go-wrong" class="content-section reveal-left">
+    <span class="section-label">1.11.6 &middot; What Can Go Wrong</span>
+    <h3 class="slide-heading">What Can Go Wrong</h3>
+    <div class="section-body"><p><strong>Missing response models.</strong> If you forget <code>response_model=FeedbackResponse</code> on a route, FastAPI still works — but the OpenAPI spec will show the response as &quot;any&quot; or just <code>200 OK</code> with no schema. This makes the spec useless for client generation.</p>
+<p><strong>Internal fields leaking into the spec.</strong> If your <code>FeedbackResponse</code> Pydantic model accidentally includes a <code>password_hash</code> or <code>internal_notes</code> field from the SQLAlchemy model, it will appear in the public OpenAPI spec. This is why separating Pydantic schemas from ORM models matters.</p>
+<p><strong>Stale specs.</strong> If you generate a static <code>openapi.yaml</code> file and then change your routes, the file becomes stale. Always generate from the live app, or set up CI to regenerate on every merge.</p></div>
+    
+  </section>
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-4a-api-versioning-strategies" class="content-section reveal-left">
+    <span class="section-label">1.12 &middot; 4a. API Versioning Strategies</span>
+    <h2 class="slide-heading">4a. API Versioning Strategies</h2>
+    <div class="section-body"></div>
+    <section id="day-7-ai-assisted-backend-api-development-4a-api-versioning-strategies-what-it-is" class="content-section reveal-left">
+    <span class="section-label">1.12.1 &middot; What It Is</span>
+    <h3 class="slide-heading">What It Is</h3>
+    <div class="section-body"><p>API versioning is how you evolve a backend API without breaking existing clients. In 2026, versioning is not optional for any API used by more than one consumer — including your own frontend and any AI agents that have cached your OpenAPI spec.</p></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-4a-api-versioning-strategies-why-it-matters" class="content-section reveal-left">
+    <span class="section-label">1.12.2 &middot; Why It Matters</span>
+    <h3 class="slide-heading">Why It Matters</h3>
+    <div class="section-body"><p>AI-generated backends rarely include versioning by default. When you need to change a response shape, rename a field, or remove an endpoint, you need a strategy that lets old clients keep working while new clients get the improved version.</p></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-4a-api-versioning-strategies-common-patterns" class="content-section reveal-left">
+    <span class="section-label">1.12.3 &middot; Common Patterns</span>
+    <h3 class="slide-heading">Common Patterns</h3>
+    <div class="section-body"><p><strong>URL path versioning</strong> (most common for REST APIs):</p>
+<div class="code-container"><div class="code-header"><span class="code-title">python</span><button class="copy-btn" type="button">Copy</button></div><pre><code># Prefix all routes with the API version
+app.include_router(feedback_router, prefix=&quot;/api/v1&quot;)
+app.include_router(feedback_v2_router, prefix=&quot;/api/v2&quot;)</code></pre></div>
+<p>This is the pattern used in the lab. It is visible, easy to test, and works cleanly with OpenAPI (each version gets its own spec).</p>
+<p><strong>Header versioning</strong> (preferred by some teams):</p>
+<div class="code-container"><div class="code-header"><span class="code-title">python</span><button class="copy-btn" type="button">Copy</button></div><pre><code># Client sends: API-Version: 2
+@router.get(&quot;/feedback&quot;)
+async def list_feedback(
+    api_version: str = Header(default=&quot;1&quot;, alias=&quot;API-Version&quot;)
+):
+    ...</code></pre></div>
+<p>Less visible but avoids URL changes. Harder to test in a browser.</p>
+<p><strong>Deprecation discipline:</strong> When you add <code>/api/v2</code>, add a deprecation warning to <code>/api/v1</code> routes. FastAPI supports this:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">python</span><button class="copy-btn" type="button">Copy</button></div><pre><code>@router.get(
+    &quot;/feedback&quot;,
+    deprecated=True,
+    description=&quot;Deprecated: use /api/v2/feedback instead. Removed after 2026-12-01.&quot;
+)</code></pre></div></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-4a-api-versioning-strategies-prompting-for-versioned-apis" class="content-section reveal-left">
+    <span class="section-label">1.12.4 &middot; Prompting for Versioned APIs</span>
+    <h3 class="slide-heading">Prompting for Versioned APIs</h3>
+    <div class="section-body"><div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>Add API versioning to this FastAPI project.
+Use URL path versioning: /api/v1/ for current routes.
+Create a router structure that makes adding /api/v2/ straightforward without duplicating middleware.
+Mark all v1 routes as deprecated=True in OpenAPI with a sunset date of 2026-12-01.</code></pre></div></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-4a-api-versioning-strategies-mini-exercise-versioning-check-5-minutes" class="content-section reveal-left">
+    <span class="section-label">1.12.5 &middot; Mini Exercise: Versioning Check (5 minutes)</span>
+    <div class="activity-card">
+      <div class="activity-title">Mini Exercise: Versioning Check (5 minutes)</div>
+      <div class="section-body"><p>Ask learners:</p></div>
+      
+      <ul class="linear-list"><li>[ ] If you rename <code>user_email</code> to <code>email</code> in the response schema, which clients break?</li><li>[ ] How would you serve both field names simultaneously during a migration period?</li><li>[ ] What does the <code>/docs</code> deprecation badge look like on a deprecated route?</li></ul>
+    </div>
+    
+  </section>
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-5-authentication-and-authorization-patterns" class="content-section reveal-left">
+    <span class="section-label">1.13 &middot; 5. Authentication and Authorization Patterns</span>
+    <h2 class="slide-heading">5. Authentication and Authorization Patterns</h2>
+    <div class="section-body"></div>
+    <section id="day-7-ai-assisted-backend-api-development-5-authentication-and-authorization-patterns-what-it-is" class="content-section reveal-left">
+    <span class="section-label">1.13.1 &middot; What It Is</span>
+    <h3 class="slide-heading">What It Is</h3>
+    <div class="section-body"><p>Authentication (authn) verifies who a user is. Authorization (authz) determines what they can do. For backend APIs, this means JWT tokens for authentication and role/permission checks for authorization. AI tools can scaffold the boilerplate, but the security logic must be reviewed by a human.</p></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-5-authentication-and-authorization-patterns-why-it-matters" class="content-section reveal-left">
+    <span class="section-label">1.13.2 &middot; Why It Matters</span>
+    <h3 class="slide-heading">Why It Matters</h3>
+    <div class="section-body"><p>Auth is the one area where AI-generated code is most dangerous to accept without review. A subtle bug in token validation creates a security vulnerability that compiles, passes tests, and looks correct on casual review. You must understand every line of auth code.</p></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-5-authentication-and-authorization-patterns-what-learners-must-understand-in-depth" class="content-section reveal-left">
+    <span class="section-label">1.13.3 &middot; What Learners Must Understand in Depth</span>
+    <h3 class="slide-heading">What Learners Must Understand in Depth</h3>
+    <div class="section-body"><p>Authentication and authorization are separate:</p>
+<ul class="linear-list"><li>Authentication: &quot;Who is making this request?&quot; Usually proven by a bearer token, session cookie, API key, or OAuth provider.</li><li>Authorization: &quot;What is this identity allowed to do?&quot; Usually enforced through ownership checks, roles, scopes, permissions, or policies.</li></ul>
+<p>For today&#39;s lab, JWT scaffolding is enough. For production, teams often delegate login and identity to an IdP such as Auth0, Okta, Cognito, Clerk, WorkOS, or an internal platform. Even then, your FastAPI service still owns authorization checks: a valid token does not automatically mean the user can update a specific feedback item.</p>
+<p>Teach the request path:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>HTTP request
+  -&gt; Authorization: Bearer &lt;token&gt;
+  -&gt; auth dependency validates signature, expiry, issuer, audience
+  -&gt; dependency returns current user / principal
+  -&gt; route passes principal to service
+  -&gt; service checks ownership or permission
+  -&gt; service performs write</code></pre></div>
+<p>AI can scaffold this path, but learners must inspect every trust boundary.</p></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-5-authentication-and-authorization-patterns-how-to-do-it" class="content-section reveal-left">
+    <span class="section-label">1.13.4 &middot; How to Do It</span>
+    <h3 class="slide-heading">How to Do It</h3>
+    <div class="section-body"><p><strong>Scaffolding JWT auth with Claude Code:</strong></p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>Add JWT authentication to this FastAPI project:
+- Use python-jose for JWT encoding/decoding
+- Token payload: sub (user email), exp (expiry), iat (issued at)
+- Access token expiry: 30 minutes
+- Create a Depends() callable that extracts and validates the JWT from the Authorization header
+- Create a /auth/token endpoint that accepts email/password and returns a JWT
+- Add the auth dependency to all feedback endpoints except GET (public read)
+- Store the JWT secret in environment variables via pydantic-settings, never hardcode it
+
+Do NOT implement password hashing or user registration — we will add those later.
+Focus on the JWT flow only.</code></pre></div>
+<p>Notice the prompt explicitly says &quot;Do NOT implement password hashing.&quot; When you ask for &quot;authentication,&quot; AI tools tend to generate a complete user management system — registration, login, password reset, email verification. You want the JWT plumbing only. Constrain the scope.</p>
+<p><strong>OAuth scaffolding prompt for discussion, not the main lab:</strong></p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>Scaffold the FastAPI side of an OAuth authorization-code flow for a web app.
+Do not implement a custom identity provider.
+Assume an external provider issues tokens.
+Include routes for login redirect and callback, validate state to prevent CSRF,
+exchange authorization code for tokens, store only a secure session reference,
+and document which parts are placeholders requiring real provider settings.</code></pre></div>
+<p>Use this prompt to show why OAuth is more complex than JWT bearer verification. The main takeaway is not to build OAuth from memory; it is to constrain AI to the exact provider flow and review the state, redirect URI, issuer, audience, and token validation logic.</p>
+<p><strong>Review checklist for AI-generated auth code:</strong></p>
+<p>After Claude Code generates the auth module, check these items manually:</p>
+<ol class="linear-list"><li>Token secret is from environment variables, not hardcoded in the source</li><li>Expiry is validated — the dependency raises 401 if the token is expired</li><li>Algorithm is explicit — <code>algorithms=[&quot;HS256&quot;]</code> is passed to the decode function, not inferred</li><li>Error handling is specific — expired tokens return &quot;Token expired,&quot; invalid tokens return &quot;Invalid token,&quot; missing headers return &quot;Not authenticated.&quot; Not a generic 403 for everything</li><li>The dependency does not trust the token payload blindly — if the token says <code>role: admin</code>, the dependency should verify that claim against your database, not just pass it through</li><li>Issuer and audience are validated when tokens come from an external identity provider</li><li>Password hashing uses a modern password hashing library if local passwords are in scope; never store plaintext or reversible encrypted passwords</li><li>Authorization checks happen in the service layer, not only in frontend UI or route decorators</li><li>Tests cover forbidden access, not just successful login</li></ol></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-5-authentication-and-authorization-patterns-mini-exercise-adversarial-auth-review-15-minutes" class="content-section reveal-left">
+    <span class="section-label">1.13.5 &middot; Mini Exercise: Adversarial Auth Review (15 minutes)</span>
+    <div class="activity-card">
+      <div class="activity-title">Mini Exercise: Adversarial Auth Review (15 minutes)</div>
+      <div class="section-body"><p>Ask Claude Code or Cursor:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>Review app/core/security.py and all route dependencies as an attacker.
+Look for hardcoded secrets, missing expiry checks, missing issuer/audience checks,
+trusting role claims without database verification, endpoints missing auth,
+ownership bypasses, and tests that only cover happy paths.
+Return findings by severity before proposing fixes.</code></pre></div>
+<p>Learners should verify at least:</p></div>
+      
+      <ul class="linear-list"><li>[ ] Can user A update user B&#39;s feedback?</li><li>[ ] Does an expired token fail?</li><li>[ ] Does a token signed with the wrong secret fail?</li><li>[ ] Do GET routes match the intended public/private policy?</li><li>[ ] Are auth errors 401 and authorization errors 403?</li></ul>
+    </div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-5-authentication-and-authorization-patterns-what-can-go-wrong" class="content-section reveal-left">
+    <span class="section-label">1.13.6 &middot; What Can Go Wrong</span>
+    <h3 class="slide-heading">What Can Go Wrong</h3>
+    <div class="section-body"><p><strong>Hardcoded secrets.</strong> The most common AI-generated auth mistake. If you see <code>SECRET_KEY = &quot;your-secret-key-here&quot;</code> anywhere other than a <code>.env.example</code> file, fix it immediately.</p>
+<p><strong>Weak algorithm defaults.</strong> Some AI-generated code uses <code>&quot;none&quot;</code> or <code>&quot;HS384&quot;</code> as the algorithm. <code>HS256</code> is standard for symmetric JWTs. <code>RS256</code> is better for production (asymmetric, allows public key verification without sharing the signing key). Never accept <code>&quot;none&quot;</code>.</p>
+<p><strong>Missing token refresh.</strong> The AI will scaffold access token creation but often skip refresh tokens entirely. For a training exercise this is fine, but flag it as something you would add before production.</p>
+<p><strong>OAuth complexity explosion.</strong> If you mention &quot;OAuth&quot; in a prompt, AI tools will generate hundreds of lines covering authorization code flow, PKCE, token exchange, and callback handling. Start with simple JWT. Add OAuth only after the basic flow works.</p>
+<p><strong>Confusing authn and authz.</strong> AI may validate that a token is real but forget to check that the authenticated user owns the resource being changed.</p>
+<p><strong>Frontend-only permissions.</strong> A generated frontend may hide buttons for unauthorized users, but the backend must still enforce permissions.</p></div>
+    
+  </section>
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-6-sql-query-generation-and-optimization" class="content-section reveal-left">
+    <span class="section-label">1.14 &middot; 6. SQL Query Generation and Optimization</span>
+    <h2 class="slide-heading">6. SQL Query Generation and Optimization</h2>
+    <div class="section-body"></div>
+    <section id="day-7-ai-assisted-backend-api-development-6-sql-query-generation-and-optimization-what-it-is" class="content-section reveal-left">
+    <span class="section-label">1.14.1 &middot; What It Is</span>
+    <h3 class="slide-heading">What It Is</h3>
+    <div class="section-body"><p>Using AI to write and optimize SQLAlchemy ORM queries for your product&#39;s data access patterns. This is product SQL — &quot;Get all open feedback items for this user, sorted by priority, paginated&quot; — not analytics SQL with complex multi-table joins.</p></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-6-sql-query-generation-and-optimization-why-it-matters" class="content-section reveal-left">
+    <span class="section-label">1.14.2 &middot; Why It Matters</span>
+    <h3 class="slide-heading">Why It Matters</h3>
+    <div class="section-body"><p>Most product engineers write correct-but-slow queries — full table scans when an index exists, loading 50 columns when the endpoint needs 3, or N+1 queries in a loop. AI tools are good at spotting these patterns if you tell them your indexes and data volume.</p></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-6-sql-query-generation-and-optimization-what-learners-must-understand-in-depth" class="content-section reveal-left">
+    <span class="section-label">1.14.3 &middot; What Learners Must Understand in Depth</span>
+    <h3 class="slide-heading">What Learners Must Understand in Depth</h3>
+    <div class="section-body"><p>This module is about product queries, not analytics. Product queries serve user-facing flows and must be predictable under load:</p>
+<ul class="linear-list"><li>list feedback with filters and pagination</li><li>fetch one feedback item by ID</li><li>update one item with an ownership check</li><li>delete or soft-delete one item</li><li>count open items for a dashboard badge</li><li>list one user&#39;s feedback history</li></ul>
+<p>The performance questions are practical:</p>
+<ul class="linear-list"><li>Does the query use the index we designed?</li><li>Does pagination use <code>LIMIT</code> and <code>OFFSET</code> or cursor-based pagination intentionally?</li><li>Does count happen in the database, not Python memory?</li><li>Does the endpoint fetch only the data it returns?</li><li>Are related rows loaded in batches rather than one query per item?</li><li>Are writes wrapped in a transaction when multiple rows change together?</li></ul>
+<p>AI can write SQLAlchemy syntax quickly. It cannot know real cardinality, skew, or query-plan behavior without telemetry. For anything performance-sensitive, use database tools such as <code>EXPLAIN ANALYZE</code> against realistic data.</p></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-6-sql-query-generation-and-optimization-the-n-1-query-problem" class="content-section reveal-left">
+    <span class="section-label">1.14.4 &middot; The N+1 Query Problem</span>
+    <h3 class="slide-heading">The N+1 Query Problem</h3>
+    <div class="section-body"><p>This is the most common query failure in AI-generated backends. It happens when the code issues one query to fetch a list, then one additional query per item to fetch related data.</p>
+<div class="code-container"><div class="code-header"><span class="code-title">python</span><button class="copy-btn" type="button">Copy</button></div><pre><code># Bad: N+1 — fetches all feedback, then one query per item for its category details
+feedbacks = await db.execute(select(Feedback))
+for fb in feedbacks.scalars().all():
+    category = await db.execute(select(Category).where(Category.id == fb.category_id))
+    # one query per feedback item</code></pre></div>
+<div class="code-container"><div class="code-header"><span class="code-title">python</span><button class="copy-btn" type="button">Copy</button></div><pre><code># Good: single query with joinedload or selectinload
+from sqlalchemy.orm import selectinload
+
+result = await db.execute(
+    select(Feedback).options(selectinload(Feedback.category))
+)
+feedbacks = result.scalars().all()</code></pre></div>
+<p>AI generates N+1 patterns constantly when models have relationships. After any scaffold that involves relationships, ask:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>Review every query in app/services/ for N+1 patterns.
+For any query that loads related objects in a loop, rewrite it using selectinload or joinedload.
+Explain why each change is needed.</code></pre></div></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-6-sql-query-generation-and-optimization-how-to-do-it" class="content-section reveal-left">
+    <span class="section-label">1.14.5 &middot; How to Do It</span>
+    <h3 class="slide-heading">How to Do It</h3>
+    <div class="section-body"><p><strong>Generating queries with Claude Code:</strong></p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>Write SQLAlchemy 2.0 async queries for these feedback access patterns:
+1. Get paginated feedback list, filtered by optional status, category, and priority
+2. Get a single feedback item by ID (raise 404 if not found)
+3. Get feedback count grouped by status (for a dashboard widget)
+4. Get all feedback from a specific user, most recent first
+
+Use select() style (not legacy query()), async sessions, and proper type hints.
+Put these in app/services/feedback.py as a FeedbackService class.</code></pre></div>
+<p><strong>Reviewing generated queries for performance:</strong></p>
+<p>After generation, ask Claude Code to review its own work:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>Review the queries in app/services/feedback.py for performance issues:
+- Are we using the indexes defined in our model? (status+priority composite, category+created_at composite, user_email)
+- Are there any N+1 query risks?
+- Should any of these use .options(load_only(...)) to reduce column fetches?
+- For the paginated list: are we counting total items efficiently?
+
+Explain each finding and fix any issues.</code></pre></div>
+<p>This &quot;generate then review&quot; pattern is core to AI pair-programming. The first pass produces functional code; the review pass catches performance issues.</p>
+<p><strong>A common pitfall — the pagination count query:</strong></p>
+<p>AI-generated pagination often looks like this:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">python</span><button class="copy-btn" type="button">Copy</button></div><pre><code># Bad: fetches all rows just to count them
+items = await db.execute(select(Feedback).filter(...))
+total = len(items.scalars().all())  # loads entire result set into memory</code></pre></div>
+<p>The correct approach is a separate count query:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">python</span><button class="copy-btn" type="button">Copy</button></div><pre><code># Good: database-level count
+count_query = select(func.count()).select_from(Feedback).filter(...)
+total = (await db.execute(count_query)).scalar()</code></pre></div>
+<p>Always check how the AI handles pagination. This is one of the most frequent performance bugs in AI-generated backend code.</p>
+<p><strong>Product query prompt with constraints:</strong></p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>Implement feedback list queries for a product API, not analytics.
+Requirements:
+- optional filters: status, category, priority, user_email
+- sort by created_at desc by default
+- page and page_size with max page_size 100
+- separate database count query
+- no loading rows just to count
+- no raw SQL unless there is a clear reason
+- use SQLAlchemy 2.0 select() style with AsyncSession
+- explain which indexes each query can use</code></pre></div>
+<p><strong>Optimization review prompt:</strong></p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>Review app/services/feedback.py for product-query performance.
+Check for full table scans, N+1 queries, Python-side filtering/counting,
+missing LIMIT/OFFSET, over-fetching columns, transaction mistakes,
+sync database calls in async code, and indexes that do not match filters.
+Suggest fixes with reasoning.</code></pre></div></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-6-sql-query-generation-and-optimization-mini-exercise-find-the-slow-query-15-minutes" class="content-section reveal-left">
+    <span class="section-label">1.14.6 &middot; Mini Exercise: Find the Slow Query (15 minutes)</span>
+    <div class="activity-card">
+      <div class="activity-title">Mini Exercise: Find the Slow Query (15 minutes)</div>
+      <div class="section-body"><p>Show learners this bug:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">python</span><button class="copy-btn" type="button">Copy</button></div><pre><code>async def list_feedback(db: AsyncSession, status: str | None, page: int, page_size: int):
+    result = await db.execute(select(Feedback))
+    items = result.scalars().all()
+    if status:
+        items = [item for item in items if item.status == status]
+    total = len(items)
+    start = (page - 1) * page_size
+    return items[start:start + page_size], total</code></pre></div>
+<p>Ask AI:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>Explain why this query is unsafe for a product API with 100K rows.
+Rewrite it so filtering, sorting, counting, and pagination happen in the database.</code></pre></div>
+<p>Expected corrections:</p></div>
+      
+      <ul class="linear-list"><li>[ ] Add <code>WHERE</code> clauses to the SQL query</li><li>[ ] Add <code>ORDER BY</code></li><li>[ ] Use <code>LIMIT</code> and <code>OFFSET</code></li><li>[ ] Use a separate <code>select(func.count())</code></li><li>[ ] Return a stable response model with <code>items</code>, <code>total</code>, <code>page</code>, and <code>page_size</code></li></ul>
+    </div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-6-sql-query-generation-and-optimization-what-can-go-wrong" class="content-section reveal-left">
+    <span class="section-label">1.14.7 &middot; What Can Go Wrong</span>
+    <h3 class="slide-heading">What Can Go Wrong</h3>
+    <div class="section-body"><p><strong>Synchronous queries in async routes.</strong> If the AI mixes <code>Session</code> (sync) with <code>AsyncSession</code> (async), you will get cryptic errors about event loops. Every database call must use <code>await</code> with <code>AsyncSession</code>. This is a hard rule — check every query.</p>
+<p><strong>Eager loading everything.</strong> If your model has relationships, the AI might add <code>joinedload()</code> on every query. For a simple CRUD service with no relationships, this is unnecessary complexity.</p>
+<p><strong>Raw SQL for simple operations.</strong> Sometimes Claude Code generates raw SQL strings where a simple ORM call would suffice. Prefer ORM queries — they are parameterized by default (preventing SQL injection) and type-checked by your IDE.</p></div>
+    
+  </section>
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-6a-rate-limiting-and-throttling" class="content-section reveal-left">
+    <span class="section-label">1.15 &middot; 6a. Rate Limiting and Throttling</span>
+    <h2 class="slide-heading">6a. Rate Limiting and Throttling</h2>
+    <div class="section-body"></div>
+    <section id="day-7-ai-assisted-backend-api-development-6a-rate-limiting-and-throttling-what-it-is" class="content-section reveal-left">
+    <span class="section-label">1.15.1 &middot; What It Is</span>
+    <h3 class="slide-heading">What It Is</h3>
+    <div class="section-body"><p>Rate limiting controls how many requests a client can make in a given time window. Throttling slows down requests rather than rejecting them outright. Both protect your backend from abuse, scraping, and unintentional denial-of-service from buggy clients.</p></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-6a-rate-limiting-and-throttling-why-it-matters" class="content-section reveal-left">
+    <span class="section-label">1.15.2 &middot; Why It Matters</span>
+    <h3 class="slide-heading">Why It Matters</h3>
+    <div class="section-body"><p>AI-generated backends ship without rate limiting. This is a production gap, not a nice-to-have. A buggy frontend retry loop or a malicious actor can exhaust your database connections in minutes on an unprotected API.</p></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-6a-rate-limiting-and-throttling-implementing-rate-limiting-with-ai" class="content-section reveal-left">
+    <span class="section-label">1.15.3 &middot; Implementing Rate Limiting with AI</span>
+    <h3 class="slide-heading">Implementing Rate Limiting with AI</h3>
+    <div class="section-body"><p>The simplest approach in FastAPI is <code>slowapi</code>, which wraps the <code>limits</code> library:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">python</span><button class="copy-btn" type="button">Copy</button></div><pre><code># app/core/rate_limit.py
+from slowapi import Limiter
+from slowapi.util import get_remote_address
+
+limiter = Limiter(key_func=get_remote_address)</code></pre></div>
+<div class="code-container"><div class="code-header"><span class="code-title">python</span><button class="copy-btn" type="button">Copy</button></div><pre><code># app/main.py
+from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
+from app.core.rate_limit import limiter
+
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+app.add_middleware(SlowAPIMiddleware)</code></pre></div>
+<div class="code-container"><div class="code-header"><span class="code-title">python</span><button class="copy-btn" type="button">Copy</button></div><pre><code># app/routes/feedback.py
+from app.core.rate_limit import limiter
+
+@router.post(&quot;/&quot;)
+@limiter.limit(&quot;10/minute&quot;)
+async def create_feedback(request: Request, feedback: FeedbackCreate, db: AsyncSession = Depends(get_db)):
+    ...</code></pre></div>
+<p><strong>Prompt for adding rate limiting:</strong></p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>Add rate limiting to the feedback API using slowapi 0.1.9:
+- POST endpoints: 10 requests per minute per IP
+- GET list endpoint: 60 requests per minute per IP
+- GET single item: 120 requests per minute per IP
+- Rate limit exceeded responses must match our structured error format
+- Add to requirements.txt and configure in app/main.py</code></pre></div></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-6a-rate-limiting-and-throttling-rate-limit-strategy-decisions" class="content-section reveal-left">
+    <span class="section-label">1.15.4 &middot; Rate Limit Strategy Decisions</span>
+    <h3 class="slide-heading">Rate Limit Strategy Decisions</h3>
+    <div class="section-body"><div class="table-wrap"><table><thead><tr><th>Endpoint</th><th>Typical Limit</th><th>Reasoning</th></tr></thead><tbody><tr><td>POST (create)</td><td>10/minute</td><td>Write operations, prevent spam</td></tr><tr><td>GET list</td><td>60/minute</td><td>Read-heavy, but still bounded</td></tr><tr><td>GET single</td><td>120/minute</td><td>High read frequency expected</td></tr><tr><td>Auth endpoints</td><td>5/minute</td><td>Brute-force protection</td></tr></tbody></table></div></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-6a-rate-limiting-and-throttling-mini-exercise-rate-limit-verification-5-minutes" class="content-section reveal-left">
+    <span class="section-label">1.15.5 &middot; Mini Exercise: Rate Limit Verification (5 minutes)</span>
+    <div class="activity-card">
+      <div class="activity-title">Mini Exercise: Rate Limit Verification (5 minutes)</div>
+      <div class="section-body"><div class="code-container"><div class="code-header"><span class="code-title">bash</span><button class="copy-btn" type="button">Copy</button></div><pre><code># Send 12 POST requests in rapid succession — the 11th should return 429
+for i in $(seq 1 12); do
+  http POST localhost:8000/api/v1/feedback \
+    userEmail=&quot;test@example.com&quot; \
+    category=&quot;bug&quot; \
+    title=&quot;Test $i&quot; \
+    description=&quot;Rate limit test&quot;
+done</code></pre></div>
+<p>Verify the 429 response matches your structured error format.</p></div>
+      
+      
+    </div>
+    
+  </section>
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-6b-structured-logging-and-observability" class="content-section reveal-left">
+    <span class="section-label">1.16 &middot; 6b. Structured Logging and Observability</span>
+    <h2 class="slide-heading">6b. Structured Logging and Observability</h2>
+    <div class="section-body"></div>
+    <section id="day-7-ai-assisted-backend-api-development-6b-structured-logging-and-observability-what-it-is" class="content-section reveal-left">
+    <span class="section-label">1.16.1 &middot; What It Is</span>
+    <h3 class="slide-heading">What It Is</h3>
+    <div class="section-body"><p>Structured logging means emitting log records as JSON objects with consistent fields — timestamp, level, request ID, user, endpoint, duration, status code — rather than free-text strings. Observability means making the system&#39;s internal state visible enough to diagnose problems without attaching a debugger.</p></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-6b-structured-logging-and-observability-why-it-matters" class="content-section reveal-left">
+    <span class="section-label">1.16.2 &middot; Why It Matters</span>
+    <h3 class="slide-heading">Why It Matters</h3>
+    <div class="section-body"><p>AI-generated backends ship with <code>print()</code> statements or no logging at all. In production, you cannot debug a 500 error that happened three hours ago without logs. Structured logs make it possible to search, filter, and alert on specific conditions.</p></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-6b-structured-logging-and-observability-the-logging-pattern" class="content-section reveal-left">
+    <span class="section-label">1.16.3 &middot; The Logging Pattern</span>
+    <h3 class="slide-heading">The Logging Pattern</h3>
+    <div class="section-body"><p>AI almost never adds structured logging unless you ask for it explicitly. When you do ask, use this prompt:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>Add structured JSON logging to the feedback service using Python&#39;s structlog 24.x:
+- Every service method should log: method name, input parameters (excluding PII), result type
+- Every HTTP request should log: method, path, status_code, duration_ms, request_id
+- Log exceptions with stack traces at ERROR level, never at INFO
+- Never log email addresses or user-identifiable data in INFO logs
+- Output JSON format in production, human-readable format in development (based on ENV variable)</code></pre></div>
+<p><strong>Example structured log output:</strong></p>
+<div class="code-container"><div class="code-header"><span class="code-title">json</span><button class="copy-btn" type="button">Copy</button></div><pre><code>{
+  &quot;timestamp&quot;: &quot;2026-05-24T10:30:00Z&quot;,
+  &quot;level&quot;: &quot;info&quot;,
+  &quot;event&quot;: &quot;feedback.created&quot;,
+  &quot;request_id&quot;: &quot;req_01HX...&quot;,
+  &quot;feedback_id&quot;: &quot;2df2fd66-...&quot;,
+  &quot;category&quot;: &quot;bug&quot;,
+  &quot;priority&quot;: 1,
+  &quot;duration_ms&quot;: 42
+}</code></pre></div>
+<p><strong>Adding request ID middleware:</strong></p>
+<div class="code-container"><div class="code-header"><span class="code-title">python</span><button class="copy-btn" type="button">Copy</button></div><pre><code># app/middleware/request_id.py
+import uuid
+from starlette.middleware.base import BaseHTTPMiddleware
+
+class RequestIDMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request, call_next):
+        request_id = str(uuid.uuid4())
+        request.state.request_id = request_id
+        response = await call_next(request)
+        response.headers[&quot;X-Request-ID&quot;] = request_id
+        return response</code></pre></div>
+<p>The request ID should appear in every log line and every error response. This is what lets you trace a user complaint (&quot;my request failed at 10:30&quot;) to the exact log sequence.</p></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-6b-structured-logging-and-observability-observability-principles-for-ai-generated-backends" class="content-section reveal-left">
+    <span class="section-label">1.16.4 &middot; Observability Principles for AI-Generated Backends</span>
+    <h3 class="slide-heading">Observability Principles for AI-Generated Backends</h3>
+    <div class="section-body"><ul class="linear-list"><li>Log at service boundaries, not inside utility functions</li><li>Include request_id in every log line using a context variable or structlog&#39;s <code>bind_contextvars</code></li><li>Measure duration for every external call (database, HTTP, cache)</li><li>Never log secrets, tokens, or passwords — even accidentally via <code>str(exception)</code></li><li>Use different log levels consistently: DEBUG for development detail, INFO for normal operation, WARNING for expected-but-abnormal events, ERROR for failures requiring attention</li></ul></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-6b-structured-logging-and-observability-mini-exercise-add-logging-to-one-service-method-10-minutes" class="content-section reveal-left">
+    <span class="section-label">1.16.5 &middot; Mini Exercise: Add Logging to One Service Method (10 minutes)</span>
+    <div class="activity-card">
+      <div class="activity-title">Mini Exercise: Add Logging to One Service Method (10 minutes)</div>
+      <div class="section-body"><p>Take this service method:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">python</span><button class="copy-btn" type="button">Copy</button></div><pre><code>async def create_feedback(self, db: AsyncSession, data: FeedbackCreate) -&gt; Feedback:
+    feedback = Feedback(**data.model_dump())
+    db.add(feedback)
+    await db.commit()
+    await db.refresh(feedback)
+    return feedback</code></pre></div>
+<p>Ask Claude Code:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>Add structured logging to this method using structlog.
+Log: entry with category and priority, successful creation with feedback_id and duration_ms,
+any exception at ERROR level.
+Do not log user_email in INFO logs.</code></pre></div></div>
+      
+      
+    </div>
+    
+  </section>
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-7-the-ai-pair-programming-rhythm-for-backend" class="content-section reveal-left">
+    <span class="section-label">1.17 &middot; 7. The AI Pair-Programming Rhythm for Backend</span>
+    <h2 class="slide-heading">7. The AI Pair-Programming Rhythm for Backend</h2>
+    <div class="section-body"></div>
+    <section id="day-7-ai-assisted-backend-api-development-7-the-ai-pair-programming-rhythm-for-backend-what-it-is" class="content-section reveal-left">
+    <span class="section-label">1.17.1 &middot; What It Is</span>
+    <h3 class="slide-heading">What It Is</h3>
+    <div class="section-body"><p>A repeatable workflow for building backend features with AI assistance: <strong>spec, scaffold, test, refine, ship.</strong> This is not &quot;type a prompt and ship the result.&quot; It is a structured process where you drive the design decisions and the AI handles the implementation typing.</p></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-7-the-ai-pair-programming-rhythm-for-backend-why-it-matters" class="content-section reveal-left">
+    <span class="section-label">1.17.2 &middot; Why It Matters</span>
+    <h3 class="slide-heading">Why It Matters</h3>
+    <div class="section-body"><p>Without a rhythm, AI-assisted development devolves into two failure modes: prompting once and shipping unreviewed code (dangerous), or spending more time on prompts than writing the code yourself (wasteful). The rhythm is consistently faster than manual coding while maintaining quality.</p></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-7-the-ai-pair-programming-rhythm-for-backend-what-learners-must-understand-in-depth" class="content-section reveal-left">
+    <span class="section-label">1.17.3 &middot; What Learners Must Understand in Depth</span>
+    <h3 class="slide-heading">What Learners Must Understand in Depth</h3>
+    <div class="section-body"><p>Backend AI work needs a cadence because generated code compounds. If the schema is vague, the models are wrong. If the models are wrong, the migration is wrong. If the migration is wrong, routes and tests may still pass against the wrong data contract. The solution is not one giant perfect prompt; it is a sequence of short, inspectable steps.</p>
+<p>Use this loop for every backend feature:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>1. Spec: human writes the behavior and constraints.
+2. Plan: AI proposes file-level changes without editing.
+3. Scaffold: AI creates the first implementation.
+4. Inspect: human checks architecture, auth, database, and contracts.
+5. Test: AI drafts tests; human rejects weak tests.
+6. Refine: AI fixes failures and review findings.
+7. Verify: run app, tests, migrations, OpenAPI, manual endpoint checks.
+8. Ship: commit only when behavior and contracts are understood.</code></pre></div>
+<p>The rhythm also decides which tool to use:</p>
+<ul class="linear-list"><li>Claude Code: plan, scaffold, migrations, multi-file changes, test-fix loops, final repo review.</li><li>Cursor: inspect code, ask cross-file questions, apply targeted refactors, review diffs, maintain project rules.</li><li>Postman/HTTPie: prove endpoints behave like the spec.</li><li>Git: capture a working checkpoint before the next risky change.</li></ul></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-7-the-ai-pair-programming-rhythm-for-backend-ai-verification-discipline" class="content-section reveal-left">
+    <span class="section-label">1.17.4 &middot; AI Verification Discipline</span>
+    <h3 class="slide-heading">AI Verification Discipline</h3>
+    <div class="section-body"><p>Verification is a core engineering competency in 2026, not an optional step. The common mistakes to call out explicitly:</p>
+<p><strong>Never accept migrations blindly.</strong> Generated migrations compile and run — that does not mean they are correct. Read the <code>upgrade()</code> function. Verify the <code>downgrade()</code> function reverses it completely. Run the migration on a test database before production.</p>
+<p><strong>Never accept auth code blindly.</strong> Generated auth code almost always has at least one of: hardcoded secret, missing expiry check, wrong algorithm, or missing issuer validation. Read every line.</p>
+<p><strong>Never accept async code blindly.</strong> Search for <code>Session(</code> (sync) inside async routes, un-awaited coroutines, and blocking I/O calls inside async functions.</p>
+<p><strong>Generated code compiles ≠ correct.</strong> The test suite passing is necessary but not sufficient. Read the test assertions. A test that checks <code>response.status_code == 200</code> without checking the response body is testing FastAPI&#39;s HTTP stack, not your logic.</p></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-7-the-ai-pair-programming-rhythm-for-backend-the-five-steps" class="content-section reveal-left">
+    <span class="section-label">1.17.5 &middot; The Five Steps</span>
+    <h3 class="slide-heading">The Five Steps</h3>
+    <div class="section-body"><p><strong>Step 1 — Spec (5 minutes, you write this).</strong> Write a plain-text spec before touching Claude Code. Two paragraphs maximum: what the feature does, what endpoints it needs, what data it stores, what the error cases are. If the AI-generated code does not match this spec, the code is wrong.</p>
+<p><strong>Step 2 — Scaffold (10 minutes, AI does the typing).</strong> Give Claude Code the spec. Use plan mode first for anything touching 3+ files. Review the plan, approve it, let it execute. Note small corrections for the refine step — do not interrupt.</p>
+<p><strong>Step 3 — Test (10 minutes, AI generates, you review).</strong> Ask Claude Code to generate pytest tests for the scaffolded code:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>Write pytest tests for the feedback CRUD API:
+- Test each endpoint: create, get, get by ID, update, delete
+- Test validation: missing required fields, invalid email, priority out of range
+- Test error cases: get/update/delete non-existent ID
+- Use httpx AsyncClient with the FastAPI TestClient
+- Use a separate test database (SQLite in-memory is fine for tests)</code></pre></div>
+<p>Read every test. AI-generated tests have a known failure mode: <strong>tautological tests</strong> that test the framework, not your logic. A test that checks the response has a <code>title</code> field tests FastAPI&#39;s serialization. A good test creates an item with priority 3, updates to priority 1, fetches it, and verifies the change.</p>
+<p><strong>Step 4 — Refine (15 minutes, collaborative).</strong> Run the tests. Some will fail — this is expected. Failures point to gaps in the scaffold:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>3 tests are failing:
+1. test_update_partial - sending only {&quot;status&quot;: &quot;resolved&quot;} returns 422 because FeedbackUpdate requires all fields
+2. test_get_nonexistent - returns 500 instead of 404
+3. test_pagination - returns all items instead of respecting page_size
+
+Fix each issue. Run the tests again after fixing.</code></pre></div>
+<p>This is where the learning happens. Failures teach you what the AI got wrong; fixing them teaches you how the framework works.</p>
+<p><strong>Step 5 — Ship (5 minutes).</strong> Once tests pass, do a final review:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>Do a final review of the entire feedback module:
+- Any security issues? (SQL injection, missing auth, data leaks)
+- Any missing error handling?
+- Are all async operations properly awaited?
+- Does the OpenAPI spec look correct? Start the app and check /docs.</code></pre></div>
+<p>Then commit and push. Total time: roughly 45–60 minutes for a complete CRUD feature with tests, validation, error handling, and documentation.</p></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-7-the-ai-pair-programming-rhythm-for-backend-live-demo-complete-loop-before-lab-45-minutes" class="content-section reveal-left">
+    <span class="section-label">1.17.6 &middot; Live Demo: Complete Loop Before Lab (45 minutes)</span>
+    <div class="activity-card">
+      <div class="activity-title">Live Demo: Complete Loop Before Lab (45 minutes)</div>
+      <div class="section-body"><p>Use a small feedback API so learners see the whole loop once before doing it themselves.</p>
+<p>The point is not to finish a production system in the demo. The point is to model the rhythm learners will repeat in the capstone.</p></div>
+      <div class="checklist"><div class="checklist-row" onclick="toggleChecklist(this)" role="checkbox" aria-checked="false" tabindex="0"><span class="checklist-checkbox"></span><span class="checklist-text">Spec, 5 minutes: Write the endpoints, fields, errors, and done criteria on screen.</span></div><div class="checklist-row" onclick="toggleChecklist(this)" role="checkbox" aria-checked="false" tabindex="0"><span class="checklist-checkbox"></span><span class="checklist-text">Plan, 5 minutes: Ask Claude Code for a file-by-file plan and reject one over-engineered item.</span></div><div class="checklist-row" onclick="toggleChecklist(this)" role="checkbox" aria-checked="false" tabindex="0"><span class="checklist-checkbox"></span><span class="checklist-text">Scaffold, 10 minutes: Let Claude Code create the app, schema, route, model, and migration.</span></div><div class="checklist-row" onclick="toggleChecklist(this)" role="checkbox" aria-checked="false" tabindex="0"><span class="checklist-checkbox"></span><span class="checklist-text">Inspect, 8 minutes: Open the generated files in Cursor and ask what can break.</span></div><div class="checklist-row" onclick="toggleChecklist(this)" role="checkbox" aria-checked="false" tabindex="0"><span class="checklist-checkbox"></span><span class="checklist-text">Test, 7 minutes: Ask Claude Code for pytest and manual HTTPie checks.</span></div><div class="checklist-row" onclick="toggleChecklist(this)" role="checkbox" aria-checked="false" tabindex="0"><span class="checklist-checkbox"></span><span class="checklist-text">Refine, 7 minutes: Fix one intentional issue, such as partial update returning 422.</span></div><div class="checklist-row" onclick="toggleChecklist(this)" role="checkbox" aria-checked="false" tabindex="0"><span class="checklist-checkbox"></span><span class="checklist-text">Ship, 3 minutes: Commit locally with a meaningful message.</span></div></div>
+      
+    </div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-7-the-ai-pair-programming-rhythm-for-backend-cursor-ide-in-the-refine-step" class="content-section reveal-left">
+    <span class="section-label">1.17.7 &middot; Cursor IDE in the Refine Step</span>
+    <h3 class="slide-heading">Cursor IDE in the Refine Step</h3>
+    <div class="section-body"><p>Cursor IDE is better for the refine step. Once files exist, open the project in Cursor:</p>
+<ul class="linear-list"><li>Codebase Chat (Cmd+L): &quot;What happens if two requests update the same feedback item simultaneously?&quot; Cursor indexes your project and reasons about cross-file interactions.</li><li>Agent Mode in Composer: Select &quot;Agent&quot; and type &quot;Refactor the feedback service to handle optimistic concurrency.&quot; It identifies every file that needs changes and proposes coordinated diffs.</li><li>@-References: &quot;@app/services/feedback.py Add logging to every database operation&quot; to target specific files.</li><li>Cursor Rules: Create <code>.cursor/rules/python-backend.mdc</code> or a project rule with your conventions — the Cursor equivalent of <code>CLAUDE.md</code>.</li></ul>
+<p>Suggested Cursor rule:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">markdown</span><button class="copy-btn" type="button">Copy</button></div><pre><code>---
+description: FastAPI backend conventions
+globs: [&quot;app/**/*.py&quot;, &quot;tests/**/*.py&quot;, &quot;alembic/**/*.py&quot;]
+alwaysApply: false
+---
+
+- Use Pydantic v2 and SQLAlchemy 2.0 typed models.
+- Keep routes thin; put business logic in services.
+- Use AsyncSession for all database access.
+- Do not expose internal ORM fields in API responses.
+- Add or update tests for behavior changes.</code></pre></div></div>
+    
+  </section>
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-8-latest-trends-emerging-patterns-may-2026" class="content-section reveal-left">
+    <span class="section-label">1.18 &middot; 8. Latest Trends &amp; Emerging Patterns (May 2026)</span>
+    <h2 class="slide-heading">8. Latest Trends &amp; Emerging Patterns (May 2026)</h2>
+    <div class="section-body"><blockquote><strong>The 2026 backend stack is converging on MCP for tool integration, LLM gateways for cost/routing, streaming-first protocols, and agentic patterns — backends are becoming orchestration layers for AI agents, not just CRUD APIs.</strong></blockquote></div>
+    <section id="day-7-ai-assisted-backend-api-development-8-latest-trends-emerging-patterns-may-2026-8-1-mcp-servers-as-the-new-backend-middleware" class="content-section reveal-left">
+    <span class="section-label">1.18.1 &middot; 8.1 MCP Servers as the New Backend Middleware</span>
+    <h3 class="slide-heading">8.1 MCP Servers as the New Backend Middleware</h3>
+    <div class="section-body"><p><strong>Maturity: Growing</strong></p>
+<p>The Model Context Protocol (MCP) has become the universal adapter between AI agents and backend systems — databases, APIs, internal services, file systems. Rather than each AI tool inventing its own integration format, MCP standardizes how agents discover and call tools. Two notable implementations are <code>crystaldba/postgres-mcp</code>, which exposes index tuning, query plan analysis, and schema inspection to AI agents, and Supabase MCP and Prisma MCP, which give agents direct database management capabilities. The public registry now lists 500+ servers. The July 2026 spec revision removes session state requirements, making MCP servers deployable behind round-robin load balancers — a significant production readiness upgrade. Adoption is accelerating: 28% of Fortune 500 companies have deployed MCP in some capacity, and Gartner predicts 75% of enterprise API gateways will include MCP support by end of 2026. For product engineers, MCP changes what &quot;backend&quot; means: your API is now also a toolset for AI agents, not just a surface for human-facing frontends.</p></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-8-latest-trends-emerging-patterns-may-2026-8-2-llm-gateway-ai-proxy-pattern" class="content-section reveal-left">
+    <span class="section-label">1.18.2 &middot; 8.2 LLM Gateway / AI Proxy Pattern</span>
+    <h3 class="slide-heading">8.2 LLM Gateway / AI Proxy Pattern</h3>
+    <div class="section-body"><p><strong>Maturity: Mainstream for AI-at-scale</strong></p>
+<p>As teams operate multiple LLM providers simultaneously, a purpose-built reverse proxy sitting in front of all LLM traffic has become standard at scale. The proxy normalizes traffic across providers (OpenAI, Anthropic, Gemini, local models) and implements model cascading — route cheaper models first, escalate to expensive models only when quality thresholds are not met. This cascading pattern alone produces 60–80% cost reduction in practice. Key open-source options include LiteLLM Proxy (MIT license, 100+ provider integrations), OpenRouter, and TensorZero. Enterprise LLM spend averaged $384,500 per year in April 2026, making cost routing a real engineering concern, not just an optimization. A minimal LiteLLM config:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">yaml</span><button class="copy-btn" type="button">Copy</button></div><pre><code># litellm_config.yaml
+model_list:
+  - model_name: gpt-4o-mini
+    litellm_params:
+      model: openai/gpt-4o-mini
+      api_key: os.environ/OPENAI_API_KEY
+  - model_name: claude-haiku
+    litellm_params:
+      model: anthropic/claude-haiku-4-5
+      api_key: os.environ/ANTHROPIC_API_KEY
+
+router_settings:
+  routing_strategy: cost-based-routing
+  fallbacks: [{&quot;gpt-4o-mini&quot;: [&quot;claude-haiku&quot;]}]
+
+litellm_settings:
+  max_budget: 100  # USD per day
+  budget_duration: 1d</code></pre></div>
+<div class="code-container"><div class="code-header"><span class="code-title">bash</span><button class="copy-btn" type="button">Copy</button></div><pre><code>litellm --config litellm_config.yaml --port 4000</code></pre></div></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-8-latest-trends-emerging-patterns-may-2026-8-3-streaming-first-architecture-sse-vs-websockets-for-ai" class="content-section reveal-left">
+    <span class="section-label">1.18.3 &middot; 8.3 Streaming-First Architecture (SSE vs WebSockets for AI)</span>
+    <h3 class="slide-heading">8.3 Streaming-First Architecture (SSE vs WebSockets for AI)</h3>
+    <div class="section-body"><p><strong>Maturity: Mainstream (SSE); Growing (WebSockets for agents)</strong></p>
+<p>AI generation is inherently streaming — users see tokens appear rather than waiting for complete responses. This forces a streaming-first architecture decision early. The standard pattern for generation is SSE (Server-Sent Events): client sends a POST, server streams tokens back over a long-lived HTTP connection. SSE is simple, firewall-friendly, and sufficient for one-way token streaming. WebSockets are gaining traction for agentic multi-turn flows where the client needs to send tool results or interrupts mid-stream — the bidirectional channel allows richer agent-to-backend communication. Time to First Token (TTFT) has become a first-class backend performance metric alongside p95 latency and throughput. FastAPI handles both patterns well:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">python</span><button class="copy-btn" type="button">Copy</button></div><pre><code>from fastapi import FastAPI
+from fastapi.responses import StreamingResponse
+import asyncio
+
+app = FastAPI()
+
+async def token_generator(prompt: str):
+    # Call your LLM here
+    async for token in llm_stream(prompt):
+        yield f&quot;data: {token}\n\n&quot;
+    yield &quot;data: [DONE]\n\n&quot;
+
+@app.post(&quot;/api/v1/generate&quot;)
+async def generate(request: GenerateRequest):
+    return StreamingResponse(
+        token_generator(request.prompt),
+        media_type=&quot;text/event-stream&quot;,
+        headers={&quot;Cache-Control&quot;: &quot;no-cache&quot;, &quot;X-Accel-Buffering&quot;: &quot;no&quot;},
+    )</code></pre></div>
+<p>Choosing the wrong protocol (SSE when you need mid-stream client messages, or WebSockets where SSE suffices) means rebuilding the entire messaging layer later. Decide based on whether the client needs to send data after the stream starts.</p></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-8-latest-trends-emerging-patterns-may-2026-8-4-edge-ai-inference" class="content-section reveal-left">
+    <span class="section-label">1.18.4 &middot; 8.4 Edge AI Inference</span>
+    <h3 class="slide-heading">8.4 Edge AI Inference</h3>
+    <div class="section-body"><p><strong>Maturity: Growing</strong></p>
+<p>Cloudflare Workers AI now runs Llama 3.1, Whisper, and SDXL at the network edge with sub-5ms cold starts — no GPU server provisioning required. The practical impact for product backends is a complete RAG pipeline running at the edge: embedding generation, vector search, and LLM generation all happen in a single network hop close to the user. Edge RAG benchmarks show 200ms end-to-end latency versus 800ms for a traditional centralized pipeline. Cloudflare&#39;s billing model charges only for CPU time, meaning idle time waiting for LLM inference costs nothing — a significant cost model difference from provisioned GPU instances. Vercel&#39;s AI SDK with Fluid Compute offers a similar model for teams already on Vercel. Edge inference is not a replacement for all backends — stateful operations, large context windows, and fine-tuned models still run better on traditional infrastructure — but for latency-sensitive read paths such as search and summarization, the edge pattern is worth evaluating.</p></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-8-latest-trends-emerging-patterns-may-2026-8-5-ai-native-api-design-openapi-arazzo" class="content-section reveal-left">
+    <span class="section-label">1.18.5 &middot; 8.5 AI-Native API Design (OpenAPI Arazzo)</span>
+    <h3 class="slide-heading">8.5 AI-Native API Design (OpenAPI Arazzo)</h3>
+    <div class="section-body"><p><strong>Maturity: Emerging</strong></p>
+<p>The Arazzo Specification 1.1.0, published by the OpenAPI Initiative, extends OpenAPI with multi-step workflow descriptions. Where OpenAPI describes individual endpoints, Arazzo describes sequences: authenticate, search, filter results, add to cart, checkout. This matters for AI agent consumption: an agent reading an Arazzo workflow can execute a complete business process without needing to infer the correct sequence from individual endpoint docs. APIs designed for AI agent consumption — sometimes called AI-native APIs — include machine-readable discovery, structured tool schemas, and workflow descriptions that let agents act autonomously. The MCP specification already references Arazzo for describing multi-step tool workflows. OpenAPI 4.0 &quot;Moonwalk&quot; is in early design and expected to incorporate agent-oriented patterns more deeply. For product engineers today, this means annotating your FastAPI routes thoroughly and structuring your OpenAPI output so that AI tools can discover and chain your endpoints without human guidance.</p></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-8-latest-trends-emerging-patterns-may-2026-8-6-ai-generated-infrastructure-as-code" class="content-section reveal-left">
+    <span class="section-label">1.18.6 &middot; 8.6 AI-Generated Infrastructure as Code</span>
+    <h3 class="slide-heading">8.6 AI-Generated Infrastructure as Code</h3>
+    <div class="section-body"><p><strong>Maturity: Growing</strong></p>
+<p>Two major IaC platforms shipped AI-native features in early 2026. Pulumi Neo accepts natural language descriptions and generates multi-file Pulumi programs that comply with organizational policies — a single prompt can produce a complete Kubernetes deployment with networking, secrets, and monitoring. Terraform 1.8+ Smart Plans uses ML to predict resource dependency order and flags potential security issues before <code>apply</code> runs. The Pulumi MCP Server takes this further: AI agents can provision infrastructure directly by calling Pulumi through MCP without writing any IaC code themselves. The IaC market hit $2.1 billion in 2026 with 28% annual growth. Teams using AI-powered cloud optimization alongside AI-generated IaC report 15–25% cloud cost savings from right-sizing and idle resource cleanup. For backend engineers, the practical implication is that AI agents can now create and manage the infrastructure your services run on — shifting infrastructure from a separate ops function toward an AI-orchestrated capability.</p></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-8-latest-trends-emerging-patterns-may-2026-8-7-drizzle-orm-edge-compatible-migrations" class="content-section reveal-left">
+    <span class="section-label">1.18.7 &middot; 8.7 Drizzle ORM + Edge-Compatible Migrations</span>
+    <h3 class="slide-heading">8.7 Drizzle ORM + Edge-Compatible Migrations</h3>
+    <div class="section-body"><p><strong>Maturity: Growing</strong></p>
+<p>Drizzle ORM has become the preferred TypeScript ORM for edge runtimes — Cloudflare Workers, Vercel Edge Functions, Deno Deploy — because it has zero Node.js-specific dependencies and runs inside V8 isolates where Prisma&#39;s query engine cannot. For teams building edge backends or full-stack Next.js apps deployed to Vercel, Drizzle is often the only viable ORM choice. The <code>strict: true</code> configuration flag is important: it prevents Drizzle&#39;s schema inferencer from silently accepting ambiguous types. AI code generators have roughly 65% success on simple Drizzle schemas but commonly trip on the migration workflow — the correct pattern is to generate migrations with <code>drizzle-kit generate</code>, never edit the generated SQL manually, and apply with <code>drizzle-kit migrate</code>. Editing generated SQL breaks the migration chain and causes drift between the schema definition and the database state. For Python teams on FastAPI, Drizzle is not directly relevant, but the architectural pattern — zero-dependency ORM for constrained runtimes — is a principle that applies when evaluating ORM choices for edge or serverless Python deployments.</p></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-8-latest-trends-emerging-patterns-may-2026-8-8-agentic-backend-patterns-fastapi-as-agent-api-layer" class="content-section reveal-left">
+    <span class="section-label">1.18.8 &middot; 8.8 Agentic Backend Patterns — FastAPI as Agent API Layer</span>
+    <h3 class="slide-heading">8.8 Agentic Backend Patterns — FastAPI as Agent API Layer</h3>
+    <div class="section-body"><p><strong>Maturity: Growing rapidly</strong></p>
+<p>FastAPI has become the standard framework for exposing AI agents via REST in Python. Three orchestration libraries have emerged as the main choices: LangGraph for stateful multi-step agent orchestration with explicit graph-based flow control; CrewAI for role-based multi-agent systems where specialized agents collaborate on tasks; and Pydantic AI for typed, FastAPI-native agent definitions that fit naturally into the validation patterns already covered in this workshop. The conventional pattern for an agent backend is a <code>/agent/kickoff</code> endpoint that accepts a task description, starts the agent asynchronously, and returns a <code>StreamingResponse</code> with real-time execution traces so the frontend can show progress. 73% of enterprises surveyed in early 2026 report active investment in agentic AI systems. The backend implication is that CRUD APIs are increasingly wrappers around agent workflows: a <code>POST /api/v1/feedback/analyze</code> endpoint might kick off an agent that queries the database, calls an LLM to categorize trends, generates a report, and streams the results back — all within the FastAPI request lifecycle your team already knows how to operate.</p>
+<div class="code-container"><div class="code-header"><span class="code-title">python</span><button class="copy-btn" type="button">Copy</button></div><pre><code>from fastapi import FastAPI
+from fastapi.responses import StreamingResponse
+from pydantic_ai import Agent
+import asyncio, json
+
+app = FastAPI()
+agent = Agent(&quot;claude-sonnet-4-5&quot;, system_prompt=&quot;Analyze feedback trends.&quot;)
+
+@app.post(&quot;/agent/kickoff&quot;)
+async def kickoff(task: AgentTask):
+    async def run_and_stream():
+        async with agent.run_stream(task.prompt) as result:
+            async for text in result.stream():
+                yield f&quot;data: {json.dumps({&#39;chunk&#39;: text})}\n\n&quot;
+        yield &quot;data: [DONE]\n\n&quot;
+
+    return StreamingResponse(run_and_stream(), media_type=&quot;text/event-stream&quot;)</code></pre></div></div>
+    
+  </section>
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-hands-on-lab-build-a-full-crud-feedback-api-in-45-minutes" class="content-section reveal-left">
+    <span class="section-label">1.19 &middot; Hands-On Lab: Build a Full CRUD Feedback API in 45 Minutes</span>
+    <div class="activity-card">
+      <div class="activity-title">Hands-On Lab: Build a Full CRUD Feedback API in 45 Minutes</div>
+      <div class="section-body"><p>The lab occupies the final 45 minutes of the session. The target from the syllabus says &quot;functional API in under 60 minutes&quot;; this workshop makes it stricter by giving learners 45 minutes after the live demo. Auth, pagination, filtering, and tests are valuable stretch goals, but the required deliverable is a working CRUD API with OpenAPI docs committed to GitHub.</p></div>
+      
+      
+    </div>
+    <section id="day-7-ai-assisted-backend-api-development-hands-on-lab-build-a-full-crud-feedback-api-in-45-minutes-required-lab-output" class="content-section reveal-left">
+    <span class="section-label">1.19.1 &middot; Required Lab Output</span>
+    <div class="activity-card">
+      <div class="activity-title">Required Lab Output</div>
+      <div class="section-body"></div>
+      
+      <ul class="linear-list"><li>GitHub repo with the completed API</li><li><code>POST /api/v1/feedback</code></li><li><code>GET /api/v1/feedback</code></li><li><code>GET /api/v1/feedback/{id}</code></li><li><code>PUT</code> or <code>PATCH /api/v1/feedback/{id}</code></li><li><code>DELETE /api/v1/feedback/{id}</code></li><li>Pydantic request/response models</li><li>SQLAlchemy ORM model</li><li>Alembic initial migration</li><li>Structured error handling for validation and not-found cases</li><li>Auto-generated OpenAPI spec visible at <code>/docs</code> and <code>/openapi.json</code></li><li>README with setup and example requests</li></ul>
+    </div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-hands-on-lab-build-a-full-crud-feedback-api-in-45-minutes-lab-timebox" class="content-section reveal-left">
+    <span class="section-label">1.19.2 &middot; Lab Timebox</span>
+    <div class="activity-card">
+      <div class="activity-title">Lab Timebox</div>
+      <div class="section-body"><div class="table-wrap"><table><thead><tr><th>Time</th><th>Action</th><th>Done when</th></tr></thead><tbody><tr><td>0-5 min</td><td>Create repo, add <code>CLAUDE.md</code>, start Claude Code</td><td>Project has instructions and git initialized</td></tr><tr><td>5-15 min</td><td>Plan and scaffold</td><td>Claude Code creates app structure and dependencies</td></tr><tr><td>15-25 min</td><td>Generate model, schemas, migration, routes</td><td>App starts and <code>/health</code> works</td></tr><tr><td>25-32 min</td><td>Manual endpoint testing</td><td>POST/GET/PUT/DELETE work through HTTPie or Postman</td></tr><tr><td>32-38 min</td><td>Fix validation/error issues</td><td>Not-found and bad-input cases return structured errors</td></tr><tr><td>38-43 min</td><td>OpenAPI and README polish</td><td><code>/docs</code> is usable and README has commands</td></tr><tr><td>43-45 min</td><td>Commit and push</td><td>GitHub repo contains the working API</td></tr></tbody></table></div></div>
+      
+      
+    </div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-hands-on-lab-build-a-full-crud-feedback-api-in-45-minutes-setup-5-minutes" class="content-section reveal-left">
+    <span class="section-label">1.19.3 &middot; Setup (5 minutes)</span>
+    <h3 class="slide-heading">Setup (5 minutes)</h3>
+    <div class="section-body"><ol class="linear-list"><li>Create a new directory and initialize it:</li></ol>
+<p>``<code>bash mkdir feedback-api &amp;&amp; cd feedback-api git init </code>``</p>
+<ol class="linear-list"><li>Create the <code>CLAUDE.md</code> file from Section 1 (copy it exactly).</li></ol>
+<ol class="linear-list"><li>Ensure PostgreSQL is running:</li></ol>
+<p>```bash # If using Docker: docker run -d --name feedback-db -p 5432:5432 -e POSTGRES_PASSWORD=devpass -e POSTGRES_DB=feedback postgres:16</p>
+<p># If using Homebrew: createdb feedback ```</p>
+<ol class="linear-list"><li>Open Claude Code:</li></ol>
+<p>``<code>bash claude </code>``</p></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-hands-on-lab-build-a-full-crud-feedback-api-in-45-minutes-part-1-scaffold-the-project-10-minutes" class="content-section reveal-left">
+    <span class="section-label">1.19.4 &middot; Part 1: Scaffold the Project (10 minutes)</span>
+    <h3 class="slide-heading">Part 1: Scaffold the Project (10 minutes)</h3>
+    <div class="section-body"><p>Give Claude Code this prompt (use Plan mode first — Shift+Tab twice):</p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>Plan and then create a complete FastAPI project for a user feedback service. 
+
+Feature spec:
+- Users can submit feedback about product features (POST /api/v1/feedback)
+- Anyone can list feedback with filters (GET /api/v1/feedback?status=open&amp;category=bug&amp;page=1&amp;page_size=20)
+- Anyone can get a single feedback item (GET /api/v1/feedback/{id})
+- Users can update their feedback (PUT /api/v1/feedback/{id})
+- Users can delete their feedback (DELETE /api/v1/feedback/{id})
+- Health check at GET /health
+
+Data model:
+- id: UUID (auto-generated)
+- user_email: valid email, required
+- category: enum (bug, feature, improvement), required
+- title: string, max 500 chars, required
+- description: string, max 5000 chars, required  
+- priority: integer 1-5, default 3
+- status: enum (open, in_progress, resolved, closed), default open
+- created_at: timestamp with timezone, auto-set
+- updated_at: timestamp with timezone, auto-update
+
+Technical requirements:
+- Async SQLAlchemy 2.0 with Mapped[T] annotations
+- Pydantic v2 schemas separate from ORM models
+- Service layer between routes and database
+- Custom error handling with structured JSON errors
+- Alembic migration for the initial schema
+- CORS middleware for localhost:3000
+- uv for dependency management
+- .env file for database URL
+
+Follow the CLAUDE.md conventions exactly. After creating all files, initialize the database, 
+run the migration, and start the app. Verify the health check returns 200.</code></pre></div>
+<p>While Claude Code works, watch what it creates. Note the file structure. When it finishes, verify:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">bash</span><button class="copy-btn" type="button">Copy</button></div><pre><code># Should return {&quot;status&quot;: &quot;healthy&quot;}
+http GET localhost:8000/health</code></pre></div></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-hands-on-lab-build-a-full-crud-feedback-api-in-45-minutes-part-2-test-the-api-manually-7-minutes" class="content-section reveal-left">
+    <span class="section-label">1.19.5 &middot; Part 2: Test the API Manually (7 minutes)</span>
+    <h3 class="slide-heading">Part 2: Test the API Manually (7 minutes)</h3>
+    <div class="section-body"><p>Use HTTPie to test each endpoint:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">bash</span><button class="copy-btn" type="button">Copy</button></div><pre><code># Create feedback
+http POST localhost:8000/api/v1/feedback \
+  userEmail=&quot;intern@company.com&quot; \
+  category=&quot;bug&quot; \
+  title=&quot;Login button unresponsive on mobile&quot; \
+  description=&quot;The login button on the /auth page does not respond to taps on iOS Safari. Tested on iPhone 15, iOS 18.&quot; \
+  priority:=1
+
+# List all feedback
+http GET localhost:8000/api/v1/feedback
+
+# Get by ID (use the id from the POST response)
+http GET localhost:8000/api/v1/feedback/{id}
+
+# Update status
+http PUT localhost:8000/api/v1/feedback/{id} \
+  status=&quot;in_progress&quot;
+
+# Delete
+http DELETE localhost:8000/api/v1/feedback/{id}</code></pre></div>
+<p>If any endpoint fails, tell Claude Code:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>The PUT endpoint returns 422 when I send only {&quot;status&quot;: &quot;in_progress&quot;}. 
+It should accept partial updates. Fix the FeedbackUpdate schema to make all fields optional.</code></pre></div></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-hands-on-lab-build-a-full-crud-feedback-api-in-45-minutes-part-3-error-handling-and-openapi-check-8-minutes" class="content-section reveal-left">
+    <span class="section-label">1.19.6 &middot; Part 3: Error Handling and OpenAPI Check (8 minutes)</span>
+    <h3 class="slide-heading">Part 3: Error Handling and OpenAPI Check (8 minutes)</h3>
+    <div class="section-body"><p>Ask Claude Code:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>Add or fix structured error handling:
+- nonexistent feedback ID returns 404 with error.code = FEEDBACK_NOT_FOUND
+- invalid request body returns a documented validation error
+- generic exceptions are logged but not exposed to clients
+- OpenAPI documents success and error responses
+
+Then start the app and tell me exactly which URLs to verify.</code></pre></div>
+<p>Verify:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">bash</span><button class="copy-btn" type="button">Copy</button></div><pre><code>http GET localhost:8000/openapi.json
+http GET localhost:8000/api/v1/feedback/00000000-0000-0000-0000-000000000000</code></pre></div></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-hands-on-lab-build-a-full-crud-feedback-api-in-45-minutes-part-4-optional-test-generation-7-minutes" class="content-section reveal-left">
+    <span class="section-label">1.19.7 &middot; Part 4: Optional Test Generation (7 minutes)</span>
+    <h3 class="slide-heading">Part 4: Optional Test Generation (7 minutes)</h3>
+    <div class="section-body"><p>Ask Claude Code to generate tests:</p>
+<div class="code-container"><div class="code-header"><span class="code-title">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>Write comprehensive pytest tests for the feedback API:
+- Use httpx.AsyncClient with the FastAPI test app
+- Use a separate SQLite async database for tests (not PostgreSQL)
+- Test happy paths for all 5 endpoints
+- Test validation errors: missing email, invalid category, priority=0, priority=6, title over 500 chars
+- Test 404 for get/update/delete with a non-existent UUID
+- Test pagination: create 25 items, request page 2 with page_size=10, verify 10 items returned
+- Test filtering: create items with different statuses, filter by status, verify correct count
+
+Run the tests and fix any failures.</code></pre></div>
+<p>Claude Code will generate the test file, run <code>pytest</code>, and iterate on failures. Watch the cycle. This is the &quot;test and refine&quot; phase in action.</p>
+<p>If time is tight, require only smoke tests or manual endpoint evidence. If a pair finishes early, they should run the full pytest suite.</p></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-hands-on-lab-build-a-full-crud-feedback-api-in-45-minutes-part-5-polish-and-ship-8-minutes" class="content-section reveal-left">
+    <span class="section-label">1.19.8 &middot; Part 5: Polish and Ship (8 minutes)</span>
+    <h3 class="slide-heading">Part 5: Polish and Ship (8 minutes)</h3>
+    <div class="section-body"><ol class="linear-list"><li>Check the OpenAPI docs:</li></ol>
+<p>Open <code>http://localhost:8000/docs</code> in your browser. Verify every endpoint is documented, every field has a description, and the example values make sense.</p>
+<ol class="linear-list"><li>Ask Claude Code for a final review:</li></ol>
+<p>``` Review the entire project for:</p>
+<ul class="linear-list"><li>Security issues</li><li>Missing error handling</li><li>Incomplete validation</li><li>Async/await correctness</li><li>Any TODO or placeholder code</li></ul>
+<p>List issues by severity and fix the critical ones. ```</p>
+<ol class="linear-list"><li>Commit to GitHub:</li></ol>
+<p>``<code>bash git add -A git commit -m &quot;feat: complete CRUD feedback API with tests and OpenAPI docs&quot; git remote add origin &lt;your-repo-url&gt; git push -u origin main </code>``</p></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-hands-on-lab-build-a-full-crud-feedback-api-in-45-minutes-lab-rubric" class="content-section reveal-left">
+    <span class="section-label">1.19.9 &middot; Lab Rubric</span>
+    <div class="activity-card">
+      <div class="activity-title">Lab Rubric</div>
+      <div class="section-body"><div class="table-wrap"><table><thead><tr><th>Criterion</th><th>Required</th><th>Strong</th></tr></thead><tbody><tr><td>API behavior</td><td>CRUD endpoints work locally</td><td>Includes filtering, pagination, and clear status codes</td></tr><tr><td>Validation</td><td>Pydantic rejects invalid email, category, priority, and long text</td><td>Update schema rejects empty updates but accepts partial updates</td></tr><tr><td>Database</td><td>SQLAlchemy model and Alembic migration exist</td><td>Migration has reviewed downgrade and useful indexes</td></tr><tr><td>Errors</td><td>Not-found and validation errors are structured</td><td>All error responses include stable error codes and request IDs</td></tr><tr><td>OpenAPI</td><td><code>/docs</code> and <code>/openapi.json</code> load</td><td>Schemas include descriptions, examples, and documented errors</td></tr><tr><td>AI workflow</td><td>Repo was built through prompts</td><td>README includes the prompt sequence or an AI workflow log</td></tr><tr><td>GitHub</td><td>Working code pushed</td><td>Clean commit history and setup instructions</td></tr></tbody></table></div></div>
+      
+      
+    </div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-hands-on-lab-build-a-full-crud-feedback-api-in-45-minutes-stretch-goals" class="content-section reveal-left">
+    <span class="section-label">1.19.10 &middot; Stretch Goals</span>
+    <h3 class="slide-heading">Stretch Goals</h3>
+    <div class="section-body"><p>If you finish early, try these progressions:</p>
+<ol class="linear-list"><li>Add JWT authentication (Section 5): Protect POST/PUT/DELETE endpoints. Leave GET endpoints public. This adds 15–20 minutes.</li></ol>
+<ol class="linear-list"><li>Generate a TypeScript client from the OpenAPI spec:</li></ol>
+<p>``<code>bash npx @hey-api/openapi-ts -i http://localhost:8000/openapi.json -o ./ts-client </code>`` Inspect the generated code. This is how your frontend team would consume your API.</p>
+<ol class="linear-list"><li>Add a second resource — &quot;feedback comments.&quot; Each comment belongs to one feedback item. This tests whether your project structure supports adding new features without reorganizing everything. Ask Claude Code:</li></ol>
+<p>``` Add a feedback comments feature:</p>
+<ul class="linear-list"><li>POST /api/v1/feedback/{feedback_id}/comments</li><li>GET /api/v1/feedback/{feedback_id}/comments</li><li>Each comment has: id, feedback_id, author_email, body, created_at</li><li>Include the SQLAlchemy model, Pydantic schemas, service, routes, Alembic migration, and tests</li></ul>
+<p>```</p>
+<ol class="linear-list"><li>Performance test. Create 1,000 feedback items and test the list endpoint under load. Does pagination break? Does the database connection pool exhaust?</li></ol></div>
+    
+  </section>
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-key-takeaways" class="content-section reveal-left">
+    <span class="section-label">1.20 &middot; Key Takeaways</span>
+    <h2 class="slide-heading">Key Takeaways</h2>
+    <div class="section-body"><ol class="linear-list"><li>AI in 2026 is an accelerator, not an architect. It can scaffold fast, but humans still own product decisions, boundaries, security, and data correctness.</li></ol>
+<ol class="linear-list"><li><code>CLAUDE.md</code> and project rules are leverage multipliers. They turn generic codegen into repo-specific codegen.</li></ol>
+<ol class="linear-list"><li>Schemas, models, routes, and migrations must stay separate. That separation keeps APIs honest and migrations survivable.</li></ol>
+<ol class="linear-list"><li>OpenAPI is a live contract. If the docs are wrong, downstream SDKs, Postman, and AI agents all inherit the mistake.</li></ol>
+<ol class="linear-list"><li>Auth deserves adversarial review. Treat every generated auth dependency as guilty until you have checked secrets, expiry, issuer, audience, and ownership rules.</li></ol>
+<ol class="linear-list"><li>The backend workflow is repeatable: spec, plan, scaffold, inspect, test, refine, verify, ship. That rhythm is the real skill.</li></ol>
+<ol class="linear-list"><li>Verification is a core competency. Never accept migrations, auth code, or async queries without reading them. Generated code compiling is not the same as generated code being correct.</li></ol>
+<ol class="linear-list"><li>Rate limiting and logging are not optional. Add them with a Hardening Prompt before shipping. AI will not add them unless you ask.</li></ol></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-self-assessment-checklist" class="content-section reveal-left">
+    <span class="section-label">1.21 &middot; Self-Assessment Checklist</span>
+    <h2 class="slide-heading">Self-Assessment Checklist</h2>
+    <div class="section-body"><p>After completing today&#39;s material and lab, you should be able to answer &quot;yes&quot; to each of these:</p>
+<ul class="linear-list"><li>[ ] I can write a CLAUDE.md that specifies stack, conventions, directory structure, and error handling patterns for a FastAPI project</li><li>[ ] I can use Claude Code Plan mode to review a multi-file scaffold before any code is written</li><li>[ ] I can explain the difference between Pydantic schemas and SQLAlchemy models and why they must be separate files</li><li>[ ] I can generate an Alembic migration from SQLAlchemy models and review it for correctness (including downgrade logic and enum handling)</li><li>[ ] I can identify tautological tests in AI-generated test suites and request meaningful replacements</li><li>[ ] I can check AI-generated auth code for hardcoded secrets, missing expiry validation, and algorithm specification</li><li>[ ] I can explain what the OpenAPI spec at <code>/docs</code> shows and how it is generated from route annotations</li><li>[ ] I can explain when to use Claude Code versus Cursor for backend work</li><li>[ ] I can review AI-generated SQL queries for pagination, counting, index use, and async correctness</li><li>[ ] I built a complete CRUD API using the spec-scaffold-test-refine-ship rhythm and committed it to GitHub</li><li>[ ] I can articulate at least three categories of bugs that AI-generated backend code commonly contains</li><li>[ ] I can name the four prompting patterns (Spec, Scaffold, Refine, Hardening) and explain when to use each</li><li>[ ] I can explain what normalization levels 1NF, 2NF, and 3NF mean and when intentional denormalization is appropriate</li><li>[ ] I can identify an N+1 query in AI-generated code and rewrite it using selectinload or joinedload</li><li>[ ] I can add structured JSON logging to a service method and include request_id in every log line</li></ul></div>
+    
+  </section>
+<section id="day-7-ai-assisted-backend-api-development-references-further-reading" class="content-section reveal-left">
+    <span class="section-label">1.22 &middot; References &amp; Further Reading</span>
+    <h2 class="slide-heading">References &amp; Further Reading</h2>
+    <div class="section-body"><ul class="linear-list"><li>Claude Code official docs: https://code.claude.com/docs/en/overview</li><li>Claude Code product page: https://www.anthropic.com/product/claude-code</li><li>Claude Code x Python FastAPI Production Guide 2026: https://claudelab.net/en/articles/claude-code/claude-code-python-fastapi-production-api-guide</li><li>FastAPI Claude Code Skill (MCPMarket): https://mcpmarket.com/tools/skills/fastapi-production-toolkit</li><li>FastAPI Backend Scaffolding Skill (MCPMarket): https://mcpmarket.com/tools/skills/fastapi-backend-scaffolding</li><li>My Experience Using Claude Code on a FastAPI Backend (Medium, 2026): https://medium.com/@suganthi2496/part-1-my-experience-using-claude-code-on-a-fastapi-backend-2c387ffb707b</li><li>FastAPI + SQLAlchemy 2.0 Modern Async Database Patterns: https://dev-faizan.medium.com/fastapi-sqlalchemy-2-0-modern-async-database-patterns-7879d39b6843</li><li>Patterns and Practices for Using SQLAlchemy 2.0 with FastAPI: https://chaoticengineer.hashnode.dev/fastapi-sqlalchemy</li><li>FastAPI Best Practices (GitHub): https://github.com/zhanymkanov/fastapi-best-practices</li><li>fastapi-sqlalchemy-asyncpg Reference Implementation: https://github.com/grillazz/fastapi-sqlalchemy-asyncpg</li><li>Alembic on PyPI: https://pypi.org/project/alembic/</li><li>Alembic on GitHub: https://github.com/sqlalchemy/alembic</li><li>Database Migration Tools — Flyway, Liquibase, and Alembic (2026): https://dasroot.net/posts/2026/04/database-migration-tools-flyway-liquibase-alembic/</li><li>Versioning Your Database with SQLAlchemy and Alembic: https://dev.to/jcasman/versioning-your-database-with-sqlalchemy-and-alembic-from-models-to-safe-migrations-3i1c</li><li>FastAPI SDK Generation Docs: https://fastapi.tiangolo.com/advanced/generate-clients/</li><li>OpenAPI Generator (GitHub): https://github.com/OpenAPITools/openapi-generator</li><li>API Documentation with Swagger in FastAPI (2025): https://johal.in/api-documentation-generation-with-swagger-in-fastapi-2025/</li><li>Cursor AI 2026 — The Complete Guide: https://dev.to/sahilkhurana/cursor-ai-2026-the-complete-guide-to-the-ai-native-ide-3n4h</li><li>Cursor IDE: https://cursor.com/</li><li>Pydantic AI Docs: https://ai.pydantic.dev/</li><li>Pydantic Agent Basics — A Complete 2026 Tutorial: https://www.pyblog.in/programming/python/pydantic-agent-basics-a-complete-2026-tutorial/</li><li>slowapi — Rate Limiting for FastAPI: https://github.com/laurentS/slowapi</li><li>structlog — Structured Logging for Python: https://www.structlog.org/en/stable/</li></ul></div>
+    
+  </section>
+  </section>
+    </main>
+
+    <script>
+
+function toggleChecklist(el){
+  el.classList.toggle("checked");
+  el.setAttribute("aria-checked",String(el.classList.contains("checked")));
+}
+
+document.getElementById("themeBtn").addEventListener("click",()=>{
+  const root=document.documentElement;
+  root.dataset.theme=root.dataset.theme==="dark"?"light":"dark";
+});
+
+// Sidebar toggle
+(function(){
+  const btn=document.getElementById("sidebarBtn");
+  const sidebar=document.getElementById("workshopSidebar");
+  const body=document.body;
+  const stored=localStorage.getItem("workshop-sidebar");
+  if(stored!=="expanded"){body.classList.add("sidebar-collapsed");sidebar.classList.add("collapsed");}
+  btn.addEventListener("click",()=>{
+    const isCollapsed=body.classList.toggle("sidebar-collapsed");
+    sidebar.classList.toggle("collapsed");
+    localStorage.setItem("workshop-sidebar",isCollapsed?"collapsed":"expanded");
+  });
+})();
+
+document.addEventListener("mousemove",e=>{
+  document.getElementById("spotlight").style.background="radial-gradient(540px circle at "+e.clientX+"px "+e.clientY+"px,var(--glow),transparent 45%)";
+},{passive:true});
+document.addEventListener("keydown",e=>{
+  if((e.key===" "||e.key==="Enter")&&document.activeElement.classList.contains("checklist-row")){
+    e.preventDefault();toggleChecklist(document.activeElement);
+  }
+});
+
+const revealEls=document.querySelectorAll(".reveal,.reveal-left,.reveal-right,.reveal-scale,.reveal-blur");
+const observer=new IntersectionObserver(entries=>{
+  entries.forEach(entry=>{if(entry.isIntersecting)entry.target.classList.add("visible");});
+},{threshold:.08});
+revealEls.forEach(el=>observer.observe(el));
+setTimeout(()=>{revealEls.forEach(el=>el.classList.add("visible"));},1200);
+
+const navItems=[...document.querySelectorAll(".nav-item")];
+const sections=navItems.map(item=>document.querySelector(item.getAttribute("href"))).filter(Boolean);
+window.addEventListener("scroll",()=>{
+  let current=sections[0]?.id;
+  for(const section of sections){if(window.scrollY>=section.offsetTop-150)current=section.id;}
+  navItems.forEach(item=>item.classList.toggle("active",item.getAttribute("href")==="#"+current));
+},{passive:true});
+
+document.querySelectorAll(".copy-btn").forEach(btn=>btn.addEventListener("click",()=>{
+  const text=btn.closest(".code-container").querySelector("code").innerText;
+  navigator.clipboard?.writeText(text);
+  btn.textContent="Copied";
+  setTimeout(()=>btn.textContent="Copy",900);
+}));
+
+document.querySelectorAll(".tab-container").forEach(tc=>{
+  const headers=[...tc.querySelectorAll(".tab-header")];
+  const panels=[...tc.querySelectorAll(".tab-panel")];
+  headers.forEach((hdr,i)=>{
+    hdr.addEventListener("click",()=>{
+      headers.forEach(h=>h.classList.remove("active"));
+      panels.forEach(p=>p.classList.remove("active"));
+      hdr.classList.add("active");
+      if(panels[i])panels[i].classList.add("active");
+    });
+  });
+  if(headers[0])headers[0].classList.add("active");
+  if(panels[0])panels[0].classList.add("active");
+});
+
+    </script>
+</body>
+</html>

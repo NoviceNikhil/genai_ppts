@@ -1,0 +1,1652 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="slides-format" content="fullscreen">
+    <title>AI-Assisted Backend &amp; API Development — Slides</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+    /* ═══════════════════════════════════════
+       DESIGN TOKENS — DARK & LIGHT THEMES
+       ═══════════════════════════════════════ */
+    :root, [data-theme="dark"] {
+        --bg:           #0e0e10;
+        --bg-deep:      #080809;
+        --surface:      #18181b;
+        --surface-2:    #212124;
+        --border:       rgba(255,255,255,0.07);
+        --border-hover: rgba(139,92,246,0.3);
+        --text:         #f4f4f5;
+        --text-2:       #a1a1aa;
+        --text-3:       #52525b;
+        --accent:       #8b5cf6;
+        --accent-2:     #a78bfa;
+        --accent-3:     #c4b5fd;
+        --glow:         rgba(139,92,246,0.13);
+        --glow-strong:  rgba(139,92,246,0.22);
+        --tag-bg:       rgba(139,92,246,0.12);
+        --tag-border:   rgba(139,92,246,0.22);
+        --tag-text:     #a78bfa;
+        --card-bg:      rgba(255,255,255,0.03);
+        --card-bg-h:    rgba(255,255,255,0.055);
+        --grid-line:    rgba(255,255,255,0.016);
+        --accent-line:  rgba(139,92,246,0.55);
+        --nav-bg:       rgba(18,18,20,0.92);
+        --stat-grad:    linear-gradient(135deg,#f4f4f5 30%,#8b5cf6);
+        --bar-track:    rgba(255,255,255,0.06);
+        --bar-fill:     linear-gradient(90deg,#7c3aed,#a78bfa);
+        --shadow:       0 0 0 1px rgba(255,255,255,0.07);
+        --noise-op:     0.025;
+    }
+
+    [data-theme="light"] {
+        --bg:           #fafafa;
+        --bg-deep:      #f3f3f6;
+        --surface:      #ffffff;
+        --surface-2:    #f5f5f7;
+        --border:       rgba(0,0,0,0.08);
+        --border-hover: rgba(109,40,217,0.35);
+        --text:         #111113;
+        --text-2:       #6b6b74;
+        --text-3:       #b0b0b8;
+        --accent:       #7c3aed;
+        --accent-2:     #6d28d9;
+        --accent-3:     #5b21b6;
+        --glow:         rgba(124,58,237,0.07);
+        --glow-strong:  rgba(124,58,237,0.13);
+        --tag-bg:       rgba(124,58,237,0.08);
+        --tag-border:   rgba(124,58,237,0.18);
+        --tag-text:     #6d28d9;
+        --card-bg:      rgba(0,0,0,0.025);
+        --card-bg-h:    rgba(0,0,0,0.04);
+        --grid-line:    rgba(0,0,0,0.04);
+        --accent-line:  rgba(124,58,237,0.45);
+        --nav-bg:       rgba(250,250,250,0.94);
+        --stat-grad:    linear-gradient(135deg,#111113 30%,#7c3aed);
+        --bar-track:    rgba(0,0,0,0.07);
+        --bar-fill:     linear-gradient(90deg,#6d28d9,#8b5cf6);
+        --shadow:       0 1px 3px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.06);
+        --noise-op:     0.015;
+    }
+
+    /* ═══════════════════════════════════════
+       BASE RESET
+       ═══════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+        background: var(--bg);
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        color: var(--text);
+        overflow: hidden;
+        height: 100vh; width: 100vw;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    /* ═══════════════════════════════════════
+       DECK — FULLSCREEN MODE
+       Slides top-anchor content so heading
+       sits in the upper third like a real PPT slide.
+       ═══════════════════════════════════════ */
+    .deck { width: 100vw; height: 100vh; position: relative; }
+
+    .slide {
+        position: absolute; inset: 0;
+        background: var(--bg);
+        display: flex; flex-direction: column;
+        align-items: flex-start; justify-content: flex-start;
+        opacity: 0; transform: scale(0.985) translateY(8px);
+        transition: opacity 0.52s cubic-bezier(0.16,1,0.3,1),
+                    transform 0.52s cubic-bezier(0.16,1,0.3,1),
+                    background 0.3s ease;
+        pointer-events: none; overflow: hidden;
+    }
+    .slide.active {
+        opacity: 1; transform: scale(1) translateY(0);
+        pointer-events: all;
+    }
+    /* Full-bleed content — no max-width column.
+       Padding gives just enough breathing room from edges. */
+    .slide > .content {
+        position: relative; z-index: 2;
+        width: 100%;
+        padding: clamp(2.5rem, 5vh, 6rem) clamp(2.5rem, 5vw, 6.5rem) clamp(1.5rem, 3vh, 4rem);
+    }
+
+    /* Hero slides (title, closing) stay vertically centred */
+    .slide.slide-hero {
+        align-items: center;
+        justify-content: center;
+    }
+    .slide.slide-hero > .content {
+        width: 100%;
+        text-align: center;
+        padding: clamp(3rem, 6vh, 8rem) clamp(3rem, 8vw, 12rem);
+    }
+
+    /* ═══════════════════════════════════════
+       SLIDE ANATOMY LAYERS
+       ═══════════════════════════════════════ */
+    .accent-line {
+        position: absolute; top: 0; left: 0; right: 0; height: 2px;
+        background: linear-gradient(90deg, transparent, var(--accent-line), transparent);
+        z-index: 3; transition: background 0.3s;
+    }
+    .grid-overlay {
+        position: absolute; inset: 0; z-index: 0; pointer-events: none;
+        background-image:
+            linear-gradient(var(--grid-line) 1px, transparent 1px),
+            linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+        background-size: 64px 64px;
+        transition: background-image 0.3s;
+    }
+    .glow {
+        position: absolute; z-index: 0; pointer-events: none;
+        border-radius: 50%;
+        background: radial-gradient(circle, var(--glow-strong) 0%, transparent 70%);
+        transition: background 0.3s;
+    }
+    .slide::before {
+        content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+        background-size: 256px; opacity: var(--noise-op); mix-blend-mode: overlay;
+        transition: opacity 0.3s;
+    }
+
+    /* ═══════════════════════════════════════
+       COMPONENTS — PPT SCALE
+       ═══════════════════════════════════════ */
+    .tag {
+        display: inline-flex; align-items: center;
+        padding: 4px 14px; border-radius: 5px;
+        font-size: 0.78rem; font-weight: 600;
+        letter-spacing: 0.08em; text-transform: uppercase;
+        background: var(--tag-bg); color: var(--tag-text);
+        border: 1px solid var(--tag-border);
+        transition: background 0.3s, color 0.3s, border-color 0.3s;
+    }
+    .section-label {
+        font-size: 0.8rem; font-weight: 700;
+        letter-spacing: 0.13em; text-transform: uppercase;
+        color: var(--accent); margin-bottom: 0.6rem;
+        transition: color 0.3s;
+    }
+    /* PPT-scale heading: ~65pt at 1920px wide */
+    .slide-heading {
+        font-size: clamp(3rem, 4.5vw, 5rem);
+        font-weight: 800; letter-spacing: -0.035em; line-height: 1.08;
+        color: var(--text); margin: 0 0 2.2rem;
+        transition: color 0.3s;
+    }
+    .card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        transition: background 0.2s, border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+        box-shadow: var(--shadow);
+    }
+    .card:hover {
+        background: var(--card-bg-h);
+        border-color: var(--border-hover);
+        transform: translateY(-2px);
+    }
+    .mono { font-family: 'JetBrains Mono','Fira Code',ui-monospace,monospace; font-size: 0.85rem; color: var(--text-3); transition: color 0.3s; }
+    .divider { height: 1px; background: var(--border); border: none; transition: background 0.3s; }
+
+    /* Bullet list — ~26pt at 1920px, readable from a projector */
+    .linear-list { list-style: none; padding: 0; }
+    .linear-list li {
+        display: flex; gap: 18px; align-items: flex-start;
+        padding: 16px 0;
+        border-bottom: 1px solid var(--border);
+        font-size: clamp(1.3rem, 1.7vw, 1.9rem);
+        color: var(--text-2); line-height: 1.55;
+        transition: border-color 0.3s, color 0.3s;
+    }
+    .linear-list li:last-child { border-bottom: none; }
+    .linear-list li::before {
+        content: '';
+        flex-shrink: 0; width: 8px; height: 8px;
+        border-radius: 50%; background: var(--accent);
+        margin-top: 0.6em; transition: background 0.3s;
+    }
+
+    .stat-num {
+        background: var(--stat-grad);
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        background-clip: text; transition: background 0.3s;
+    }
+
+    .hbar-track {
+        background: var(--bar-track); border-radius: 4px;
+        height: 8px; overflow: hidden; transition: background 0.3s;
+    }
+    .hbar-fill {
+        height: 100%; border-radius: 4px;
+        background: var(--bar-fill);
+        width: 0%; transition: width 0.975s cubic-bezier(0.16,1,0.3,1), background 0.3s;
+    }
+
+    .timeline { position: relative; padding-left: 36px; }
+    .timeline::before {
+        content: ''; position: absolute; left: 8px; top: 10px; bottom: 10px;
+        width: 2px;
+        background: linear-gradient(to bottom, var(--accent), transparent);
+        transition: background 0.3s;
+    }
+    .timeline-item { position: relative; padding-bottom: 32px; }
+    .timeline-item:last-child { padding-bottom: 0; }
+    .timeline-item::before {
+        content: ''; position: absolute; left: -31px; top: 9px;
+        width: 10px; height: 10px; border-radius: 50%;
+        background: var(--accent);
+        box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 15%, transparent);
+        transition: background 0.3s;
+    }
+
+    .reveal { opacity: 0; transform: translateY(12px); }
+
+    /* ═══════════════════════════════════════
+       NAVIGATION BAR
+       ═══════════════════════════════════════ */
+    .nav-controls {
+        position: fixed; bottom: 28px; left: 50%;
+        transform: translateX(-50%);
+        display: flex; align-items: center; gap: 12px; z-index: 200;
+        background: var(--nav-bg);
+        backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+        padding: 9px 20px; border-radius: 40px;
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow);
+        transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
+    }
+    .nav-btn {
+        width: 32px; height: 32px; border: none;
+        background: transparent; color: var(--text-3);
+        font-size: 1.2rem; cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        border-radius: 6px; transition: color 0.2s, background 0.2s;
+    }
+    .nav-btn:hover { color: var(--text); background: var(--card-bg-h); }
+    .slide-dots { display: flex; gap: 5px; align-items: center; }
+    .dot {
+        width: 5px; height: 5px; border-radius: 99px;
+        background: var(--text-3); cursor: pointer;
+        transition: background 0.26s, width 0.325s;
+    }
+    .dot.active { background: var(--accent); width: 20px; }
+    .slide-counter { font-size: 0.75rem; color: var(--text-3); min-width: 38px; text-align: center; font-variant-numeric: tabular-nums; transition: color 0.3s; }
+
+    /* ═══════════════════════════════════════
+       THEME TOGGLE
+       ═══════════════════════════════════════ */
+    .theme-toggle {
+        position: fixed; top: 20px; right: 22px; z-index: 300;
+        width: 38px; height: 38px;
+        background: var(--nav-bg);
+        backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        display: flex; align-items: center; justify-content: center;
+        cursor: pointer; font-size: 1rem;
+        box-shadow: var(--shadow);
+        transition: background 0.3s, border-color 0.3s, transform 0.15s, box-shadow 0.3s;
+    }
+    .theme-toggle:hover { transform: scale(1.08); background: var(--card-bg-h); }
+    .theme-toggle:active { transform: scale(0.94); }
+
+    /* ═══════════════════════════════════════
+       HAMBURGER BUTTON
+       ═══════════════════════════════════════ */
+    .hamburger-btn {
+        position: fixed; top: 20px; left: 22px; z-index: 300;
+        width: 38px; height: 38px;
+        background: var(--nav-bg);
+        backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        display: flex; align-items: center; justify-content: center;
+        cursor: pointer; font-size: 1.1rem; color: var(--text-2);
+        box-shadow: var(--shadow);
+        transition: background 0.3s, border-color 0.3s, transform 0.15s, box-shadow 0.3s, color 0.3s;
+    }
+    .hamburger-btn:hover { transform: scale(1.08); background: var(--card-bg-h); color: var(--text); }
+    .hamburger-btn:active { transform: scale(0.94); }
+
+    /* ═══════════════════════════════════════
+       NAVIGATION DRAWER
+       ═══════════════════════════════════════ */
+    .drawer-overlay {
+        position: fixed; inset: 0; z-index: 398;
+        background: rgba(0,0,0,0.45);
+        opacity: 0; pointer-events: none;
+        transition: opacity 0.28s ease;
+    }
+    .drawer-overlay.visible { opacity: 1; pointer-events: all; }
+
+    .nav-drawer {
+        position: fixed; top: 0; left: 0; bottom: 0;
+        width: 300px;
+        background: var(--surface);
+        border-right: 1px solid var(--border);
+        z-index: 399;
+        transform: translateX(-100%);
+        transition: transform 0.34s cubic-bezier(0.16,1,0.3,1),
+                    background 0.3s, border-color 0.3s;
+        display: flex; flex-direction: column;
+        box-shadow: 4px 0 32px rgba(0,0,0,0.22);
+    }
+    .nav-drawer.open { transform: translateX(0); }
+
+    .drawer-header {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 20px 18px 16px;
+        border-bottom: 1px solid var(--border);
+        flex-shrink: 0; transition: border-color 0.3s;
+    }
+    .drawer-header-title {
+        font-size: .65rem; font-weight: 700;
+        letter-spacing: .12em; text-transform: uppercase;
+        color: var(--text-3); transition: color 0.3s;
+    }
+    .drawer-close-btn {
+        width: 28px; height: 28px; border: none;
+        background: transparent; color: var(--text-3);
+        font-size: .9rem; cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        border-radius: 5px; transition: color 0.2s, background 0.2s;
+    }
+    .drawer-close-btn:hover { color: var(--text); background: var(--card-bg-h); }
+
+    .drawer-body {
+        flex: 1; overflow-y: auto;
+        padding: 10px 0 36px;
+    }
+    .drawer-body::-webkit-scrollbar { width: 3px; }
+    .drawer-body::-webkit-scrollbar-track { background: transparent; }
+    .drawer-body::-webkit-scrollbar-thumb { background: var(--border-hover); border-radius: 99px; }
+
+    .drawer-section { margin-bottom: 4px; }
+    .drawer-section-tag {
+        padding: 14px 18px 5px;
+        font-size: .6rem; font-weight: 700;
+        letter-spacing: .12em; text-transform: uppercase;
+        color: var(--accent); transition: color 0.3s;
+    }
+    .drawer-slide-item {
+        display: flex; align-items: flex-start; gap: 11px;
+        padding: 9px 18px 9px 22px;
+        cursor: pointer; border-left: 2px solid transparent;
+        transition: background 0.15s, border-left-color 0.15s;
+    }
+    .drawer-slide-item:hover { background: var(--card-bg-h); }
+    .drawer-slide-item.active { background: var(--tag-bg); border-left-color: var(--accent); }
+    .drawer-slide-num {
+        font-size: .62rem; color: var(--text-3);
+        font-variant-numeric: tabular-nums;
+        min-width: 20px; margin-top: 2px; flex-shrink: 0;
+        font-family: 'JetBrains Mono','Fira Code',ui-monospace,monospace;
+        transition: color 0.15s;
+    }
+    .drawer-slide-title { font-size: .84rem; color: var(--text-2); line-height: 1.45; transition: color 0.15s; }
+    .drawer-slide-item.active .drawer-slide-title { color: var(--text); font-weight: 500; }
+    .drawer-slide-item.active .drawer-slide-num  { color: var(--accent); }
+
+    /* Mouse spotlight */
+    #spotlight { position: fixed; inset: 0; z-index: 99; pointer-events: none; }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.15s !important; }
+    }
+
+    /* ═══════════════════════════════════════
+       SPRING ENTRANCE SYSTEM
+       ═══════════════════════════════════════ */
+    :root { --spring: cubic-bezier(0.16, 1.1, 0.3, 1); }
+
+    .reveal        { opacity: 0; transform: translateY(16px); }
+    .reveal-left   { opacity: 0; transform: translateX(-28px); }
+    .reveal-right  { opacity: 0; transform: translateX(28px); }
+    .reveal-scale  { opacity: 0; transform: scale(0.88) translateY(10px); }
+    .reveal-blur   { opacity: 0; transform: translateY(14px); filter: blur(6px); }
+    .reveal-pop    { opacity: 0; transform: scale(0.72); }
+
+    .section-label, .tag { --enter: reveal-left; }
+    .slide-subtitle { --enter: reveal-blur; }
+    .stat-card  { --enter: reveal-scale; }
+    .card       { --enter: reveal-scale; }
+    .linear-list li { --enter: reveal; }
+    .timeline-item  { --enter: reveal-left; }
+    .bar-row   { --enter: reveal; }
+    .agenda-row { --enter: reveal-left; }
+    .emoji-hero { --enter: reveal-pop; }
+
+    /* ═══════════════════════════════════════
+       TYPEWRITER — multiline safe
+       ═══════════════════════════════════════ */
+    @keyframes cursor-blink {
+        0%, 100% { opacity: 1; }
+        50%       { opacity: 0; }
+    }
+    .typewriter-active { }
+    .typewriter-done   { }
+    .tw-cursor {
+        display: inline;
+        color: var(--accent);
+        animation: cursor-blink 0.65s step-end infinite;
+        margin-left: 1px; font-weight: 300; line-height: 1;
+        transition: color 0.3s;
+    }
+
+    /* === extension: activity · checklist · workflow === */
+    .activity-card {
+        background: var(--card-bg); border: 1px solid var(--border);
+        border-radius: 12px; padding: 28px 32px; box-shadow: var(--shadow);
+    }
+    .checklist-row {
+        display: flex; align-items: flex-start; gap: 14px;
+        padding: 12px 0; border-bottom: 1px solid var(--border); transition: border-color 0.3s;
+    }
+    .checklist-row:last-child { border-bottom: none; }
+    .checklist-box {
+        flex-shrink: 0; width: 22px; height: 22px;
+        border: 2px solid var(--accent); border-radius: 5px; margin-top: 2px; transition: border-color 0.3s;
+    }
+    .checklist-text { font-size: clamp(1.1rem, 1.5vw, 1.4rem); color: var(--text-2); line-height: 1.6; transition: color 0.3s; }
+    .workflow-container { display: flex; align-items: center; flex-wrap: wrap; gap: 0; margin-top: 1.5rem; }
+    .workflow-step {
+        background: var(--card-bg); border: 1px solid var(--border);
+        border-radius: 10px; padding: 18px 28px;
+        font-size: clamp(1rem, 1.3vw, 1.3rem); font-weight: 500; color: var(--text);
+        text-align: center; flex: 1; min-width: 120px;
+        transition: background 0.2s, border-color 0.2s;
+    }
+    .workflow-step:hover { background: var(--card-bg-h); border-color: var(--border-hover); }
+    .workflow-arrow { color: var(--accent); font-size: 1.4rem; padding: 0 10px; flex-shrink: 0; }
+
+    </style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════════
+     JSON DATA — Edit only this block to populate slides
+     ════════════════════════════════════════════════════ -->
+<script id="deck-data" type="application/json">
+{
+  "slides": [
+    {
+      "type": "title",
+      "emoji": "⚡",
+      "tag": "Week 2 · Backend Track",
+      "title": "AI-Assisted Backend \u0026 API Development",
+      "subtitle": "Day 7 — Week 2"
+    },
+    {
+      "type": "agenda",
+      "tag": "Overview",
+      "title": "What We'll Cover",
+      "items": [
+        {
+          "num": "01",
+          "label": "Learning Objectives",
+          "desc": "Key concepts, examples, and practice."
+        },
+        {
+          "num": "02",
+          "label": "Workshop Timeline",
+          "desc": "Key concepts, examples, and practice."
+        },
+        {
+          "num": "03",
+          "label": "The Mental Model: What Changed in 2026",
+          "desc": "Key concepts, examples, and practice."
+        },
+        {
+          "num": "04",
+          "label": "What AI Is Strong At for Backend Work",
+          "desc": "Key concepts, examples, and practice."
+        },
+        {
+          "num": "05",
+          "label": "What AI Is Weak At — Know Before You Review",
+          "desc": "Key concepts, examples, and practice."
+        },
+        {
+          "num": "06",
+          "label": "Constraint Engineering: The Real 2026 Skill",
+          "desc": "Key concepts, examples, and practice."
+        },
+        {
+          "num": "07",
+          "label": "Claude Code Capabilities",
+          "desc": "Key concepts, examples, and practice."
+        },
+        {
+          "num": "08",
+          "label": "Claude Code: Common Failure Modes",
+          "desc": "Key concepts, examples, and practice."
+        }
+      ]
+    },
+    {
+      "type": "bullets",
+      "tag": "Week 2 · Backend Track",
+      "title": "Learning Objectives",
+      "items": [
+        "Scaffold a complete FastAPI project from a single Claude Code prompt",
+        "Design normalized schemas with AI — indexes, constraints, migrations",
+        "Build Pydantic v2 request/response models with structured error handling",
+        "Generate and validate OpenAPI specs as live downstream contracts",
+        "Review AI-generated auth code for the security failures it always has",
+        "Optimize AI-generated SQL queries for N+1, pagination, and index use"
+      ]
+    },
+    {
+      "type": "agenda",
+      "tag": "Week 2 · Backend Track",
+      "title": "Workshop Timeline",
+      "items": [
+        {
+          "num": "01",
+          "label": "0:00–0:20",
+          "desc": "AI-native backend mental model"
+        },
+        {
+          "num": "02",
+          "label": "0:20–1:10",
+          "desc": "FastAPI scaffolding with Claude Code"
+        },
+        {
+          "num": "03",
+          "label": "1:10–2:05",
+          "desc": "Database schema design with AI"
+        },
+        {
+          "num": "04",
+          "label": "2:05–2:45",
+          "desc": "Request validation and error handling"
+        },
+        {
+          "num": "05",
+          "label": "2:45–3:05",
+          "desc": "Break"
+        },
+        {
+          "num": "06",
+          "label": "3:05–3:35",
+          "desc": "OpenAPI / Swagger contract generation"
+        }
+      ]
+    },
+    {
+      "type": "workflow",
+      "tag": "Week 2 · Backend Track",
+      "title": "The Mental Model: What Changed in 2026",
+      "steps": [
+        "Traditional: Requirements → Design → Type everything manually → Deploy",
+        "AI-Native: Spec first → AI scaffolds structure → Human constrains architecture",
+        "AI iteratively fills implementation → Human verifies contracts and security",
+        "AI assists testing, refactoring, docs → Ship",
+        "The shift: syntax is no longer the bottleneck — context quality and verification are"
+      ]
+    },
+    {
+      "type": "bullets",
+      "tag": "Week 2 · Backend Track",
+      "title": "What AI Is Strong At for Backend Work",
+      "items": [
+        "CRUD scaffolding and repetitive boilerplate across many files",
+        "Route generation from specs with full OpenAPI annotations",
+        "Schema-to-model conversion Pydantic ↔ SQLAlchemy",
+        "Alembic migration drafts from existing models",
+        "Test generation for happy paths",
+        "Refactors across multiple files simultaneously"
+      ]
+    },
+    {
+      "type": "checklist",
+      "tag": "Exercise",
+      "title": "What AI Is Weak At — Know Before You Review",
+      "items": [
+        "☐ Business logic that is ambiguous or domain-specific",
+        "☐ Transactional correctness across multiple tables",
+        "☐ Concurrency edge cases and race conditions",
+        "☐ Auth security nuances (issuer/audience validation, token rotation)",
+        "☐ Indexing tradeoffs without runtime telemetry",
+        "☐ Migration safety when data already exists in production",
+        "☐ Production scalability decisions (connection pooling, caching)"
+      ]
+    },
+    {
+      "type": "bullets",
+      "tag": "Week 2 · Backend Track",
+      "title": "Constraint Engineering: The Real 2026 Skill",
+      "items": [
+        "Vague prompt → single-file sync app, no separation, no validation",
+        "Constraint prompt → layered, testable, maintainable backend",
+        "Specify: stack versions, directory layout, async vs sync, what \"done\" means",
+        "Include: \"Plan files first. Do not write code until I approve the plan.\"",
+        "CLAUDE.md encodes all constraints so every prompt inherits them",
+        "The AI is the typist; you are the architect"
+      ]
+    },
+    {
+      "type": "bullets",
+      "tag": "Week 2 · Backend Track",
+      "title": "Claude Code Capabilities",
+      "items": [
+        "Multi-file generation: entire project structure in one session",
+        "Repo-aware edits: reads your files, matches your naming patterns",
+        "Architectural consistency: applies CLAUDE.md rules across all generated files",
+        "Test-fix loops: generates tests, runs them, reads failures, fixes code",
+        "Migration assistance: generates Alembic migrations and verifies app starts",
+        "Refactors across files: rename a method and all call sites update"
+      ]
+    },
+    {
+      "type": "checklist",
+      "tag": "Exercise",
+      "title": "Claude Code: Common Failure Modes",
+      "items": [
+        "☐ Circular imports — `ImportError` at startup → ask for import graph first",
+        "☐ Hallucinated package versions — `ModuleNotFoundError` → pin in CLAUDE.md",
+        "☐ Async/sync mixing — sync `Session()` inside async routes → audit every await",
+        "☐ Duplicate models — two ORM classes for the same table → require file-by-file plan",
+        "☐ Incorrect dependency injection — route gets `None` instead of a session",
+        "☐ Pydantic v1 syntax — `class Config:` inside model → specify \"Pydantic v2\" explicitly",
+        "☐ Missing downgrade in migration — rollback leaves orphan tables"
+      ]
+    },
+    {
+      "type": "workflow",
+      "tag": "Week 2 · Backend Track",
+      "title": "The Four Prompting Patterns",
+      "steps": [
+        "Spec: define entities, endpoints, architecture, constraints — before any code",
+        "Scaffold: after plan approval — generate the full structure, install, and verify",
+        "Refine: after scaffold — add pagination, filtering, fix specific behaviors",
+        "Hardening: after feature works — tests, logging, error handling, async audit",
+        "Use them in order: each pattern produces a reviewable checkpoint"
+      ]
+    },
+    {
+      "type": "workflow",
+      "tag": "Week 2 · Backend Track",
+      "title": "Section 1: FastAPI Scaffolding",
+      "steps": [
+        "Step 1: Write CLAUDE.md — stack, conventions, directory layout, error patterns",
+        "Step 2: Open Claude Code in project root (`claude`)",
+        "Step 3: Plan mode first (Shift+Tab twice) — review file-by-file plan before any code",
+        "Step 4: Reject over-engineering (\"no caching, no background tasks yet\")",
+        "Step 5: Approve plan → execute → verify health check returns 200",
+        "Step 6: Read every generated file — you are the engineer, AI is the typist"
+      ]
+    },
+    {
+      "type": "bullets",
+      "tag": "Week 2 · Backend Track",
+      "title": "FastAPI Layered Architecture",
+      "items": [
+        "Routes — HTTP contracts: paths, methods, status codes, response models",
+        "Schemas — Pydantic input/output contracts NOT the same as database models",
+        "Models — SQLAlchemy persistent data with types, constraints, migrations",
+        "Services — business logic; routes stay thin and testable",
+        "Dependencies — database sessions, auth context, reusable request-scoped objects",
+        "Core — config, secrets, middleware, exception handlers"
+      ]
+    },
+    {
+      "type": "activity",
+      "tag": "Week 2 · Backend Track",
+      "title": "Mini Exercise: Prompt Diagnosis (10 min)",
+      "items": [
+        "Compare: \"Create a FastAPI API for feedback\" vs. the layered architecture prompt",
+        "Predict what each prompt produces before running either",
+        "Check the better prompt: does it specify architecture, async vs sync, versions?",
+        "Check: does it force plan-before-code? Does it define done criteria?",
+        "Identify what you would add to the prompt for your own team's conventions"
+      ]
+    },
+    {
+      "type": "bullets",
+      "tag": "Week 2 · Backend Track",
+      "title": "Section 2: Database Schema Design",
+      "items": [
+        "Start from access patterns, not entities — PM lists, engineer filters, user history",
+        "Tell AI: expected data volume AND query patterns before asking for a schema",
+        "Use UUID primary keys — no information leakage, distributed-system safe",
+        "Composite indexes must match your real query filters exactly",
+        "Always timezone=True on DateTime — nearly impossible to fix retroactively",
+        "String length limits on every column — not unlimited Text everywhere"
+      ]
+    },
+    {
+      "type": "checklist",
+      "tag": "Exercise",
+      "title": "Schema Review Criteria",
+      "items": [
+        "☐ Queryable fields are columns, not inside JSON blobs",
+        "☐ Priority/status have check constraints at the database level",
+        "☐ Composite index exists for the primary list endpoint's filter combination",
+        "☐ Nullable columns are only those that are genuinely optional",
+        "☐ Enums defined once in `app/core/enums.py`, not duplicated in models and schemas",
+        "☐ All timestamps include timezone",
+        "☐ If soft-delete column exists, every list query filters it"
+      ]
+    },
+    {
+      "type": "checklist",
+      "tag": "Exercise",
+      "title": "Alembic Migration Review",
+      "items": [
+        "☐ Table names match your model `tablename` exactly",
+        "☐ Column types are correct — especially enum types (not raw strings)",
+        "☐ All indexes from `__table_args__` are included in the migration",
+        "☐ `downgrade()` reverses `upgrade()` completely, including enum type drops",
+        "☐ Migration does not silently drop or rewrite existing data",
+        "☐ Migration fails clearly if applied twice (idempotency)",
+        "☐ PostgreSQL enum creation/deletion order is correct"
+      ]
+    },
+    {
+      "type": "activity",
+      "tag": "Week 2 · Backend Track",
+      "title": "Mini Exercise: AI Schema Review (15 min)",
+      "items": [
+        "Ask Claude Code to generate a feedback schema from access patterns",
+        "Run the review prompt: \"Find issues in normalization, constraints, indexes, nullable fields, and migration risk. Return findings by severity before proposing code.\"",
+        "Check specifically: composite index for primary list, priority check constraint, timezone on timestamps",
+        "Discuss with neighbor: what would you change before running this migration?"
+      ]
+    },
+    {
+      "type": "bullets",
+      "tag": "Week 2 · Backend Track",
+      "title": "Section 3: Pydantic v2 Validation",
+      "items": [
+        "Three validation layers: API Pydantic, Domain service, Database constraints",
+        "Schemas and ORM models are separate files — always",
+        "FeedbackCreate: strict, required fields, email validation, range checks",
+        "FeedbackUpdate: all fields optional, reject empty body, preserve constraints",
+        "FeedbackResponse: only what the API promises — never every database column",
+        "Error schema: stable JSON shape clients can handle code, message, requestid"
+      ]
+    },
+    {
+      "type": "checklist",
+      "tag": "Exercise",
+      "title": "Section 3: Common Pydantic Pitfalls",
+      "items": [
+        "☐ AI generates `class Config:` → that is Pydantic v1; specify v2 explicitly",
+        "☐ `EmailStr` used without `email-validator` in requirements → import error at runtime",
+        "☐ FeedbackUpdate has required fields → client must send every field to update one",
+        "☐ Enum defined separately in schemas and models with slightly different values",
+        "☐ Generic handler returns `str(exc)` → exposes table names, SQL, or secrets",
+        "☐ Different routes return different error shapes → frontend cannot handle them uniformly"
+      ]
+    },
+    {
+      "type": "activity",
+      "tag": "Week 2 · Backend Track",
+      "title": "Mini Exercise: Error Contract First (10 min)",
+      "items": [
+        "Before writing any error handler, define error codes as a table: scenario → status → code",
+        "Cover: not found (404), invalid input (422), ownership (403), conflict (409), unavailable (503)",
+        "Then prompt Claude Code: \"Implement these as typed exceptions and global handlers\"",
+        "Verify: each error code is tested with an assertion on both status and response shape",
+        "The discipline: define the contract first, generate code second"
+      ]
+    },
+    {
+      "type": "bullets",
+      "tag": "Week 2 · Backend Track",
+      "title": "Section 4: OpenAPI as a Live Contract",
+      "items": [
+        "FastAPI auto-generates OpenAPI from routes, Pydantic models, and annotations",
+        "Spec powers: Postman imports, TypeScript SDK generation, AI agent tool discovery",
+        "Every endpoint needs: responsemodel, statuscode, summary, responses",
+        "Missing responsemodel → spec shows \"any\" → client generation breaks",
+        "Internal fields in response schema → they appear in the public spec",
+        "Generate TypeScript clients with npx @hey-api/openapi-ts from the live spec"
+      ]
+    },
+    {
+      "type": "bullets",
+      "tag": "Week 2 · Backend Track",
+      "title": "Section 4a: API Versioning",
+      "items": [
+        "URL path versioning is most common — /api/v1/ prefix on all routers",
+        "Prefix is visible, easy to test, and each version gets its own OpenAPI spec",
+        "When adding v2, mark v1 routes deprecated=True in FastAPI with a sunset date",
+        "Header versioning is an alternative — less visible, harder to test in a browser",
+        "AI-generated backends ship without versioning — add it to your CLAUDE.md",
+        "Any API with more than one consumer including your own frontend needs versioning"
+      ]
+    },
+    {
+      "type": "activity",
+      "tag": "Week 2 · Backend Track",
+      "title": "Mini Exercise: Contract Verification (10 min)",
+      "items": [
+        "Start the app and open `/docs` — check every endpoint appears under the correct tag",
+        "Run: `http GET localhost:8000/openapi.json` — verify it loads and has schemas",
+        "Test POST, GET, PUT, DELETE with HTTPie — check status codes match the spec",
+        "Check: does PUT allow partial updates? Does DELETE return 204?",
+        "Check: do error responses appear in the docs under each endpoint?"
+      ]
+    },
+    {
+      "type": "bullets",
+      "tag": "Week 2 · Backend Track",
+      "title": "Section 5: Auth — The One Area That Requires Adversarial Review",
+      "items": [
+        "Authentication answers \"who is this?\" — JWT bearer token validates identity",
+        "Authorization answers \"what can they do?\" — ownership and role checks in the service layer",
+        "A valid token does NOT automatically mean the user can edit a specific item",
+        "AI scaffolds the happy path; adversarial review finds the exploitable edge cases",
+        "Never accept generated auth code without reading every line",
+        "Defer to external IdPs Auth0, Cognito, Clerk for identity — own authorization yourself"
+      ]
+    },
+    {
+      "type": "checklist",
+      "tag": "Exercise",
+      "title": "Auth Security Checklist",
+      "items": [
+        "☐ Token secret comes from environment variables — never hardcoded in source",
+        "☐ Expiry is validated — expired tokens return 401, not 403",
+        "☐ Algorithm is explicit (`algorithms=[\"HS256\"]`) — never accept `\"none\"`",
+        "☐ Issuer and audience validated when tokens come from an external IdP",
+        "☐ Role claims are verified against the database, not trusted from token payload",
+        "☐ Authorization errors are 403; authentication errors are 401",
+        "☐ User A cannot update User B's feedback item",
+        "☐ Tests cover forbidden access, not only successful login"
+      ]
+    },
+    {
+      "type": "activity",
+      "tag": "Week 2 · Backend Track",
+      "title": "Mini Exercise: Adversarial Auth Review (15 min)",
+      "items": [
+        "Prompt: \"Review app/core/security.py as an attacker. Look for hardcoded secrets, missing expiry checks, missing issuer/audience, trusting role claims without DB verification, and endpoints missing auth.\"",
+        "Manually test: can user A update user B's item?",
+        "Manually test: does an expired token fail? A token with the wrong secret?",
+        "Check: are auth errors 401 and authorization errors 403?",
+        "Identify: which GET routes are public vs protected — does the code match the intent?"
+      ]
+    },
+    {
+      "type": "bullets",
+      "tag": "Week 2 · Backend Track",
+      "title": "Section 6: SQL Query Generation",
+      "items": [
+        "AI writes SQLAlchemy syntax quickly — it cannot know real cardinality without telemetry",
+        "Always check: does the query use the index that was designed?",
+        "Pagination must use LIMIT/OFFSET in SQL — never Python slice after loading all rows",
+        "Count must use a separate selectfunc.count query — never len on a full result set",
+        "Write operations touching multiple rows must be wrapped in a transaction",
+        "Fetch only the columns the endpoint returns — use loadonly for wide tables"
+      ]
+    },
+    {
+      "type": "bullets",
+      "tag": "Week 2 · Backend Track",
+      "title": "The N+1 Query Problem",
+      "items": [
+        "Pattern: one query fetches a list, then one query per item fetches related data",
+        "At 10 items: 11 queries. At 1000 items: 1001 queries — database exhaustion",
+        "AI generates N+1 patterns constantly when models have relationships",
+        "Fix: selectinload or joinedload loads relationships in one batch query",
+        "After any scaffold involving relationships, run the N+1 review prompt",
+        "Ask AI to explain which relationships could cause N+1 before scaffolding"
+      ]
+    },
+    {
+      "type": "activity",
+      "tag": "Week 2 · Backend Track",
+      "title": "Mini Exercise: Find the Slow Query (15 min)",
+      "items": [
+        "Examine the provided Python-side filter/count/slice implementation",
+        "Ask Claude Code: \"Explain why this is unsafe for 100K rows. Rewrite it.\"",
+        "Check the rewrite: WHERE clauses in SQL, ORDER BY, LIMIT/OFFSET, separate count query",
+        "Verify the response model includes: items, total, page, page_size",
+        "Run EXPLAIN on the fixed query — does it show an index scan or a seq scan?"
+      ]
+    },
+    {
+      "type": "bullets",
+      "tag": "Week 2 · Backend Track",
+      "title": "Section 6a: Rate Limiting",
+      "items": [
+        "AI-generated backends ship without rate limiting — it is a production gap, not optional",
+        "Use slowapi wrapping the limits library for FastAPI",
+        "Write endpoints: 10 requests/minute per IP — prevents submission spam",
+        "Read list: 60 requests/minute per IP — bounded but read-heavy",
+        "Auth endpoints: 5 requests/minute — brute-force protection",
+        "Rate-limit exceeded responses must match your structured error format 429"
+      ]
+    },
+    {
+      "type": "bullets",
+      "tag": "Week 2 · Backend Track",
+      "title": "Section 6b: Structured Logging",
+      "items": [
+        "AI-generated backends ship with print or no logging — add it explicitly",
+        "Every service method logs: entry, result type, duration, exceptions at ERROR level",
+        "Every HTTP request logs: method, path, status code, durationms, requestid",
+        "Never log email addresses or user-identifiable data in INFO logs",
+        "Request ID middleware injects a UUID into every request and every log line",
+        "JSON format in production, human-readable in development — environment variable controls"
+      ]
+    },
+    {
+      "type": "workflow",
+      "tag": "Week 2 · Backend Track",
+      "title": "Section 7: The AI Pair-Programming Rhythm",
+      "steps": [
+        "Spec: human writes behavior, constraints, error cases — 5 minutes, no AI yet",
+        "Plan: AI proposes file-level changes in read-only mode — review and reject over-engineering",
+        "Scaffold: AI creates the first implementation — watch, don't interrupt",
+        "Inspect: human checks architecture, auth, database, and contracts in Cursor",
+        "Test: AI drafts tests — human rejects tautological tests (testing FastAPI, not your logic)",
+        "Refine: run tests, share failures with AI, fix and re-run"
+      ]
+    },
+    {
+      "type": "checklist",
+      "tag": "Exercise",
+      "title": "Verification Discipline",
+      "items": [
+        "☐ Never accept migrations blindly — read `upgrade()` and `downgrade()` both",
+        "☐ Never accept auth code blindly — check secrets, expiry, algorithm, issuer",
+        "☐ Never accept async code blindly — search for `Session(` in async routes",
+        "☐ Tests passing is necessary but not sufficient — read the assertions",
+        "☐ A test that checks `status_code == 200` without checking body is testing FastAPI, not you",
+        "☐ Good test: create item with priority 3, update to 1, fetch, verify the change",
+        "☐ Generated code compiles ≠ generated code is correct"
+      ]
+    },
+    {
+      "type": "bullets",
+      "tag": "Week 2 · Backend Track",
+      "title": "Tool Selection by Phase",
+      "items": [
+        "Claude Code → plan, scaffold, multi-file changes, migrations, test-fix loops",
+        "Cursor → inspect code, cross-file questions, targeted refactors, diff review",
+        "Postman/HTTPie → prove endpoints behave like the spec",
+        "Git → capture a working checkpoint before the next risky change",
+        "Claude Code for new projects; Cursor for iterating on individual files"
+      ]
+    },
+    {
+      "type": "bullets",
+      "tag": "Week 2 · Backend Track",
+      "title": "Section 8: 2026 Trends — What's Changing Now",
+      "items": [
+        "MCP Servers as backend middleware — 500+ public servers, 28% Fortune 500 adoption",
+        "LLM Gateway / AI Proxy — model cascading produces 60–80% cost reduction in practice",
+        "Streaming-first architecture — SSE for token streaming, WebSockets for agentic bidirectional flows",
+        "Edge AI inference — Cloudflare Workers AI runs RAG pipelines at 200ms vs 800ms centralized",
+        "AI-native API design — Arazzo Specification lets agents discover multi-step workflows",
+        "Agentic backend patterns — FastAPI as orchestration layer, not just CRUD API"
+      ]
+    },
+    {
+      "type": "activity",
+      "tag": "Week 2 · Backend Track",
+      "title": "Capstone Lab: Build a CRUD Feedback API (45 min)",
+      "items": [
+        "0–5 min: Create repo, write CLAUDE.md, start Claude Code in plan mode",
+        "5–15 min: Generate the scaffold — all files, dependencies, initial migration",
+        "15–25 min: Verify `/health` → then generate model, schemas, routes",
+        "25–32 min: Test all 5 endpoints with HTTPie or Postman",
+        "32–38 min: Fix validation gaps — structured errors, 404 behavior, partial updates",
+        "38–43 min: Open `/docs` — verify every endpoint has schema and descriptions",
+        "43–45 min: `git commit` and push — working API on GitHub"
+      ]
+    },
+    {
+      "type": "checklist",
+      "tag": "Exercise",
+      "title": "Lab Rubric",
+      "items": [
+        "☐ CRUD endpoints (POST, GET, GET/{id}, PUT, DELETE) work locally",
+        "☐ Pydantic rejects invalid email, bad category, priority out of 1–5 range",
+        "☐ FeedbackUpdate accepts partial updates (not all fields required)",
+        "☐ SQLAlchemy model and Alembic migration exist and were reviewed",
+        "☐ Not-found and validation errors return structured JSON with stable error codes",
+        "☐ `/docs` and `/openapi.json` load with schemas and descriptions",
+        "☐ README documents setup commands and at least one example prompt used",
+        "☐ Working code pushed to GitHub"
+      ]
+    },
+    {
+      "type": "bullets",
+      "tag": "Week 2 · Backend Track",
+      "title": "Key Takeaways",
+      "items": [
+        "AI is an accelerator, not an architect — humans own decisions, security, data correctness",
+        "CLAUDE.md converts generic codegen into repo-specific codegen — write it first",
+        "Schemas, models, routes, and migrations must stay separate — always",
+        "OpenAPI is a live contract — wrong docs break everything built on top of them",
+        "Auth deserves adversarial review every time — the failures are predictable",
+        "The rhythm is repeatable: spec → plan → scaffold → inspect → test → refine → verify → ship"
+      ]
+    },
+    {
+      "type": "checklist",
+      "tag": "Review",
+      "title": "Self-Assessment: Can You Answer Yes?",
+      "items": [
+        "☐ I can write a CLAUDE.md that specifies stack, conventions, and error patterns",
+        "☐ I can use Claude Code Plan mode to review a scaffold before any code is written",
+        "☐ I can explain why Pydantic schemas and SQLAlchemy models must be separate files",
+        "☐ I can review an Alembic migration for correctness including downgrade logic",
+        "☐ I can identify tautological AI-generated tests and request meaningful replacements",
+        "☐ I can check AI-generated auth for hardcoded secrets, missing expiry, wrong algorithm",
+        "☐ I can identify an N+1 query and rewrite it using selectinload or joinedload",
+        "☐ I built a complete CRUD API using the rhythm and committed it to GitHub"
+      ]
+    },
+    {
+      "type": "closing",
+      "emoji": "→",
+      "tag": "End",
+      "title": "Review \u0026 Apply",
+      "subtitle": "Use the workshop guide for deeper reading and hands-on exercises."
+    }
+  ]
+}
+</script>
+
+<!-- Hamburger / drawer toggle -->
+<button class="hamburger-btn" id="hamburgerBtn" aria-label="Open slide navigation">&#9776;</button>
+
+<!-- Drawer backdrop -->
+<div class="drawer-overlay" id="drawerOverlay"></div>
+
+<!-- Slide navigation drawer -->
+<nav class="nav-drawer" id="navDrawer" aria-label="Slide navigation">
+    <div class="drawer-header">
+        <span class="drawer-header-title">Slides</span>
+        <button class="drawer-close-btn" id="drawerCloseBtn" aria-label="Close">&#10005;</button>
+    </div>
+    <div class="drawer-body" id="drawerBody"></div>
+</nav>
+
+<!-- Theme toggle -->
+<button class="theme-toggle" id="themeBtn" aria-label="Toggle theme" title="Switch to dark mode">&#127769;</button>
+
+<!-- Mouse spotlight -->
+<div id="spotlight"></div>
+
+<!-- Deck container -->
+<div class="deck" id="deck"></div>
+
+<!-- Navigation -->
+<div class="nav-controls">
+    <button class="nav-btn" id="prevBtn" aria-label="Previous slide">&#8249;</button>
+    <div class="slide-dots" id="dots"></div>
+    <button class="nav-btn" id="nextBtn" aria-label="Next slide">&#8250;</button>
+    <span class="slide-counter" id="counter">1 / 1</span>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════
+   SAFE HTML ESCAPE — all slide data passes through here
+   ═══════════════════════════════════════════════════ */
+function h(str) {
+    return String(str == null ? '' : str)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+/* ═══════════════════════════════════════════════════
+   SLIDE BUILDERS — fullscreen scale
+   Larger padding, bigger inline font sizes, wider gaps.
+   ═══════════════════════════════════════════════════ */
+var B = {
+
+    /* Hero slides: centred via .slide-hero on the container */
+    title: function(s) {
+        return (
+            '<div class="accent-line"></div>' +
+            '<div class="grid-overlay"></div>' +
+            '<div class="glow" style="width:900px;height:900px;top:-260px;right:-200px;"></div>' +
+            '<div class="glow" style="width:600px;height:600px;bottom:-180px;left:-140px;opacity:.6;"></div>' +
+            '<div class="content">' +
+                '<div class="reveal" data-enter="pop" style="font-size:5rem;margin-bottom:1.6rem;line-height:1;filter:drop-shadow(0 0 24px var(--glow-strong))">' + h(s.emoji||'⬡') + '</div>' +
+                '<div class="tag reveal" data-enter="left" style="margin:0 auto 1.6rem;">' + h(s.tag) + '</div>' +
+                '<h1 class="reveal typewriter-target" style="font-size:clamp(4rem,6.5vw,7.5rem);font-weight:900;letter-spacing:-0.045em;line-height:1.04;color:var(--text);margin:0 0 1.4rem;transition:color .3s;">' + h(s.title) + '</h1>' +
+                '<p class="reveal" data-enter="blur" style="font-size:clamp(1.3rem,1.8vw,1.8rem);color:var(--text-2);font-weight:400;line-height:1.6;max-width:720px;margin:0 auto;transition:color .3s;">' + h(s.subtitle) + '</p>' +
+            '</div>'
+        );
+    },
+
+    agenda: function(s) {
+        var rows = s.items.map(function(i) {
+            return (
+                '<div class="card reveal" data-enter="left" style="padding:18px 28px;display:flex;align-items:center;gap:28px;">' +
+                    '<span class="mono" style="font-size:.9rem;min-width:26px;">' + h(i.num) + '</span>' +
+                    '<hr style="width:1px;height:28px;background:var(--border);border:none;flex-shrink:0;transition:background .3s;">' +
+                    '<span style="font-weight:600;font-size:clamp(1.1rem,1.3vw,1.35rem);min-width:180px;color:var(--text);transition:color .3s;">' + h(i.label) + '</span>' +
+                    '<span style="font-size:clamp(.95rem,1.1vw,1.1rem);color:var(--text-2);transition:color .3s;">' + h(i.desc) + '</span>' +
+                '</div>'
+            );
+        }).join('');
+        return (
+            '<div class="accent-line"></div>' +
+            '<div class="grid-overlay"></div>' +
+            '<div class="glow" style="width:560px;height:560px;top:-140px;right:-140px;opacity:.6;"></div>' +
+            '<div class="content">' +
+                '<div class="section-label reveal" data-enter="left">' + h(s.tag) + '</div>' +
+                '<h2 class="slide-heading reveal">' + h(s.title) + '</h2>' +
+                '<div style="display:flex;flex-direction:column;gap:14px;">' + rows + '</div>' +
+            '</div>'
+        );
+    },
+
+    bullets: function(s) {
+        var lis = s.items.map(function(t){ return '<li>' + h(t) + '</li>'; }).join('');
+        return (
+            '<div class="accent-line"></div>' +
+            '<div class="grid-overlay"></div>' +
+            '<div class="glow" style="width:600px;height:600px;top:-140px;right:-140px;opacity:.5;"></div>' +
+            '<div class="content">' +
+                '<div class="section-label reveal" data-enter="left">' + h(s.tag) + '</div>' +
+                '<h2 class="slide-heading reveal">' + h(s.title) + '</h2>' +
+                '<ul class="linear-list reveal" data-enter="bottom">' + lis + '</ul>' +
+            '</div>'
+        );
+    },
+
+    'two-col': function(s) {
+        return (
+            '<div class="accent-line"></div>' +
+            '<div class="grid-overlay"></div>' +
+            '<div class="glow" style="width:640px;height:640px;top:-160px;left:45%;opacity:.45;"></div>' +
+            '<div class="content">' +
+                '<div class="section-label reveal" data-enter="left">' + h(s.tag) + '</div>' +
+                '<h2 class="slide-heading reveal">' + h(s.title) + '</h2>' +
+                '<div class="reveal" data-enter="bottom" style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">' +
+                    '<div class="card" style="padding:38px 36px;">' +
+                        '<h3 style="font-size:clamp(1.1rem,1.4vw,1.5rem);font-weight:600;margin:0 0 14px;color:var(--text);transition:color .3s;">' + h(s.left.heading) + '</h3>' +
+                        '<p style="color:var(--text-2);font-size:clamp(1rem,1.2vw,1.2rem);line-height:1.7;margin:0;transition:color .3s;">' + h(s.left.body) + '</p>' +
+                    '</div>' +
+                    '<div class="card" style="padding:38px 36px;">' +
+                        '<h3 style="font-size:clamp(1.1rem,1.4vw,1.5rem);font-weight:600;margin:0 0 14px;color:var(--text);transition:color .3s;">' + h(s.right.heading) + '</h3>' +
+                        '<p style="color:var(--text-2);font-size:clamp(1rem,1.2vw,1.2rem);line-height:1.7;margin:0;transition:color .3s;">' + h(s.right.body) + '</p>' +
+                    '</div>' +
+                '</div>' +
+            '</div>'
+        );
+    },
+
+    'three-cards': function(s) {
+        var cs = s.cards.map(function(c) {
+            return (
+                '<div class="card reveal" data-enter="scale" style="padding:36px 30px;">' +
+                    '<div style="font-size:2.2rem;margin-bottom:18px;color:var(--accent);transition:color .3s;">' + h(c.icon) + '</div>' +
+                    '<h3 style="font-size:clamp(1.1rem,1.3vw,1.35rem);font-weight:600;margin:0 0 10px;color:var(--text);transition:color .3s;">' + h(c.title) + '</h3>' +
+                    '<p style="color:var(--text-2);font-size:clamp(1rem,1.1vw,1.1rem);line-height:1.65;margin:0;transition:color .3s;">' + h(c.body) + '</p>' +
+                '</div>'
+            );
+        }).join('');
+        return (
+            '<div class="accent-line"></div>' +
+            '<div class="grid-overlay"></div>' +
+            '<div class="glow" style="width:560px;height:560px;top:-120px;left:50%;transform:translateX(-50%);opacity:.5;"></div>' +
+            '<div class="content">' +
+                '<div class="section-label reveal" data-enter="left">' + h(s.tag) + '</div>' +
+                '<h2 class="slide-heading reveal">' + h(s.title) + '</h2>' +
+                '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:22px;">' + cs + '</div>' +
+            '</div>'
+        );
+    },
+
+    stats: function(s) {
+        var cols = 'repeat(' + s.stats.length + ',1fr)';
+        var cs = s.stats.map(function(st) {
+            return (
+                '<div class="card reveal" data-enter="scale" style="padding:48px 36px;text-align:center;">' +
+                    '<div class="stat-num" style="font-size:clamp(4rem,7vw,7.5rem);font-weight:900;line-height:1;letter-spacing:-0.045em;margin-bottom:16px;">' + h(st.value) + '</div>' +
+                    '<div style="font-size:clamp(1.1rem,1.3vw,1.3rem);font-weight:500;color:var(--text);margin-bottom:6px;transition:color .3s;">' + h(st.label) + '</div>' +
+                    '<div class="mono" style="font-size:.85rem;">' + h(st.note||'') + '</div>' +
+                '</div>'
+            );
+        }).join('');
+        return (
+            '<div class="accent-line"></div>' +
+            '<div class="grid-overlay"></div>' +
+            '<div class="glow" style="width:700px;height:700px;top:-140px;left:50%;transform:translateX(-50%);opacity:.9;"></div>' +
+            '<div class="content">' +
+                '<div class="section-label reveal" data-enter="left">' + h(s.tag) + '</div>' +
+                '<h2 class="slide-heading reveal">' + h(s.title) + '</h2>' +
+                '<div style="display:grid;grid-template-columns:' + cols + ';gap:26px;">' + cs + '</div>' +
+            '</div>'
+        );
+    },
+
+    'bar-chart': function(s) {
+        var rows = s.bars.map(function(b) {
+            return (
+                '<div class="reveal" data-enter="bottom" style="display:grid;grid-template-columns:200px 1fr 70px;align-items:center;gap:20px;padding:14px 0;border-bottom:1px solid var(--border);transition:border-color .3s;">' +
+                    '<span style="font-size:clamp(1rem,1.2vw,1.2rem);color:var(--text-2);transition:color .3s;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + h(b.label) + '</span>' +
+                    '<div class="hbar-track"><div class="hbar-fill" data-width="' + h(b.value) + '"></div></div>' +
+                    '<span class="mono" style="text-align:right;font-size:.9rem;">' + h(b.display) + '</span>' +
+                '</div>'
+            );
+        }).join('');
+        return (
+            '<div class="accent-line"></div>' +
+            '<div class="grid-overlay"></div>' +
+            '<div class="glow" style="width:500px;height:500px;top:-100px;right:-100px;opacity:.45;"></div>' +
+            '<div class="content">' +
+                '<div class="section-label reveal" data-enter="left">' + h(s.tag) + '</div>' +
+                '<h2 class="slide-heading reveal">' + h(s.title) + '</h2>' +
+                '<div>' + rows + '</div>' +
+            '</div>'
+        );
+    },
+
+    timeline: function(s) {
+        var ts = s.items.map(function(t) {
+            return (
+                '<div class="timeline-item reveal" data-enter="left">' +
+                    '<div style="display:flex;align-items:baseline;gap:14px;margin-bottom:4px;">' +
+                        '<span class="mono" style="font-size:.9rem;">' + h(t.date) + '</span>' +
+                        '<span style="font-size:clamp(1.1rem,1.3vw,1.3rem);font-weight:600;color:var(--text);transition:color .3s;">' + h(t.title) + '</span>' +
+                    '</div>' +
+                    '<p style="color:var(--text-2);font-size:clamp(1rem,1.15vw,1.15rem);line-height:1.6;margin:0;transition:color .3s;">' + h(t.desc) + '</p>' +
+                '</div>'
+            );
+        }).join('');
+        return (
+            '<div class="accent-line"></div>' +
+            '<div class="grid-overlay"></div>' +
+            '<div class="glow" style="width:560px;height:560px;top:-120px;right:-100px;opacity:.45;"></div>' +
+            '<div class="content">' +
+                '<div class="section-label reveal" data-enter="left">' + h(s.tag) + '</div>' +
+                '<h2 class="slide-heading reveal">' + h(s.title) + '</h2>' +
+                '<div class="timeline">' + ts + '</div>' +
+            '</div>'
+        );
+    },
+
+    activity: function(s) {
+        var lis = s.items.map(function(t){ return '<li>' + h(t) + '</li>'; }).join('');
+        return (
+            '<div class="accent-line"></div>' +
+            '<div class="grid-overlay"></div>' +
+            '<div class="glow" style="width:600px;height:600px;top:-140px;right:-140px;opacity:.5;"></div>' +
+            '<div class="content">' +
+                '<div class="section-label reveal">' + h(s.tag) + '</div>' +
+                '<h2 class="slide-heading reveal">' + h(s.title) + '</h2>' +
+                '<div class="activity-card reveal"><ul class="linear-list">' + lis + '</ul></div>' +
+            '</div>'
+        );
+    },
+
+    checklist: function(s) {
+        var rows = s.items.map(function(item) {
+            if (item.charAt(0) === '☐') {
+                return (
+                    '<div class="checklist-row">' +
+                        '<div class="checklist-box"></div>' +
+                        '<span class="checklist-text">' + h(item.slice(1).trim()) + '</span>' +
+                    '</div>'
+                );
+            }
+            return '<p style="color:var(--text-3);font-size:.9rem;margin-top:14px;font-style:italic;transition:color .3s;">' + h(item) + '</p>';
+        }).join('');
+        return (
+            '<div class="accent-line"></div>' +
+            '<div class="grid-overlay"></div>' +
+            '<div class="glow" style="width:600px;height:600px;top:-140px;right:-140px;opacity:.5;"></div>' +
+            '<div class="content">' +
+                '<div class="section-label reveal">' + h(s.tag) + '</div>' +
+                '<h2 class="slide-heading reveal">' + h(s.title) + '</h2>' +
+                '<div class="card reveal" style="padding:28px;">' + rows + '</div>' +
+            '</div>'
+        );
+    },
+
+    workflow: function(s) {
+        var parts = s.steps.map(function(step, i) {
+            var arrow = i < s.steps.length - 1 ? '<span class="workflow-arrow">&#8594;</span>' : '';
+            return '<div class="workflow-step">' + h(step) + '</div>' + arrow;
+        }).join('');
+        return (
+            '<div class="accent-line"></div>' +
+            '<div class="grid-overlay"></div>' +
+            '<div class="glow" style="width:600px;height:600px;top:-140px;right:-140px;opacity:.5;"></div>' +
+            '<div class="content">' +
+                '<div class="section-label reveal">' + h(s.tag) + '</div>' +
+                '<h2 class="slide-heading reveal">' + h(s.title) + '</h2>' +
+                '<div class="workflow-container reveal">' + parts + '</div>' +
+            '</div>'
+        );
+    },
+
+    closing: function(s) {
+        return (
+            '<div class="accent-line"></div>' +
+            '<div class="grid-overlay"></div>' +
+            '<div class="glow" style="width:900px;height:900px;top:-260px;right:-200px;"></div>' +
+            '<div class="glow" style="width:640px;height:640px;bottom:-200px;left:-140px;opacity:.5;"></div>' +
+            '<div class="content">' +
+                '<div class="reveal" data-enter="pop" style="font-size:4.5rem;margin-bottom:1.6rem;line-height:1;filter:drop-shadow(0 0 22px var(--glow-strong))">' + h(s.emoji||'→') + '</div>' +
+                '<div class="tag reveal" data-enter="left" style="margin:0 auto 1.6rem;">' + h(s.tag||'Thank You') + '</div>' +
+                '<h1 class="reveal typewriter-target" style="font-size:clamp(4rem,6.5vw,7.5rem);font-weight:900;letter-spacing:-0.045em;line-height:1.04;color:var(--text);margin:0 0 1.4rem;transition:color .3s;">' + h(s.title) + '</h1>' +
+                '<p class="reveal" data-enter="blur" style="font-size:clamp(1.3rem,1.8vw,1.8rem);color:var(--text-2);font-weight:400;line-height:1.6;max-width:720px;margin:0 auto;transition:color .3s;">' + h(s.subtitle) + '</p>' +
+            '</div>'
+        );
+    }
+};
+
+/* ═══════════════════════════════════════════════════
+   BUILD DECK
+   Hero slides get .slide-hero so they stay centred.
+   ═══════════════════════════════════════════════════ */
+var DATA = JSON.parse(document.getElementById('deck-data').textContent);
+var deck = document.getElementById('deck');
+var HERO_TYPES = { title: true, closing: true };
+
+DATA.slides.forEach(function(slide, i) {
+    var el = document.createElement('div');
+    el.className = 'slide' + (i === 0 ? ' active' : '') + (HERO_TYPES[slide.type] ? ' slide-hero' : '');
+    el.setAttribute('data-slide', i + 1);
+    var builder = B[slide.type] || B.bullets;
+    el.insertAdjacentHTML('beforeend', builder(slide));
+    deck.appendChild(el);
+});
+
+/* ═══════════════════════════════════════════════════
+   NAVIGATION
+   ═══════════════════════════════════════════════════ */
+var current  = 1;
+var dotsEl   = document.getElementById('dots');
+var counterEl = document.getElementById('counter');
+
+function total() { return document.querySelectorAll('.slide').length; }
+
+function buildDots() {
+    while (dotsEl.firstChild) dotsEl.removeChild(dotsEl.firstChild);
+    for (var i = 1; i <= total(); i++) {
+        var d = document.createElement('div');
+        d.className = 'dot' + (i === 1 ? ' active' : '');
+        d.setAttribute('aria-label', 'Slide ' + i);
+        (function(n){ d.onclick = function(){ goTo(n); }; })(i);
+        dotsEl.appendChild(d);
+    }
+    counterEl.textContent = '1 / ' + total();
+}
+buildDots();
+
+function goTo(n) {
+    var prev = document.querySelector('.slide.active');
+    var next = document.querySelector('.slide[data-slide="' + n + '"]');
+    if (!next || prev === next) return;
+    prev.classList.remove('active');
+    next.classList.add('active');
+    animateIn(next);
+    current = n;
+    document.querySelectorAll('.dot').forEach(function(d, i){ d.classList.toggle('active', i + 1 === current); });
+    counterEl.textContent = current + ' / ' + total();
+    updateDrawerActive(n);
+}
+
+function move(dir) {
+    var n = current + dir;
+    var t = total();
+    if (n < 1) n = t;
+    if (n > t) n = 1;
+    goTo(n);
+}
+
+document.getElementById('prevBtn').onclick = function(){ move(-1); };
+document.getElementById('nextBtn').onclick = function(){ move(1); };
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); move(1); }
+    if (e.key === 'ArrowLeft')  { e.preventDefault(); move(-1); }
+});
+var touchStart = 0;
+document.addEventListener('touchstart', function(e){ touchStart = e.touches[0].clientX; });
+document.addEventListener('touchend',   function(e){
+    var d = touchStart - e.changedTouches[0].clientX;
+    if (Math.abs(d) > 50) move(d > 0 ? 1 : -1);
+});
+
+/* ═══════════════════════════════════════════════════
+   DRAWER NAVIGATION — DOM methods only
+   ═══════════════════════════════════════════════════ */
+var navDrawerEl  = document.getElementById('navDrawer');
+var overlayEl    = document.getElementById('drawerOverlay');
+var hamburgerEl  = document.getElementById('hamburgerBtn');
+
+function openDrawer()  { navDrawerEl.classList.add('open');    overlayEl.classList.add('visible'); }
+function closeDrawer() { navDrawerEl.classList.remove('open'); overlayEl.classList.remove('visible'); }
+
+hamburgerEl.addEventListener('click', function() {
+    navDrawerEl.classList.contains('open') ? closeDrawer() : openDrawer();
+});
+document.getElementById('drawerCloseBtn').addEventListener('click', closeDrawer);
+overlayEl.addEventListener('click', closeDrawer);
+
+function buildDrawer() {
+    var body   = document.getElementById('drawerBody');
+    var groups = [];
+    var tagMap  = {};
+
+    DATA.slides.forEach(function(slide, i) {
+        var tag   = slide.tag   || '—';
+        var title = slide.title || slide.subtitle || tag;
+        if (!tagMap[tag]) { var g = { tag: tag, items: [] }; groups.push(g); tagMap[tag] = g; }
+        tagMap[tag].items.push({ title: title, index: i + 1 });
+    });
+
+    groups.forEach(function(g) {
+        var section = document.createElement('div');
+        section.className = 'drawer-section';
+
+        var tagEl = document.createElement('div');
+        tagEl.className = 'drawer-section-tag';
+        tagEl.textContent = g.tag;
+        section.appendChild(tagEl);
+
+        g.items.forEach(function(it) {
+            var item = document.createElement('div');
+            item.className = 'drawer-slide-item';
+            item.setAttribute('data-slide', it.index);
+
+            var numEl = document.createElement('span');
+            numEl.className = 'drawer-slide-num';
+            numEl.textContent = String(it.index).padStart(2, '0');
+
+            var titleEl = document.createElement('span');
+            titleEl.className = 'drawer-slide-title';
+            titleEl.textContent = it.title;
+
+            item.appendChild(numEl);
+            item.appendChild(titleEl);
+            item.addEventListener('click', (function(n){ return function(){ goTo(n); closeDrawer(); }; })(it.index));
+            section.appendChild(item);
+        });
+        body.appendChild(section);
+    });
+}
+
+function updateDrawerActive(n) {
+    var items = document.querySelectorAll('.drawer-slide-item');
+    if (!items.length) return;
+    items.forEach(function(item){ item.classList.toggle('active', parseInt(item.getAttribute('data-slide'), 10) === n); });
+    var active = document.querySelector('.drawer-slide-item.active');
+    if (active) active.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+}
+
+buildDrawer();
+updateDrawerActive(1);
+
+/* ═══════════════════════════════════════════════════
+   TYPEWRITER — multiline safe
+   ═══════════════════════════════════════════════════ */
+function typewriteHeading(el) {
+    var fullText = el.dataset.originalText || el.textContent.trim();
+    if (!el.dataset.originalText) el.dataset.originalText = fullText;
+
+    el.classList.remove('typewriter-done');
+    el.classList.add('typewriter-active');
+
+    var textNode = document.createTextNode('');
+    var cursor   = document.createElement('span');
+    cursor.className = 'tw-cursor';
+    cursor.setAttribute('aria-hidden', 'true');
+    cursor.textContent = '|';
+
+    while (el.firstChild) el.removeChild(el.firstChild);
+    el.appendChild(textNode);
+    el.appendChild(cursor);
+
+    var speed = Math.min(36, 1560 / Math.max(fullText.length, 1));
+    var i = 0;
+
+    function tick() {
+        textNode.textContent = fullText.slice(0, ++i);
+        if (i < fullText.length) {
+            setTimeout(tick, speed);
+        } else {
+            el.classList.remove('typewriter-active');
+            el.classList.add('typewriter-done');
+            cursor.style.transition = 'opacity 0.4s ease 0.15s';
+            cursor.style.opacity    = '0';
+            setTimeout(function(){ if (cursor.parentNode === el) el.removeChild(cursor); }, 700);
+        }
+    }
+    setTimeout(tick, 234);
+}
+
+/* ═══════════════════════════════════════════════════
+   SPRING ENTRANCE
+   ═══════════════════════════════════════════════════ */
+var SPRING = 'cubic-bezier(0.16, 1.1, 0.3, 1)';
+
+var ENTER_STATES = {
+    left:   { opacity:'0', transform:'translateX(-28px)',            filter:'' },
+    right:  { opacity:'0', transform:'translateX(28px)',             filter:'' },
+    scale:  { opacity:'0', transform:'scale(0.88) translateY(10px)', filter:'' },
+    blur:   { opacity:'0', transform:'translateY(14px)',             filter:'blur(6px)' },
+    pop:    { opacity:'0', transform:'scale(0.72)',                  filter:'' },
+    bottom: { opacity:'0', transform:'translateY(18px)',             filter:'' }
+};
+
+function getEnterType(el) {
+    return el.dataset.enter ||
+           (el.classList.contains('section-label') || el.classList.contains('tag') ? 'left' :
+            el.classList.contains('timeline-item') ? 'left' :
+            el.classList.contains('card')           ? 'scale' :
+            'bottom');
+}
+
+function applyHidden(el, type) {
+    var s = ENTER_STATES[type] || ENTER_STATES.bottom;
+    el.style.transition = 'none';
+    el.style.opacity    = s.opacity;
+    el.style.transform  = s.transform;
+    if (s.filter) el.style.filter = s.filter;
+    el.offsetHeight;
+}
+
+function applyVisible(el, delay, duration) {
+    el.style.transition =
+        'opacity '   + duration         + 's ' + SPRING + ' ' + delay + 's,' +
+        'transform ' + duration         + 's ' + SPRING + ' ' + delay + 's,' +
+        'filter '    + (duration * 0.7) + 's ' + SPRING + ' ' + delay + 's';
+    el.style.opacity   = '1';
+    el.style.transform = 'translateX(0) translateY(0) scale(1)';
+    el.style.filter    = '';
+}
+
+function animateIn(slide) {
+    var headings  = new Set(slide.querySelectorAll('.slide-heading, h1.typewriter-target'));
+    var allReveal = Array.from(slide.querySelectorAll('.reveal'));
+    var others    = allReveal.filter(function(el){ return !headings.has(el); });
+
+    var counter = 0;
+    others.forEach(function(el) {
+        var type      = getEnterType(el);
+        var isLate    = el.classList.contains('card') || el.classList.contains('timeline-item');
+        var baseDelay = isLate ? 0.234 : 0.078;
+        var step      = isLate ? 0.13  : 0.094;
+        var delay     = baseDelay + counter * step;
+        var dur       = type === 'scale' ? 0.676 :
+                        type === 'pop'   ? 0.585 :
+                        type === 'blur'  ? 0.715 : 0.572;
+        applyHidden(el, type);
+        (function(e, d, du){ requestAnimationFrame(function(){ applyVisible(e, d, du); }); })(el, delay, dur);
+        counter++;
+    });
+
+    slide.querySelectorAll('.slide-heading, h1.typewriter-target').forEach(function(hd) {
+        applyHidden(hd, 'bottom');
+        (function(e){ requestAnimationFrame(function(){ applyVisible(e, 0.026, 0.494); }); })(hd);
+        typewriteHeading(hd);
+    });
+
+    slide.querySelectorAll('.hbar-fill:not(.done)').forEach(function(b, i) {
+        b.classList.add('done');
+        b.style.width = '0%';
+        (function(bar, idx){ setTimeout(function(){ bar.style.width = bar.dataset.width + '%'; }, 364 + idx * 85); })(b, i);
+    });
+    slide.querySelectorAll('.hbar-fill.done').forEach(function(b, i) {
+        var w = b.dataset.width;
+        b.style.transition = 'none'; b.style.width = '0%'; b.offsetHeight;
+        (function(bar, idx, ww){
+            setTimeout(function(){
+                bar.style.transition = 'width 0.75s cubic-bezier(0.16,1,0.3,1)';
+                bar.style.width = ww + '%';
+            }, 364 + idx * 85);
+        })(b, i, w);
+    });
+}
+animateIn(document.querySelector('.slide.active'));
+
+/* ═══════════════════════════════════════════════════
+   THEME TOGGLE
+   ═══════════════════════════════════════════════════ */
+var htmlEl  = document.documentElement;
+/* Read starting theme from the HTML attribute so the button is always in sync */
+var theme   = htmlEl.getAttribute('data-theme') || 'dark';
+var themeBtn = document.getElementById('themeBtn');
+themeBtn.textContent = theme === 'dark' ? '☀️' : '🌙';
+themeBtn.title = theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode';
+
+themeBtn.addEventListener('click', function() {
+    theme = theme === 'dark' ? 'light' : 'dark';
+    htmlEl.setAttribute('data-theme', theme);
+    themeBtn.textContent = theme === 'dark' ? '☀️' : '🌙';
+    themeBtn.title = theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode';
+    var cur = document.querySelector('.slide.active');
+    if (cur) {
+        cur.querySelectorAll('.hbar-fill.done').forEach(function(b){
+            b.style.transition = 'background 0.3s';
+            b.style.width = b.dataset.width + '%';
+        });
+    }
+});
+
+/* ═══════════════════════════════════════════════════
+   MOUSE SPOTLIGHT
+   ═══════════════════════════════════════════════════ */
+document.addEventListener('mousemove', function(e) {
+    document.getElementById('spotlight').style.background =
+        'radial-gradient(580px circle at ' + e.clientX + 'px ' + e.clientY + 'px, var(--glow), transparent 40%)';
+});
+</script>
+</body>
+</html>
